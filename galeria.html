@@ -512,7 +512,7 @@
   let PIECES_ACTIVE = [...PIECES];
   const FULL_PIECES = [...PIECES];
   let N      = PIECES_ACTIVE.length;
-  const RADIUS = 5.6;
+  const RADIUS = 7.6;
   let STEP   = (Math.PI * 2) / N;
 
   /* ════════════════════════════════════════════════
@@ -671,7 +671,7 @@
         texture.anisotropy  = renderer.capabilities.getMaxAnisotropy();
 
         const aspect = texture.image.naturalWidth / texture.image.naturalHeight;
-        const ph = 2.5;
+        const ph = 2.8;
         const pw = Math.min(ph * aspect, 2.2 * ph); // cap wide images
 
         buildFrame(i, x, z, pw, ph, texture, p);
