@@ -569,7 +569,7 @@
       () => {
         // Error — placeholder dark frame
         const geo = new THREE.PlaneGeometry(1.8, 2.5);
-        const mat = new THREE.MeshStandardMaterial({ color: 0x141414 });
+        const mat = new THREE.MeshBasicMaterial({ color: 0x141414, fog: false });
         const grp = new THREE.Group();
         grp.add(new THREE.Mesh(geo, mat));
         grp.position.set(x, 0, z);
@@ -597,9 +597,10 @@
 
     // Image
     const iGeo = new THREE.PlaneGeometry(pw, ph);
-    const iMat = new THREE.MeshStandardMaterial({
-      map: texture, roughness: .82, metalness: 0,
-      transparent: true, opacity: .55
+    const iMat = new THREE.MeshBasicMaterial({
+      map: texture,
+      transparent: false, opacity: 1.0,
+      fog: false
     });
     const img  = new THREE.Mesh(iGeo, iMat);
     img.position.z = .003;
@@ -707,7 +708,7 @@
     // Brightness
     frames.forEach(f => {
       const mat = f.userData.imgMat;
-      if (mat) mat.opacity = f.userData.index === idx ? 1.0 : 0.52;
+      if (mat) mat.opacity = 1.0;
     });
 
     // Show click hint briefly
