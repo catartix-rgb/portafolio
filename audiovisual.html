@@ -147,8 +147,8 @@
       scene = new THREE.Scene();
       scene.fog = new THREE.FogExp2(0x030303, 0.06);
 
-      camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 100);
-      camera.position.set(0, 0, 0);
+      camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 200);
+      camera.position.set(0, 0, 80);
 
       renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
@@ -235,13 +235,13 @@
       });
 
       // Particles
-      const pCount = 1200;
+      const pCount = 2000;
       const pGeo = new THREE.BufferGeometry();
       const pPos = new Float32Array(pCount * 3);
       for(let i=0; i<pCount; i++){
-        pPos[i*3] = (Math.random() - 0.5) * 25;
-        pPos[i*3+1] = (Math.random() - 0.5) * 25;
-        pPos[i*3+2] = (Math.random() - 0.5) * 25;
+        pPos[i*3] = (Math.random() - 0.5) * 30;
+        pPos[i*3+1] = (Math.random() - 0.5) * 30;
+        pPos[i*3+2] = (Math.random() - 0.5) * 120; // Spread along Z for tunnel effect
       }
       pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
       const pMat = new THREE.PointsMaterial({ color: 0xcccccc, size: 0.035, transparent: true, opacity: 0.3 });
@@ -254,6 +254,12 @@
       window.addEventListener('pointermove', onPointerMove);
       window.addEventListener('pointerup', onPointerUp);
       backBtn.addEventListener('click', closeMonolith);
+
+      // Tunnel entrance animation
+      new TWEEN.Tween(camera.position)
+        .to({ x: 0, y: 0, z: 0 }, 4000)
+        .easing(TWEEN.Easing.Cubic.Out)
+        .start();
 
       animate();
     }
