@@ -718,6 +718,7 @@
   let currentRot = 0;   // smoothed current
   let activeIdx  = 0;
   let prevActive = -1;
+  let hoveredIdx = -1; // Added to track which piece is currently hovered
 
   function getIdxFromRot(rot) {
     // When gallery.rotation.y = rot, which piece is at front-center?
@@ -784,7 +785,12 @@
     document.body.classList.remove('cur-drag');
 
     if (totalDelta < 6) {
-      openPanel();
+      if (hoveredIdx !== -1) {
+        navigateTo(hoveredIdx);
+        openPanel(hoveredIdx);
+      } else {
+        openPanel();
+      }
       return;
     }
     // Snap
@@ -845,8 +851,8 @@
   /* ════════════════════════════════════════════════
      DETAIL PANEL
   ════════════════════════════════════════════════ */
-  function openPanel() {
-    const p = PIECES[activeIdx];
+  function openPanel(idx = activeIdx) {
+    const p = PIECES[idx];
     document.getElementById('dp-ghost').textContent = p.num;
     document.getElementById('dp-name').textContent  = p.name;
     document.getElementById('dp-desc').textContent  = p.desc;
@@ -956,7 +962,7 @@
     /* — Raycasting for hover (linterna effect) — */
     raycaster.setFromCamera(mouseNorm, camera);
     const intersects = raycaster.intersectObjects(gallery.children, true);
-    let hoveredIdx = -1;
+    hoveredIdx = -1; // Reset global
     if (mouseActive && intersects.length > 0) {
       let obj = intersects[0].object;
       while (obj && obj.parent && obj.userData.index === undefined) {
