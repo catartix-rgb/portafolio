@@ -592,44 +592,116 @@
     }
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-       MARQUEE STRIP
+       SCOREBOARD / LED TICKER
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&display=swap');
+
     .marquee-wrap {
-      background: #D12B2B;
-      color: #EDECEA;
+      position: relative;
+      background: #000;
       overflow: hidden;
-      border-bottom: 1px solid #B72222;
+      border-top: 1px solid #1a0000;
+      border-bottom: 1px solid #1a0000;
       padding: 0;
+      /* CRT scanlines overlay */
+    }
+
+    /* Scanline effect */
+    .marquee-wrap::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.28) 2px,
+        rgba(0,0,0,0.28) 4px
+      );
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* Side fade masks */
+    .marquee-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        90deg,
+        #000 0%,
+        transparent 4%,
+        transparent 96%,
+        #000 100%
+      );
+      pointer-events: none;
+      z-index: 3;
     }
 
     .marquee-track {
       display: flex;
       white-space: nowrap;
-      animation: slide 22s linear infinite;
+      /* Slightly faster, more mechanical feel */
+      animation: scoreTick 28s linear infinite;
+      position: relative;
+      z-index: 1;
     }
 
     .m-item {
       display: inline-flex;
       align-items: center;
-      font-size: clamp(12px, 1.4vw, 16px);
-      font-weight: 400;
-      letter-spacing: 0.16em;
+      font-family: 'Orbitron', 'Courier New', monospace;
+      font-size: clamp(10px, 1.1vw, 13px);
+      font-weight: 600;
+      letter-spacing: 0.22em;
       text-transform: uppercase;
-      padding: 20px 0;
+      padding: 18px 0;
       flex-shrink: 0;
+      color: #FF2800;
+      text-shadow:
+        0 0 6px rgba(255, 40, 0, 0.9),
+        0 0 18px rgba(255, 40, 0, 0.5),
+        0 0 40px rgba(255, 40, 0, 0.25);
+      animation: ledFlicker 8s ease-in-out infinite;
     }
 
+    /* Amber-colored accent items */
+    .m-item.amber {
+      color: #FF9500;
+      text-shadow:
+        0 0 6px rgba(255, 149, 0, 0.9),
+        0 0 18px rgba(255, 149, 0, 0.5),
+        0 0 40px rgba(255, 149, 0, 0.2);
+    }
+
+    .m-item.dim {
+      color: #8B1500;
+      text-shadow: 0 0 4px rgba(255, 40, 0, 0.3);
+      animation: none;
+    }
+
+    /* Separator — vertical bar like scoreboard */
     .m-sep {
-      display: inline-block;
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: currentColor;
-      margin: 0 36px;
-      opacity: 0.5;
+      display: inline-flex;
+      align-items: center;
+      margin: 0 28px;
+      color: #400000;
+      text-shadow: none;
+      font-size: 16px;
+      animation: none;
     }
 
-    @keyframes slide {
+    /* LED digit flicker — subtle, not distracting */
+    @keyframes ledFlicker {
+      0%, 94%, 100% { opacity: 1; }
+      95% { opacity: 0.88; }
+      96% { opacity: 1; }
+      97% { opacity: 0.92; }
+      98% { opacity: 1; }
+    }
+
+    /* Mechanical step-scroll feel via steps */
+    @keyframes scoreTick {
       0%   { transform: translateX(0); }
       100% { transform: translateX(-50%); }
     }
@@ -1178,25 +1250,35 @@
     </div>
   </section>
 
-  <!-- ━━━━━━━━━━━━━━ MARQUEE ━━━━━━━━━━━━━━ -->
-  <div class="marquee-wrap">
+  <!-- ━━━━━━━━━━━━━━ SCOREBOARD TICKER ━━━━━━━━━━━━━━ -->
+  <div class="marquee-wrap" role="marquee" aria-label="Live feed">
     <div class="marquee-track" aria-hidden="true">
       <!-- Set 1 -->
-      <span class="m-item">Diseño<span class="m-sep"></span></span>
-      <span class="m-item">Juan Pablo Castro Casillas<span class="m-sep"></span></span>
-      <span class="m-item">Lo imperfecto es lo más real<span class="m-sep"></span></span>
-      <span class="m-item">Identidad Visual<span class="m-sep"></span></span>
-      <span class="m-item">Experiencia Digital<span class="m-sep"></span></span>
-      <span class="m-item">Diseñador<span class="m-sep"></span></span>
-      <span class="m-item">Arte &amp; Dirección<span class="m-sep"></span></span>
+      <span class="m-item amber">LIVE<span class="m-sep">◈</span></span>
+      <span class="m-item">SIGNAL DETECTED<span class="m-sep">◈</span></span>
+      <span class="m-item dim">19.4319° N  99.1331° W<span class="m-sep">◈</span></span>
+      <span class="m-item amber">JPCC — DISEÑADOR VISUAL<span class="m-sep">◈</span></span>
+      <span class="m-item">AUDIO INPUT ACTIVE<span class="m-sep">◈</span></span>
+      <span class="m-item dim">BPM 128 ▸ FREQ 440 Hz<span class="m-sep">◈</span></span>
+      <span class="m-item">IDENTIDAD VISUAL &amp; EXPERIENCIA DIGITAL<span class="m-sep">◈</span></span>
+      <span class="m-item amber">360° INMERSIVE MODE<span class="m-sep">◈</span></span>
+      <span class="m-item dim">MXC-26 / REF:2025-JPX<span class="m-sep">◈</span></span>
+      <span class="m-item">ARTE &amp; DIRECCIÓN CREATIVA<span class="m-sep">◈</span></span>
+      <span class="m-item amber">PORTAFOLIO — EDICIÓN 2025<span class="m-sep">◈</span></span>
+      <span class="m-item dim">SYS:OK ▸ NET:ON ▸ DSP:READY<span class="m-sep">◈</span></span>
       <!-- Set 2 (duplicate for seamless loop) -->
-      <span class="m-item">Diseño<span class="m-sep"></span></span>
-      <span class="m-item">Juan Pablo Castro Casillas<span class="m-sep"></span></span>
-      <span class="m-item">Lo imperfecto es lo más real<span class="m-sep"></span></span>
-      <span class="m-item">Identidad Visual<span class="m-sep"></span></span>
-      <span class="m-item">Experiencia Digital<span class="m-sep"></span></span>
-      <span class="m-item">Diseñador<span class="m-sep"></span></span>
-      <span class="m-item">Arte &amp; Dirección<span class="m-sep"></span></span>
+      <span class="m-item amber">LIVE<span class="m-sep">◈</span></span>
+      <span class="m-item">SIGNAL DETECTED<span class="m-sep">◈</span></span>
+      <span class="m-item dim">19.4319° N  99.1331° W<span class="m-sep">◈</span></span>
+      <span class="m-item amber">JPCC — DISEÑADOR VISUAL<span class="m-sep">◈</span></span>
+      <span class="m-item">AUDIO INPUT ACTIVE<span class="m-sep">◈</span></span>
+      <span class="m-item dim">BPM 128 ▸ FREQ 440 Hz<span class="m-sep">◈</span></span>
+      <span class="m-item">IDENTIDAD VISUAL &amp; EXPERIENCIA DIGITAL<span class="m-sep">◈</span></span>
+      <span class="m-item amber">360° INMERSIVE MODE<span class="m-sep">◈</span></span>
+      <span class="m-item dim">MXC-26 / REF:2025-JPX<span class="m-sep">◈</span></span>
+      <span class="m-item">ARTE &amp; DIRECCIÓN CREATIVA<span class="m-sep">◈</span></span>
+      <span class="m-item amber">PORTAFOLIO — EDICIÓN 2025<span class="m-sep">◈</span></span>
+      <span class="m-item dim">SYS:OK ▸ NET:ON ▸ DSP:READY<span class="m-sep">◈</span></span>
     </div>
   </div>
 

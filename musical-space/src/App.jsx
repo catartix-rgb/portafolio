@@ -15,12 +15,12 @@ export default function App() {
     return () => analyzerRef.current?.destroy()
   }, [])
 
-  // Generate new random visual config
   const randomize = useCallback(() => {
     setConfig(generateVisualConfig())
   }, [])
 
-  async function handleFile(file) {
+  // Load audio file — used for both initial load AND song replacement
+  async function loadAudio(file) {
     setError('')
     analyzerRef.current?.destroy()
     analyzerRef.current = null
@@ -29,9 +29,7 @@ export default function App() {
     try {
       await az.load(file)
       analyzerRef.current = az
-      // Generate fresh random visuals on each new song
-      setConfig(generateVisualConfig())
-      setScreen('space')
+      return true
     } catch (err) {
       console.error('[AudioAnalyzer]', err)
       az.destroy()
@@ -39,6 +37,25 @@ export default function App() {
         ? 'El navegador bloqueó el audio. Haz clic en la página primero.'
         : 'No se pudo cargar. Prueba MP3, WAV u OGG.'
       setError(msg)
+      return false
+    }
+  }
+
+  // Initial file load → enter space
+  async function handleFile(file) {
+    const ok = await loadAudio(file)
+    if (ok) {
+      setConfig(generateVisualConfig())
+      setScreen('space')
+    }
+  }
+
+  // Replace song while staying in space (no page reload)
+  async function handleNewFile(file) {
+    const ok = await loadAudio(file)
+    if (ok) {
+      // Fresh random visuals for the new track
+      setConfig(generateVisualConfig())
     }
   }
 
@@ -52,6 +69,7 @@ export default function App() {
           analyzer={analyzerRef.current}
           config={config}
           onRandomize={randomize}
+          onNewFile={handleNewFile}
         />
       )}
     </>

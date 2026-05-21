@@ -1,11 +1,17 @@
 import { useRef, useState, useEffect } from 'react'
 import styles from './UploadZone.module.css'
 
+const NAV_LINKS = [
+  { label: 'Portafolio',    href: '../../index.html' },
+  { label: 'Galería 3D',    href: '../../galeria.html' },
+  { label: 'Audiovisual',   href: '../../audiovisual.html' },
+]
+
 export default function UploadZone({ onFile, error }) {
-  const inputRef  = useRef()
-  const [hover, setHover]     = useState(false)
-  const [ready, setReady]     = useState(false)
-  const [loading, setLoading] = useState(false)
+  const inputRef      = useRef()
+  const [hover,    setHover]   = useState(false)
+  const [ready,    setReady]   = useState(false)
+  const [loading,  setLoading] = useState(false)
 
   useEffect(() => {
     const t = setTimeout(() => setReady(true), 80)
@@ -14,14 +20,10 @@ export default function UploadZone({ onFile, error }) {
 
   async function handleFile(file) {
     if (!file) return
-
-    // Accept by MIME type OR file extension (some browsers report wrong MIME)
     const validMime = file.type.startsWith('audio/')
     const validExt  = /\.(mp3|wav|flac|ogg|aac|m4a|opus|weba|webm)$/i.test(file.name)
     if (!validMime && !validExt) return
-
     setLoading(true)
-    // Call parent immediately — the user gesture context is still active
     await onFile(file)
     setLoading(false)
   }
@@ -32,18 +34,12 @@ export default function UploadZone({ onFile, error }) {
     handleFile(e.dataTransfer.files[0])
   }
 
-  function onDragOver(e) {
-    e.preventDefault()
-    setHover(true)
-  }
-
   return (
     <div
       className={`${styles.root} ${ready ? styles.visible : ''}`}
       onDrop={onDrop}
-      onDragOver={onDragOver}
+      onDragOver={e => { e.preventDefault(); setHover(true) }}
       onDragLeave={() => setHover(false)}
-      onClick={() => !loading && inputRef.current.click()}
     >
       {/* Corner marks */}
       <span className={`${styles.corner} ${styles.tl}`} />
@@ -51,23 +47,51 @@ export default function UploadZone({ onFile, error }) {
       <span className={`${styles.corner} ${styles.bl}`} />
       <span className={`${styles.corner} ${styles.br}`} />
 
+      {/* Top navigation */}
+      <nav className={styles.topNav}>
+        {NAV_LINKS.map(l => (
+          <a key={l.href} href={l.href} className={styles.navLink}>
+            {l.label}
+          </a>
+        ))}
+        <span className={styles.navActive}>Música 3D</span>
+      </nav>
+
+      {/* Main content — centered */}
       <div className={styles.inner}>
-        <p className={styles.eyebrow}>JPCC · Espacio Musical Inmersivo</p>
+        <p className={styles.eyebrow}>
+          <span className={styles.dot} />
+          Espacio Musical Inmersivo
+        </p>
 
         <h1 className={styles.headline}>
           Sube tu música.<br />
           <span className={styles.accent}>Entra dentro.</span>
         </h1>
 
-        <div className={`${styles.dropZone} ${hover ? styles.hovering : ''} ${loading ? styles.loading : ''}`}>
+        {/* Drop zone */}
+        <div
+          className={`${styles.dropZone} ${hover ? styles.hovering : ''} ${loading ? styles.loading : ''}`}
+          onClick={() => !loading && inputRef.current.click()}
+        >
           {loading ? (
-            <p className={styles.dropLabel}>Cargando…</p>
+            <div className={styles.loadingInner}>
+              <div className={styles.loadingBar} />
+              <p className={styles.dropLabel}>Cargando…</p>
+            </div>
           ) : (
             <>
+              <div className={styles.uploadIcon}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
+                  <polyline points="16 16 12 12 8 16"/>
+                  <line x1="12" y1="12" x2="12" y2="21"/>
+                  <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+                </svg>
+              </div>
               <p className={styles.dropLabel}>
                 {hover ? 'Suelta aquí' : 'Arrastra un archivo de audio'}
               </p>
-              <p className={styles.dropSub}>o haz clic en cualquier parte</p>
+              <p className={styles.dropSub}>o haz clic para seleccionar</p>
             </>
           )}
         </div>
@@ -77,10 +101,17 @@ export default function UploadZone({ onFile, error }) {
         <p className={styles.formats}>MP3 · WAV · FLAC · OGG · AAC · M4A</p>
       </div>
 
+      {/* Bottom system label */}
+      <div className={styles.systemBar}>
+        <span>SYS:READY</span>
+        <span>◈</span>
+        <span>DSP v1.0</span>
+        <span>◈</span>
+        <span>VISUAL ENGINE ONLINE</span>
+      </div>
+
       <input
-        ref={inputRef}
-        type="file"
-        accept="audio/*"
+        ref={inputRef} type="file" accept="audio/*"
         style={{ display: 'none' }}
         onChange={e => handleFile(e.target.files[0])}
       />

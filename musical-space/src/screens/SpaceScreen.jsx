@@ -4,20 +4,21 @@ import OscilloscopeScreen   from '../visual/OscilloscopeScreen'
 import NavBar               from '../ui/NavBar'
 import AudioInfo            from '../ui/AudioInfo'
 import AudioControls        from '../ui/AudioControls'
+import MiniPlayer           from '../ui/MiniPlayer'
 import styles               from './SpaceScreen.module.css'
 
-export default function SpaceScreen({ analyzer, config, onRandomize }) {
+export default function SpaceScreen({ analyzer, config, onRandomize, onNewFile }) {
   const audioRef = useRef({
     bass: 0, mids: 0, highs: 0,
     subBass: 0, lowMids: 0, presence: 0,
     amplitude: 0, bpm: 0,
   })
 
-  const [bpm, setBpm]       = useState(0)
+  const [bpm, setBpm]         = useState(0)
   const [fileName, setFileName] = useState('')
-  const [mode, setMode]     = useState('immersive') // 'immersive' | 'oscilloscope'
+  const [mode, setMode]       = useState('immersive')
 
-  // File name
+  // File name from analyzer
   useEffect(() => {
     if (!analyzer) return
     setFileName(analyzer.fileName.replace(/\.[^.]+$/, '').slice(0, 48))
@@ -52,20 +53,22 @@ export default function SpaceScreen({ analyzer, config, onRandomize }) {
     <div className={styles.root}>
       <NavBar />
 
-      {/* 3D immersive */}
       {mode === 'immersive' && (
         <ImmersiveCanvas audioRef={audioRef} config={config} />
       )}
-
-      {/* Oscilloscope */}
       {mode === 'oscilloscope' && (
         <OscilloscopeScreen analyzer={analyzer} />
       )}
 
-      {/* Overlay UI — always visible */}
-      {mode === 'immersive' && (
-        <AudioInfo fileName={fileName} bpm={bpm} visible={true} />
-      )}
+      {/* Mini Player — always visible, bottom right */}
+      <MiniPlayer
+        analyzer={analyzer}
+        fileName={fileName}
+        bpm={bpm}
+        onNewFile={onNewFile}
+      />
+
+      {/* Bottom center controls */}
       <AudioControls
         analyzer={analyzer}
         visible={true}
