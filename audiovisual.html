@@ -297,15 +297,6 @@
         mesh.position.set(Math.sin(angle) * radius, (Math.random() - 0.5) * 1.5, -Math.cos(angle) * radius);
         mesh.lookAt(0, mesh.position.y, 0);
 
-        /* Frame */
-        const frameMat  = new THREE.MeshStandardMaterial({ color: 0x080808, roughness: 0.85, metalness: 0.3 });
-        const frameMesh = new THREE.Mesh(new THREE.BoxGeometry(w + 0.12, h + 0.12, 0.28), frameMat);
-        frameMesh.position.copy(mesh.position);
-        frameMesh.rotation.copy(mesh.rotation);
-        frameMesh.position.z -= 0.14 * Math.cos(angle);
-        frameMesh.position.x += 0.14 * Math.sin(angle);
-        scene.add(frameMesh);
-
         /* Dynamic aspect ratio */
         video.addEventListener('loadedmetadata', () => {
           const aspect = video.videoWidth / video.videoHeight || 16/9;
@@ -314,8 +305,6 @@
           else             { rH = 4.2; rW = rH * aspect; }
           mesh.geometry.dispose();
           mesh.geometry = new THREE.PlaneGeometry(rW, rH);
-          frameMesh.geometry.dispose();
-          frameMesh.geometry = new THREE.BoxGeometry(rW + 0.12, rH + 0.12, 0.28);
         });
 
         /* Spatial audio */
