@@ -595,7 +595,7 @@
   const ldLabel  = document.getElementById('ld-label');
 
   PIECES.forEach((p, i) => {
-    const angle = i * STEP;
+    const angle = -i * STEP;
     const x     = Math.sin(angle) * RADIUS;
     const z     = -Math.cos(angle) * RADIUS;  // piece 0 directly in front (-Z)
 
@@ -727,16 +727,12 @@
 
   function getIdxFromRot(rot) {
     // When gallery.rotation.y = rot, which piece is at front-center?
-    // Piece i is at angle i*STEP in gallery local space.
-    // After gallery.rotation.y = rot, piece i is at world angle i*STEP + rot.
-    // For piece i to be at front (angle 0): rot ≈ -i*STEP
-    // Active: i = round(-rot / STEP)
-    let a = ((-rot) / STEP);
+    let a = (rot / STEP);
     return ((Math.round(a) % N) + N) % N;
   }
 
   function navigateTo(idx) {
-    const target     = -idx * STEP;
+    const target     = idx * STEP;
     const raw        = target - currentRot;
     const normalized = ((raw % (Math.PI * 2)) + Math.PI * 3) % (Math.PI * 2) - Math.PI;
     targetRot = currentRot + normalized;
