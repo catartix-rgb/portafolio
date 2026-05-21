@@ -229,11 +229,6 @@
       max-width: 100%; max-height: 100%;
       border-radius: 2px;
       box-shadow: 0 24px 64px rgba(0,0,0,0.5);
-      transition: transform 0.15s ease-out;
-    }
-    #large-view img:hover {
-      transform: scale(2.4);
-      cursor: zoom-in;
     }
 
     @media (max-width: 768px) {
@@ -903,15 +898,10 @@
   document.getElementById('dp-close').addEventListener('mouseenter', () => document.body.classList.add('cur-active'));
   document.getElementById('dp-close').addEventListener('mouseleave', () => document.body.classList.remove('cur-active'));
 
-  const lvImg = document.getElementById('lv-img');
-  lvImg.addEventListener('mousemove', e => {
-    const rect = lvImg.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    lvImg.style.transformOrigin = `${x}% ${y}%`;
-  });
-  lvImg.addEventListener('mouseleave', () => {
-    lvImg.style.transformOrigin = 'center center';
+  document.getElementById('large-view').addEventListener('click', e => {
+    if (e.target.id === 'large-view') {
+      closePanel();
+    }
   });
 
   /* ════════════════════════════════════════════════
