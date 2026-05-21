@@ -6,29 +6,41 @@ import './App.css'
 
 export default function App() {
   const [screen, setScreen] = useState('upload') // 'upload' | 'space'
+  const [error,  setError]  = useState('')
   const analyzerRef = useRef(null)
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => analyzerRef.current?.destroy()
   }, [])
 
   async function handleFile(file) {
-    // Destroy previous session if any
+    setError('')
+
+    // Destroy previous session
     analyzerRef.current?.destroy()
-    analyzerRef.current = new AudioAnalyzer()
+    analyzerRef.current = null
+
+    const az = new AudioAnalyzer()
     try {
-      await analyzerRef.current.load(file)
+      await az.load(file)
+      analyzerRef.current = az
       setScreen('space')
     } catch (err) {
-      console.error('Audio load failed:', err)
+      console.error('[AudioAnalyzer] Load error:', err)
+      az.destroy()
+
+      // Give a human-readable error
+      const msg = err?.name === 'NotAllowedError'
+        ? 'El navegador bloqueó el audio. Haz clic en la página primero.'
+        : 'No se pudo cargar el archivo. Prueba MP3, WAV u OGG.'
+      setError(msg)
     }
   }
 
   return (
     <>
       {screen === 'upload' && (
-        <UploadZone onFile={handleFile} />
+        <UploadZone onFile={handleFile} error={error} />
       )}
       {screen === 'space' && (
         <SpaceScreen analyzer={analyzerRef.current} />

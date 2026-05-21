@@ -1,40 +1,40 @@
 import { useRef, useState, useEffect } from 'react'
 import ImmersiveCanvas from '../three/ImmersiveCanvas'
-import NavBar    from '../ui/NavBar'
-import AudioInfo from '../ui/AudioInfo'
-import { useAudioData } from '../audio/useAudioData'
-import { Canvas }       from '@react-three/fiber'
-import styles from './SpaceScreen.module.css'
-
-// We need the audioRef to be accessible outside R3F Canvas
-// So we create a shared ref at this level
+import NavBar         from '../ui/NavBar'
+import AudioInfo      from '../ui/AudioInfo'
+import AudioControls  from '../ui/AudioControls'
+import styles         from './SpaceScreen.module.css'
 
 export default function SpaceScreen({ analyzer }) {
+  // Shared ref: updated by rAF loop, read by R3F useFrame in every 3D component
   const audioRef = useRef({
     bass: 0, mids: 0, highs: 0,
     subBass: 0, lowMids: 0, presence: 0,
     amplitude: 0, bpm: 0,
   })
 
-  const [bpm, setBpm] = useState(0)
+  const [bpm, setBpm]       = useState(0)
   const [fileName, setFileName] = useState('')
-  const [ready, setReady] = useState(false)
+  const [ready, setReady]   = useState(false)
 
   // Fade in
   useEffect(() => {
-    const t = setTimeout(() => setReady(true), 100)
+    const t = setTimeout(() => setReady(true), 80)
     return () => clearTimeout(t)
   }, [])
 
-  // Poll audio data outside R3F for UI display (low rate)
+  // Resolve file name once
   useEffect(() => {
     if (!analyzer) return
-    setFileName(analyzer.audio?.src
-      ? decodeURIComponent(analyzer.audio.src.split('/').pop()).replace(/\.[^.]+$/, '')
-      : '')
+    const raw = analyzer.fileName
+    setFileName(raw.replace(/\.[^.]+$/, '').slice(0, 48))
+  }, [analyzer])
 
+  // Animation loop: update analyzer + fill audioRef every frame
+  useEffect(() => {
+    if (!analyzer) return
     let raf
-    const poll = () => {
+    const tick = () => {
       analyzer.update()
       const b = analyzer.bands
       audioRef.current.bass      = b.bass
@@ -46,13 +46,13 @@ export default function SpaceScreen({ analyzer }) {
       audioRef.current.amplitude = analyzer.amplitude
       audioRef.current.bpm       = analyzer.bpm
 
-      // Update BPM display at low rate
-      setBpm(prev => analyzer.bpm > 0 && Math.abs(analyzer.bpm - prev) > 2
-        ? analyzer.bpm : prev)
-
-      raf = requestAnimationFrame(poll)
+      // Update BPM display only on meaningful change
+      if (analyzer.bpm > 30) {
+        setBpm(p => Math.abs(analyzer.bpm - p) > 3 ? analyzer.bpm : p)
+      }
+      raf = requestAnimationFrame(tick)
     }
-    raf = requestAnimationFrame(poll)
+    raf = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf)
   }, [analyzer])
 
@@ -61,6 +61,7 @@ export default function SpaceScreen({ analyzer }) {
       <NavBar />
       <ImmersiveCanvas audioRef={audioRef} />
       <AudioInfo fileName={fileName} bpm={bpm} visible={ready} />
+      <AudioControls analyzer={analyzer} visible={ready} />
     </div>
   )
 }

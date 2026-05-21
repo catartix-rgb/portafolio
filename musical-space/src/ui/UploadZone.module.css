@@ -104,6 +104,20 @@
   text-transform: uppercase;
 }
 
+.loading {
+  border-color: rgba(201, 168, 76, 0.6) !important;
+  background: rgba(201, 168, 76, 0.06) !important;
+}
+
+.errorMsg {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  color: rgba(255, 100, 100, 0.75);
+  letter-spacing: 0.06em;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
 @media (max-width: 600px) {
   .tl, .tr, .bl, .br { display: none; }
   .dropZone { padding: 24px 32px; min-width: 0; width: 80vw; }
