@@ -648,7 +648,8 @@
       map: texture,
       roughness: 0.8,
       metalness: 0.1,
-      transparent: false,
+      transparent: true,
+      opacity: 0.3,
     });
     const img  = new THREE.Mesh(iGeo, iMat);
     img.position.z = .003;
@@ -894,9 +895,10 @@
   const curRing = document.getElementById('cur-ring');
   let cmx = -100, cmy = -100, cdx = -100, cdy = -100;
   
-  // Normalized mouse coords for flashlight
-  const mouseNorm = new THREE.Vector2(0, 0);
+  // Normalized mouse coords for flashlight & raycasting
+  const mouseNorm = new THREE.Vector2(-100, -100);
   let mouseActive = false;
+  const raycaster = new THREE.Raycaster();
 
   document.addEventListener('mousemove', e => {
     cmx = e.clientX; cmy = e.clientY;
@@ -959,13 +961,33 @@
     camera.getWorldPosition(camWP);
     frames.forEach(f => f.lookAt(camWP));
 
-    /* — Active piece subtle scale pulse — */
+    /* — Raycasting for hover (linterna effect) — */
+    raycaster.setFromCamera(mouseNorm, camera);
+    const intersects = raycaster.intersectObjects(gallery.children, true);
+    let hoveredIdx = -1;
+    if (mouseActive && intersects.length > 0) {
+      let obj = intersects[0].object;
+      while (obj && obj.parent && obj.userData.index === undefined) {
+        obj = obj.parent;
+      }
+      if (obj && obj.userData.index !== undefined) {
+        hoveredIdx = obj.userData.index;
+      }
+    }
+
+    /* — Active piece subtle scale pulse & Hover opacity — */
     frames.forEach(f => {
       const isAct   = f.userData.index === activeIdx;
+      const isHov   = f.userData.index === hoveredIdx;
       const tgt     = isAct ? 1.045 : 1.0;
       f.scale.x     += (tgt - f.scale.x) * .055;
       f.scale.y     += (tgt - f.scale.y) * .055;
       f.scale.z     += (tgt - f.scale.z) * .055;
+
+      if (f.userData.imgMat) {
+        const tgtOpac = isHov ? 1.0 : 0.3;
+        f.userData.imgMat.opacity += (tgtOpac - f.userData.imgMat.opacity) * 0.1;
+      }
     });
 
     /* — Flashlight effect — */
