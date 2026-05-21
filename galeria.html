@@ -237,7 +237,49 @@
       box-shadow: 0 24px 64px rgba(0,0,0,0.5);
     }
 
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       FILTERS
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .gal-filters {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      z-index: 600;
+      pointer-events: auto;
+      overflow-x: auto;
+      max-width: 90vw;
+      padding-bottom: 8px;
+    }
+    .gal-filters::-webkit-scrollbar { display: none; }
+    .gal-filters { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .filter-pill {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(237,236,234,0.6);
+      padding: 8px 16px;
+      border-radius: 40px;
+      font-size: 10.5px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.25s ease;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .filter-pill:hover, .filter-pill.active {
+      background: rgba(237,236,234,0.9);
+      color: #080808;
+      border-color: rgba(237,236,234,0.9);
+    }
+    
     @media (max-width: 768px) {
+      .gal-filters { bottom: 20px; justify-content: flex-start; }
       .gal-nav { padding: 18px 24px; }
       #gal-index { display: none; }
       #drag-hint { right: 24px; bottom: 30px; }
@@ -345,6 +387,17 @@
 
   <!-- Canvas 3D -->
   <canvas id="three-canvas"></canvas>
+
+  <!-- Filters -->
+  <div class="gal-filters" id="gal-filters">
+    <button class="filter-pill active" data-filter="all">Todos</button>
+    <button class="filter-pill" data-filter="Identidad">Identidad</button>
+    <button class="filter-pill" data-filter="Editorial">Editorial</button>
+    <button class="filter-pill" data-filter="UX/UI">UX/UI</button>
+    <button class="filter-pill" data-filter="Fotografía">Fotografía</button>
+    <button class="filter-pill" data-filter="2024">2024</button>
+    <button class="filter-pill" data-filter="2025">2025</button>
+  </div>
 
   <!-- Nav -->
   <nav class="gal-nav">
@@ -628,8 +681,9 @@
         const grp = new THREE.Group();
         grp.add(new THREE.Mesh(geo, mat));
         grp.position.set(x, 0, z);
-        grp.userData = { index: i, data: p, imgMat: mat };
+        grp.userData = { index: i, data: p, imgMat: mat, activeIndex: i };
         gallery.add(grp);
+        allFrames.push(grp);
         frames.push(grp);
         onFrameLoaded();
       }
@@ -685,9 +739,10 @@
 
     grp.add(shadow, frame, img, strip, pin, wire);
     grp.position.set(x, 0, z);
-    grp.userData = { index: i, data: p, imgMat: iMat };
-    gallery.add(grp);
-    frames.push(grp);
+    grp.userData = { index: i, data: p, imgMat: iMat, activeIndex: i };
+        gallery.add(grp);
+        allFrames.push(grp);
+        frames.push(grp);
   }
 
   function onFrameLoaded() {
@@ -700,6 +755,57 @@
   /* ════════════════════════════════════════════════
      ALL LOADED
   ════════════════════════════════════════════════ */
+  function setFilter(filterVal) {
+    frames = allFrames.filter(f => {
+      if (filterVal === 'all') return true;
+      const d = f.userData.data;
+      if (filterVal === '2024' || filterVal === '2025') return d.year === filterVal;
+      return (d.cat && d.cat.includes(filterVal)) || (d.disc && d.disc.includes(filterVal));
+    });
+
+    PIECES_ACTIVE = frames.map(f => f.userData.data);
+
+    allFrames.forEach(f => gallery.remove(f));
+
+    N = frames.length;
+    if (N === 0) return;
+    STEP = (Math.PI * 2) / N;
+
+    frames.forEach((f, i) => {
+      const angle = -i * STEP;
+      const x = Math.sin(angle) * RADIUS;
+      const z = -Math.cos(angle) * RADIUS;
+      f.position.set(x, 0, z);
+      f.userData.activeIndex = i;
+      gallery.add(f);
+    });
+    
+    const indexEl = document.getElementById('gal-index');
+    indexEl.innerHTML = '';
+    frames.forEach((_, i) => {
+      const d = document.createElement('div');
+      d.className = 'gi-dot';
+      d.addEventListener('click', () => navigateTo(i));
+      indexEl.appendChild(d);
+    });
+
+    currentRot = 0;
+    targetRot = 0;
+    activeIdx = 0;
+    prevActive = -1;
+    gallery.rotation.y = 0;
+    
+    updateActive(0);
+  }
+
+  document.querySelectorAll('.filter-pill').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      setFilter(e.target.dataset.filter);
+    });
+  });
+
   function onAllLoaded() {
     // Short delay then fade loading
     setTimeout(() => {
@@ -709,7 +815,7 @@
 
     // Build side dots
     const indexEl = document.getElementById('gal-index');
-    PIECES.forEach((_, i) => {
+    PIECES_ACTIVE.forEach((_, i) => {
       const d = document.createElement('div');
       d.className = 'gi-dot';
       d.addEventListener('click', () => navigateTo(i));
@@ -808,7 +914,7 @@
       if (intersects.length > 0) {
         let obj = intersects[0].object;
         while (obj && obj.parent && obj.userData.index === undefined) obj = obj.parent;
-        if (obj && obj.userData.index !== undefined) clickedIdx = obj.userData.index;
+        if (obj && obj.userData.activeIndex !== undefined) clickedIdx = obj.userData.activeIndex;
       }
 
       if (clickedIdx !== -1) {
@@ -857,7 +963,7 @@
       if (intersects.length > 0) {
         let obj = intersects[0].object;
         while (obj && obj.parent && obj.userData.index === undefined) obj = obj.parent;
-        if (obj && obj.userData.index !== undefined) clickedIdx = obj.userData.index;
+        if (obj && obj.userData.activeIndex !== undefined) clickedIdx = obj.userData.activeIndex;
       }
       if (clickedIdx !== -1) {
         navigateTo(clickedIdx);
