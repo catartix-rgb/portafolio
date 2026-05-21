@@ -987,6 +987,10 @@
         }
       }
 
+      setTrack(index) {
+        this.updateTrackSettings();
+      }
+
       scheduler() {
         while (this.nextNoteTime < this.audioCtx.currentTime + 0.12) {
           this.scheduleNote(this.currentStep, this.nextNoteTime);
@@ -1747,6 +1751,10 @@
           
           loadProgress = (loadedCount / tracks.length) * 100;
           progressFill.style.width = loadProgress + '%';
+
+          if (index === currentTrackIndex) {
+            updateSelectedTrackUI(currentTrackIndex);
+          }
 
           if (loadedCount === tracks.length) {
             // Assets ready
