@@ -343,8 +343,23 @@
       overflow: visible;
     }
 
-    .castro-flicker {
+    .castro-wrapper {
+      position: relative;
       display: inline-block;
+    }
+
+    .castro-static {
+      opacity: 0;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .castro-flicker {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: inline-block;
+      white-space: nowrap;
       transition: color 0.15s var(--ease), transform 0.15s var(--ease);
       transform-origin: center center;
     }
@@ -1012,7 +1027,7 @@
       <h1 class="hero-name" id="hero-name" aria-label="Juan Pablo Castro Casillas">
         <span class="word"><span class="word-inner">Juan</span></span>
         <span class="word"><span class="word-inner">Pablo</span></span>
-        <span class="word"><span class="word-inner"><span class="castro-flicker">Castro</span></span></span>
+        <span class="word"><span class="word-inner"><span class="castro-wrapper"><span class="castro-static">Castro</span><span class="castro-flicker">Castro</span></span></span></span>
         <span class="word"><span class="word-inner">Casillas</span></span>
       </h1>
 
