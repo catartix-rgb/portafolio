@@ -188,9 +188,9 @@
         const texture = new THREE.VideoTexture(video);
         texture.colorSpace = THREE.SRGBColorSpace;
         
-        const aspect = 16 / 9;
-        const w = 4.2;
-        const h = w / aspect;
+        let initialAspect = 16 / 9;
+        let w = 4.2;
+        let h = w / initialAspect;
 
         const geo = new THREE.PlaneGeometry(w, h);
         const mat = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
@@ -212,6 +212,25 @@
         frame.position.z -= 0.16 * Math.cos(angle);
         frame.position.x += 0.16 * Math.sin(angle);
         scene.add(frame);
+        
+        // Dynamically adjust to true aspect ratio once metadata loads
+        video.addEventListener('loadedmetadata', () => {
+          const aspect = video.videoWidth / video.videoHeight || 16/9;
+          let realW, realH;
+          if (aspect >= 1) { // Landscape or square
+             realW = 4.2;
+             realH = realW / aspect;
+          } else { // Portrait / Vertical
+             realH = 4.2; // constrain height instead
+             realW = realH * aspect;
+          }
+          
+          mesh.geometry.dispose();
+          mesh.geometry = new THREE.PlaneGeometry(realW, realH);
+          
+          frame.geometry.dispose();
+          frame.geometry = new THREE.BoxGeometry(realW + 0.1, realH + 0.1, 0.3);
+        });
 
         // Spatial Audio
         const sound = new THREE.PositionalAudio(audioListener);
