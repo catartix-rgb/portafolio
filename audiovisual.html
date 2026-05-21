@@ -76,6 +76,17 @@
       position: fixed; bottom: 40px; right: 40px; font-size: 10px; letter-spacing: 0.1em;
       text-transform: uppercase; color: rgba(255,255,255,0.4); z-index: 500;
     }
+
+    #mute-btn {
+      position: fixed; top: 24px; right: 32px; z-index: 600;
+      background: transparent; border: 1px solid rgba(255,255,255,0.25); color: white;
+      width: 38px; height: 38px; border-radius: 50%; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; transition: all 0.3s; opacity: 0;
+    }
+    #mute-btn.show { opacity: 1; }
+    #mute-btn:hover { background: white; color: black; }
+    #mute-btn.muted { border-color: rgba(255,80,80,0.6); color: rgba(255,80,80,0.9); }
   </style>
 </head>
 <body>
@@ -97,6 +108,7 @@
   </div>
 
   <button id="back-btn">Volver al Vacío</button>
+  <button id="mute-btn" title="Silenciar / Activar sonido">🔊</button>
   <div id="hint">Arrastra para mirar alrededor</div>
 
   <!-- Three.js + Tween.js -->
@@ -140,8 +152,19 @@
     const uiTitle = document.getElementById('ui-title');
     const uiDesc = document.getElementById('ui-desc');
     const backBtn = document.getElementById('back-btn');
+    const muteBtn = document.getElementById('mute-btn');
+    let isMuted = false;
 
     document.getElementById('enter-btn').addEventListener('click', init);
+    
+    muteBtn.addEventListener('click', () => {
+      isMuted = !isMuted;
+      monoliths.forEach(m => {
+        m.userData.video.muted = isMuted;
+      });
+      muteBtn.textContent = isMuted ? '🔇' : '🔊';
+      muteBtn.classList.toggle('muted', isMuted);
+    });
 
     function init() {
       if(contextResumed) return;
@@ -149,6 +172,7 @@
 
       document.getElementById('loading').classList.add('fade');
       setTimeout(() => document.getElementById('loading').style.display = 'none', 1000);
+      muteBtn.classList.add('show');
 
       scene = new THREE.Scene();
       scene.fog = new THREE.FogExp2(0x030303, 0.06);
