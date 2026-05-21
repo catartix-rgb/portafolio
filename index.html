@@ -318,7 +318,7 @@
 
     /* Massive name */
     .hero-name {
-      font-size: clamp(40px, 11.8vw, 186px);
+      font-size: clamp(36px, 8.2vw, 124px);
       font-weight: 900;
       line-height: 0.87;
       letter-spacing: -0.045em;
@@ -355,82 +355,54 @@
     }
 
     @keyframes graffiti-flicker {
-      0% {
+      0%, 100% {
         font-family: var(--font);
         transform: none;
-        color: var(--ink);
         opacity: 1;
       }
-      5% {
+      8% {
         font-family: 'Permanent Marker', cursive;
-        transform: skewX(-8deg) scale(0.96) rotate(-2deg);
-        color: #D12B2B;
+        transform: skewX(-4deg) rotate(-1deg) scale(0.98);
         opacity: 0.9;
       }
-      10% {
+      15% {
         font-family: var(--font);
         transform: none;
-        color: var(--ink);
-        opacity: 0.2;
+        opacity: 0.7;
       }
-      15% {
+      22% {
         font-family: 'Rubik Glitch', display;
-        transform: skewY(6deg) scale(1.05) rotate(3deg) translateX(-3px);
-        color: var(--ink);
-        opacity: 1;
-      }
-      20% {
-        font-family: 'Permanent Marker', cursive;
-        transform: scale(0.92) rotate(-1deg);
-        color: var(--ink);
-        opacity: 0;
-      }
-      25% {
-        font-family: 'Sedgwick Ave Display', cursive;
-        transform: skewX(10deg) scale(1.1) rotate(-4deg) translateY(3px);
-        color: #D12B2B;
-        opacity: 0.95;
+        transform: skewY(3deg) scale(1.02);
+        opacity: 0.85;
       }
       30% {
-        font-family: var(--font);
-        transform: none;
-        color: var(--ink);
-        opacity: 1;
-      }
-      35% {
-        font-family: 'Rubik Glitch', display;
-        transform: translateY(-4px) scale(0.97) skewX(-8deg);
-        color: var(--ink);
-        opacity: 0.3;
-      }
-      40% {
         font-family: 'Permanent Marker', cursive;
-        transform: skewX(-5deg) rotate(1.5deg) scale(1.01);
-        color: var(--ink);
-        opacity: 1;
+        transform: scale(0.97) rotate(0.5deg);
+        opacity: 0.9;
       }
-      45% {
-        font-family: var(--font);
-        transform: none;
-        color: var(--ink);
-        opacity: 0.1;
-      }
-      50% {
+      38% {
         font-family: 'Sedgwick Ave Display', cursive;
-        transform: scale(1.08) rotate(2deg) translateY(-2px);
-        color: #D12B2B;
-        opacity: 1;
+        transform: skewX(5deg) scale(1.04) rotate(-2deg);
+        opacity: 0.95;
       }
-      55% {
+      46% {
         font-family: var(--font);
         transform: none;
-        color: var(--ink);
-        opacity: 1;
+        opacity: 0.8;
       }
-      100% {
+      54% {
+        font-family: 'Rubik Glitch', display;
+        transform: translateY(-2px) scale(0.99);
+        opacity: 0.75;
+      }
+      62% {
+        font-family: 'Sedgwick Ave Display', cursive;
+        transform: scale(1.02) rotate(1deg);
+        opacity: 0.9;
+      }
+      70% {
         font-family: var(--font);
         transform: none;
-        color: var(--ink);
         opacity: 1;
       }
     }
