@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>JPCC | Audiovisual - El Vacío Monolítico</title>
+  <title>JPCC | Audiovisual — El Vacío Monolítico</title>
   <meta name="description" content="Zona audiovisual inmersiva de Juan Pablo Castro.">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
@@ -12,6 +12,7 @@
       --ink: #ffffff;
       --ease: cubic-bezier(0.25, 1, 0.5, 1);
     }
+    *, *::before, *::after { box-sizing: border-box; }
     body, html {
       margin: 0; padding: 0; width: 100%; height: 100%;
       background-color: var(--bg);
@@ -20,19 +21,58 @@
       overflow: hidden;
       user-select: none;
       -webkit-user-select: none;
+      cursor: none;
     }
 
-    /* Grain */
+    /* ── Custom Cursor ── */
+    #cursor {
+      position: fixed; z-index: 9999; pointer-events: none;
+      width: 24px; height: 24px;
+      transform: translate(-50%, -50%);
+      transition: transform 0.08s, opacity 0.3s;
+    }
+    #cursor svg { width: 100%; height: 100%; transition: all 0.2s; }
+    #cursor.hover svg { transform: scale(1.6); }
+    #cursor.drag svg { transform: scale(0.7) rotate(45deg); }
+
+    /* ── Vignette + Scanlines ── */
+    #vignette {
+      position: fixed; inset: 0; pointer-events: none; z-index: 900;
+      background: radial-gradient(ellipse at center,
+        transparent 50%,
+        rgba(0,0,0,0.55) 100%);
+    }
+    #scanlines {
+      position: fixed; inset: 0; pointer-events: none; z-index: 901;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.06) 2px,
+        rgba(0,0,0,0.06) 4px
+      );
+      opacity: 0.4;
+    }
+    /* Film grain */
     body::after {
       content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9998;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      animation: grain 0.4s steps(1) infinite;
+    }
+    @keyframes grain {
+      0%,100%{background-position:0 0} 10%{background-position:-5% -10%}
+      20%{background-position:-15% 5%} 30%{background-position:7% -25%}
+      40%{background-position:-5% 25%} 50%{background-position:-15% 10%}
+      60%{background-position:15% 0} 70%{background-position:0 15%}
+      80%{background-position:3% 35%} 90%{background-position:-10% 10%}
     }
 
     #three-canvas {
       position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
-      display: block; cursor: crosshair;
+      display: block;
     }
 
+    /* ── Nav ── */
     .gal-nav {
       position: fixed; top: 0; left: 0; width: 100%;
       padding: 24px 32px; box-sizing: border-box;
@@ -45,53 +85,100 @@
       pointer-events: auto; mix-blend-mode: difference;
     }
 
+    /* ── Loading screen ── */
     #loading {
       position: fixed; inset: 0; background: #030303; z-index: 9999;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      transition: opacity 1s var(--ease);
+      transition: opacity 1.2s var(--ease);
     }
     #loading.fade { opacity: 0; pointer-events: none; }
-    .ld-logo { font-size: 12px; letter-spacing: 0.3em; margin-bottom: 30px; text-transform: uppercase; font-weight: 500; }
+    .ld-logo {
+      font-size: 11px; letter-spacing: 0.35em; margin-bottom: 48px;
+      text-transform: uppercase; font-weight: 400; color: rgba(255,255,255,0.5);
+    }
+    .ld-title {
+      font-size: clamp(28px, 5vw, 52px); font-weight: 700; letter-spacing: -0.02em;
+      margin-bottom: 48px; line-height: 1;
+    }
     .ld-btn {
-      padding: 14px 32px; background: transparent; border: 1px solid rgba(255,255,255,0.2);
-      color: white; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
-      cursor: pointer; transition: all 0.3s;
+      padding: 14px 36px; background: transparent;
+      border: 1px solid rgba(255,255,255,0.18);
+      color: white; font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase;
+      cursor: none; transition: all 0.35s; font-family: 'Inter', sans-serif;
     }
     .ld-btn:hover { background: white; color: black; }
 
+    /* ── UI Layer (title when focused) ── */
     #ui-layer {
-      position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+      position: fixed; bottom: 44px; left: 50%; transform: translateX(-50%);
       z-index: 500; pointer-events: none; text-align: center;
-      opacity: 0; transition: opacity 0.5s;
+      opacity: 0; transition: opacity 0.6s var(--ease);
+      white-space: nowrap;
     }
     #ui-layer.show { opacity: 1; }
-    .ui-title { font-size: 14px; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 500; margin-bottom: 8px; }
-    .ui-desc { font-size: 11px; color: rgba(255,255,255,0.6); max-width: 300px; margin: 0 auto; line-height: 1.5; }
-    
-    #back-btn {
-      display: none;
+    .ui-title {
+      font-size: 13px; letter-spacing: 0.25em; text-transform: uppercase;
+      font-weight: 600; margin-bottom: 6px;
+    }
+    .ui-desc {
+      font-size: 10px; color: rgba(255,255,255,0.45);
+      line-height: 1.5; letter-spacing: 0.08em;
+    }
+    .ui-close-hint {
+      margin-top: 10px; font-size: 9px; letter-spacing: 0.12em;
+      text-transform: uppercase; color: rgba(255,255,255,0.2);
     }
 
+    /* ── Buttons ── */
+    #back-btn { display: none; }
+
     #hint {
-      position: fixed; bottom: 40px; right: 40px; font-size: 10px; letter-spacing: 0.1em;
-      text-transform: uppercase; color: rgba(255,255,255,0.4); z-index: 500;
+      position: fixed; bottom: 44px; right: 40px; font-size: 9px; letter-spacing: 0.12em;
+      text-transform: uppercase; color: rgba(255,255,255,0.3); z-index: 500;
+      transition: opacity 0.4s;
     }
 
     #mute-btn {
       position: fixed; bottom: 32px; left: 32px; z-index: 600;
-      background: transparent; border: 1px solid rgba(255,255,255,0.25); color: white;
-      width: 38px; height: 38px; border-radius: 50%; cursor: pointer;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.18);
+      color: white;
+      width: 40px; height: 40px; border-radius: 50%; cursor: none;
       display: flex; align-items: center; justify-content: center;
-      font-size: 16px; transition: all 0.3s; opacity: 0;
+      font-size: 15px; transition: all 0.3s; opacity: 0;
+      backdrop-filter: blur(4px);
     }
     #mute-btn.show { opacity: 1; }
-    #mute-btn:hover { background: white; color: black; }
-    #mute-btn.muted { border-color: rgba(255,80,80,0.6); color: rgba(255,80,80,0.9); }
+    #mute-btn:hover { background: rgba(255,255,255,0.15); }
+    #mute-btn.muted { border-color: rgba(255,60,60,0.5); }
+
+    /* ── Focus overlay (darken others when monolith open) ── */
+    #focus-overlay {
+      position: fixed; inset: 0; z-index: 400; pointer-events: none;
+      background: rgba(0,0,0,0.5);
+      opacity: 0; transition: opacity 0.8s var(--ease);
+    }
+    #focus-overlay.show { opacity: 1; }
   </style>
 </head>
 <body>
+  <!-- Custom cursor -->
+  <div id="cursor">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <line x1="12" y1="2" x2="12" y2="8" stroke="white" stroke-width="1.2"/>
+      <line x1="12" y1="16" x2="12" y2="22" stroke="white" stroke-width="1.2"/>
+      <line x1="2" y1="12" x2="8" y2="12" stroke="white" stroke-width="1.2"/>
+      <line x1="16" y1="12" x2="22" y2="12" stroke="white" stroke-width="1.2"/>
+      <circle cx="12" cy="12" r="2.5" stroke="white" stroke-width="1.2"/>
+    </svg>
+  </div>
+
+  <div id="vignette"></div>
+  <div id="scanlines"></div>
+  <div id="focus-overlay"></div>
+
   <div id="loading">
-    <div class="ld-logo">El Vacío Monolítico</div>
+    <div class="ld-logo">Juan Pablo Castro</div>
+    <div class="ld-title">El Vacío Monolítico</div>
     <button class="ld-btn" id="enter-btn">Ingresar al Espacio</button>
   </div>
 
@@ -103,360 +190,407 @@
   <canvas id="three-canvas"></canvas>
 
   <div id="ui-layer">
-    <div class="ui-title" id="ui-title">Video Title</div>
-    <div class="ui-desc" id="ui-desc">Description of the video</div>
+    <div class="ui-title" id="ui-title"></div>
+    <div class="ui-desc" id="ui-desc"></div>
+    <div class="ui-close-hint">Clic afuera para cerrar</div>
   </div>
 
   <button id="back-btn">Volver al Vacío</button>
   <button id="mute-btn" title="Silenciar / Activar sonido">🔊</button>
-  <div id="hint">Arrastra para mirar alrededor</div>
+  <div id="hint">Arrastra para explorar</div>
 
-  <!-- Three.js + Tween.js -->
   <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
   <script src="https://unpkg.com/@tweenjs/tween.js@18.6.4/dist/tween.umd.js"></script>
-  
+
   <script>
+    /* ──────────────── VIDEOS ──────────────── */
     const VIDEOS = [
-      { id: 'vid1', src: 'video/manzano.mp4', title: 'Manzano', desc: '2026 · After Effects' },
-      { id: 'vid2', src: 'video/ascii.mp4', title: 'Experimentación en ASCII', desc: '2026 · After Effects' },
-      { id: 'vid3', src: 'video/videoyt.mp4', title: 'YouTube', desc: 'Motion Graphics' },
-      { id: 'vid4', src: 'video/expe.mp4', title: 'Experimento', desc: 'Proyecto Audiovisual' }
+      { id: 'vid1', src: 'video/manzano.mp4',  title: 'Manzano',                  desc: '2026 · After Effects' },
+      { id: 'vid2', src: 'video/ascii.mp4',    title: 'Experimentación en ASCII', desc: '2026 · After Effects' },
+      { id: 'vid3', src: 'video/videoyt.mp4',  title: 'YouTube',                  desc: 'Motion Graphics' },
+      { id: 'vid4', src: 'video/expe.mp4',     title: 'Experimento',              desc: 'Proyecto Audiovisual' }
     ];
 
+    /* ──────────────── GLOBALS ──────────────── */
     let scene, camera, renderer;
-    let monoliths = [];
+    let monoliths = [], glowLights = [];
     let audioListener;
     let contextResumed = false;
-    
-    // Color extraction
+
+    // Color extraction (ambilight)
     const colorCanvas = document.createElement('canvas');
-    colorCanvas.width = 4;
-    colorCanvas.height = 4;
+    colorCanvas.width = 4; colorCanvas.height = 4;
     const colorCtx = colorCanvas.getContext('2d', { willReadFrequently: true });
-    const baseColor = new THREE.Color(0x030303);
+    const baseColor   = new THREE.Color(0x030303);
     const targetColor = new THREE.Color(0x030303);
-    
-    // Interaction state
+
+    // Interaction
     let isDragging = false;
     let previousMousePosition = { x: 0, y: 0 };
-    let clickStartPosition = { x: 0, y: 0 };
-    let targetRotation = { x: 0, y: 0 };
+    let clickStartPosition    = { x: 0, y: 0 };
+    let targetRotation  = { x: 0, y: 0 };
     let currentRotation = { x: 0, y: 0 };
-    let activeMonolith = null;
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
-    let clock = new THREE.Clock();
-
-    const canvas = document.getElementById('three-canvas');
-    const uiLayer = document.getElementById('ui-layer');
-    const uiTitle = document.getElementById('ui-title');
-    const uiDesc = document.getElementById('ui-desc');
-    const backBtn = document.getElementById('back-btn');
-    const muteBtn = document.getElementById('mute-btn');
+    let activeMonolith  = null;
     let isMuted = false;
 
-    document.getElementById('enter-btn').addEventListener('click', init);
-    
+    // Mouse parallax
+    let mouseNorm = { x: 0, y: 0 }; // -1..1
+
+    // Auto-rotate when idle
+    let lastInteractionTime = 0;
+    const IDLE_DELAY = 4000; // ms before auto-rotate kicks in
+    let autoRotating = false;
+
+    // Hover detection
+    let hoveredMonolith = null;
+
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    const clock  = new THREE.Clock();
+
+    /* DOM */
+    const canvasEl      = document.getElementById('three-canvas');
+    const uiLayer       = document.getElementById('ui-layer');
+    const uiTitle       = document.getElementById('ui-title');
+    const uiDesc        = document.getElementById('ui-desc');
+    const backBtn       = document.getElementById('back-btn');
+    const muteBtn       = document.getElementById('mute-btn');
+    const focusOverlay  = document.getElementById('focus-overlay');
+    const cursorEl      = document.getElementById('cursor');
+    const hintEl        = document.getElementById('hint');
+
+    /* ──────────────── CUSTOM CURSOR ──────────────── */
+    window.addEventListener('mousemove', e => {
+      cursorEl.style.left = e.clientX + 'px';
+      cursorEl.style.top  = e.clientY + 'px';
+      mouseNorm.x = (e.clientX / window.innerWidth)  * 2 - 1;
+      mouseNorm.y = (e.clientY / window.innerHeight) * 2 - 1;
+    });
+
+    /* ──────────────── MUTE ──────────────── */
     muteBtn.addEventListener('click', () => {
       isMuted = !isMuted;
-      monoliths.forEach(m => {
-        m.userData.video.muted = isMuted;
-      });
+      monoliths.forEach(m => { m.userData.video.muted = isMuted; });
       muteBtn.textContent = isMuted ? '🔇' : '🔊';
       muteBtn.classList.toggle('muted', isMuted);
     });
 
+    /* ──────────────── ENTER ──────────────── */
+    document.getElementById('enter-btn').addEventListener('click', init);
+
     function init() {
-      if(contextResumed) return;
+      if (contextResumed) return;
       contextResumed = true;
 
       document.getElementById('loading').classList.add('fade');
-      setTimeout(() => document.getElementById('loading').style.display = 'none', 1000);
+      setTimeout(() => document.getElementById('loading').style.display = 'none', 1200);
       muteBtn.classList.add('show');
 
+      /* Scene */
       scene = new THREE.Scene();
-      scene.fog = new THREE.FogExp2(0x030303, 0.06);
+      scene.fog = new THREE.FogExp2(0x030303, 0.055);
 
-      camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 200);
+      /* Camera starts FAR for tunnel effect */
+      camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 200);
       camera.position.set(0, 0, 80);
 
-      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      /* Renderer */
+      renderer = new THREE.WebGLRenderer({ canvas: canvasEl, antialias: true, alpha: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-      // Audio Listener
+      /* Audio */
       audioListener = new THREE.AudioListener();
       camera.add(audioListener);
 
-      // Lights
-      const ambient = new THREE.AmbientLight(0xffffff, 0.1);
-      scene.add(ambient);
+      /* Ambient */
+      scene.add(new THREE.AmbientLight(0xffffff, 0.08));
 
-      // Create Monoliths
-      const radius = 6;
-      const angleStep = (Math.PI * 2) / Math.max(VIDEOS.length, 3); // space evenly even if 2 items
+      /* ──── Build monoliths ──── */
+      const radius    = 6.5;
+      const angleStep = (Math.PI * 2) / VIDEOS.length;
 
       VIDEOS.forEach((v, i) => {
         const video = document.createElement('video');
-        video.src = v.src;
+        video.src        = v.src;
         video.crossOrigin = 'anonymous';
-        video.loop = true;
+        video.loop       = true;
         video.playsInline = true;
-        // Mute initially so play() doesn't fail, we rely on PositionalAudio
-        video.muted = true;
-        video.play().then(() => {
-          // Unmute once playing is started and user interacted
-          video.muted = false;
-        });
+        video.muted      = true;
+        video.play().then(() => { video.muted = false; }).catch(() => {});
 
         const texture = new THREE.VideoTexture(video);
         texture.colorSpace = THREE.SRGBColorSpace;
-        
-        let initialAspect = 16 / 9;
-        let w = 4.2;
-        let h = w / initialAspect;
 
-        const geo = new THREE.PlaneGeometry(w, h);
-        const mat = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
+        const w = 4.2, h = w / (16/9);
+        const geo  = new THREE.PlaneGeometry(w, h);
+        const mat  = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
         const mesh = new THREE.Mesh(geo, mat);
 
         const angle = i * angleStep;
-        mesh.position.x = Math.sin(angle) * radius;
-        mesh.position.z = -Math.cos(angle) * radius;
-        mesh.position.y = (Math.random() - 0.5) * 1.5; 
-        
+        mesh.position.set(Math.sin(angle) * radius, (Math.random() - 0.5) * 1.5, -Math.cos(angle) * radius);
         mesh.lookAt(0, mesh.position.y, 0);
 
-        // Frame
-        const frameGeo = new THREE.BoxGeometry(w + 0.1, h + 0.1, 0.3);
-        const frameMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.8, metalness: 0.2 });
-        const frame = new THREE.Mesh(frameGeo, frameMat);
-        frame.position.copy(mesh.position);
-        frame.rotation.copy(mesh.rotation);
-        frame.position.z -= 0.16 * Math.cos(angle);
-        frame.position.x += 0.16 * Math.sin(angle);
-        scene.add(frame);
-        
-        // Dynamically adjust to true aspect ratio once metadata loads
+        /* Frame */
+        const frameMat  = new THREE.MeshStandardMaterial({ color: 0x080808, roughness: 0.85, metalness: 0.3 });
+        const frameMesh = new THREE.Mesh(new THREE.BoxGeometry(w + 0.12, h + 0.12, 0.28), frameMat);
+        frameMesh.position.copy(mesh.position);
+        frameMesh.rotation.copy(mesh.rotation);
+        frameMesh.position.z -= 0.14 * Math.cos(angle);
+        frameMesh.position.x += 0.14 * Math.sin(angle);
+        scene.add(frameMesh);
+
+        /* Dynamic aspect ratio */
         video.addEventListener('loadedmetadata', () => {
           const aspect = video.videoWidth / video.videoHeight || 16/9;
-          let realW, realH;
-          if (aspect >= 1) { // Landscape or square
-             realW = 4.2;
-             realH = realW / aspect;
-          } else { // Portrait / Vertical
-             realH = 4.2; // constrain height instead
-             realW = realH * aspect;
-          }
-          
+          let rW, rH;
+          if (aspect >= 1) { rW = 4.2; rH = rW / aspect; }
+          else             { rH = 4.2; rW = rH * aspect; }
           mesh.geometry.dispose();
-          mesh.geometry = new THREE.PlaneGeometry(realW, realH);
-          
-          frame.geometry.dispose();
-          frame.geometry = new THREE.BoxGeometry(realW + 0.1, realH + 0.1, 0.3);
+          mesh.geometry = new THREE.PlaneGeometry(rW, rH);
+          frameMesh.geometry.dispose();
+          frameMesh.geometry = new THREE.BoxGeometry(rW + 0.12, rH + 0.12, 0.28);
         });
 
-        // Spatial Audio
+        /* Spatial audio */
         const sound = new THREE.PositionalAudio(audioListener);
-        const source = audioListener.context.createMediaElementSource(video);
-        sound.setNodeSource(source);
-        sound.setRefDistance(2);
+        const src   = audioListener.context.createMediaElementSource(video);
+        sound.setNodeSource(src);
+        sound.setRefDistance(2.5);
         sound.setVolume(1.0);
         sound.setDistanceModel('exponential');
-        sound.setRolloffFactor(2);
+        sound.setRolloffFactor(2.5);
         mesh.add(sound);
 
-        mesh.userData = { 
-          video: video, 
-          sound: sound, 
-          data: v, 
-          basePos: mesh.position.clone()
-        };
+        /* Screen glow light */
+        const glow = new THREE.PointLight(0xffffff, 0, 5);
+        glow.position.copy(mesh.position);
+        glow.position.z += 0.6 * Math.cos(angle);
+        glow.position.x -= 0.6 * Math.sin(angle);
+        scene.add(glow);
+        glowLights.push(glow);
+
+        mesh.userData = { video, sound, data: v, basePos: mesh.position.clone(), angle, glow };
         scene.add(mesh);
         monoliths.push(mesh);
-
-        // Point Light
-        const plight = new THREE.PointLight(0xffffff, 2, 8);
-        plight.position.copy(mesh.position);
-        plight.position.z += 0.5 * Math.cos(angle);
-        plight.position.x -= 0.5 * Math.sin(angle);
-        scene.add(plight);
       });
 
-      // Particles
-      const pCount = 2000;
-      const pGeo = new THREE.BufferGeometry();
-      const pPos = new Float32Array(pCount * 3);
-      for(let i=0; i<pCount; i++){
-        pPos[i*3] = (Math.random() - 0.5) * 30;
-        pPos[i*3+1] = (Math.random() - 0.5) * 30;
-        pPos[i*3+2] = (Math.random() - 0.5) * 120; // Spread along Z for tunnel effect
+      /* ──── Particles ──── */
+      const pCount = 2400;
+      const pGeo   = new THREE.BufferGeometry();
+      const pPos   = new Float32Array(pCount * 3);
+      for (let i = 0; i < pCount; i++) {
+        pPos[i*3]   = (Math.random() - 0.5) * 32;
+        pPos[i*3+1] = (Math.random() - 0.5) * 32;
+        pPos[i*3+2] = (Math.random() - 0.5) * 130;
       }
       pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-      const pMat = new THREE.PointsMaterial({ color: 0xcccccc, size: 0.035, transparent: true, opacity: 0.3 });
+      const pMat = new THREE.PointsMaterial({ color: 0xdddddd, size: 0.04, transparent: true, opacity: 0.25 });
       window.particles = new THREE.Points(pGeo, pMat);
       scene.add(window.particles);
 
+      /* ──── Events ──── */
       window.addEventListener('resize', onResize);
-      
-      canvas.addEventListener('pointerdown', onPointerDown);
+      canvasEl.addEventListener('pointerdown', onPointerDown);
       window.addEventListener('pointermove', onPointerMove);
       window.addEventListener('pointerup', onPointerUp);
-      // Removed backBtn listener since we close by clicking outside
 
-      // Tunnel entrance animation
+      /* ──── Tunnel entrance: FOV rush from 90→55, position from Z80→0 ──── */
       new TWEEN.Tween(camera.position)
-        .to({ x: 0, y: 0, z: 0 }, 4000)
+        .to({ x: 0, y: 0, z: 0 }, 4200)
         .easing(TWEEN.Easing.Cubic.Out)
+        .start();
+
+      new TWEEN.Tween({ fov: 90 })
+        .to({ fov: 55 }, 4200)
+        .easing(TWEEN.Easing.Cubic.Out)
+        .onUpdate(obj => { camera.fov = obj.fov; camera.updateProjectionMatrix(); })
         .start();
 
       animate();
     }
 
+    /* ──────────────── POINTER EVENTS ──────────────── */
     function onPointerDown(e) {
-      if (activeMonolith) {
-        clickStartPosition = { x: e.clientX, y: e.clientY };
-        return;
-      }
+      lastInteractionTime = Date.now();
+      if (activeMonolith) { clickStartPosition = { x: e.clientX, y: e.clientY }; return; }
       isDragging = true;
-      previousMousePosition = { x: e.clientX, y: e.clientY };
-      clickStartPosition = { x: e.clientX, y: e.clientY };
+      previousMousePosition = clickStartPosition = { x: e.clientX, y: e.clientY };
+      cursorEl.classList.add('drag');
     }
 
     function onPointerMove(e) {
+      lastInteractionTime = Date.now();
       if (isDragging && !activeMonolith) {
-        const deltaMove = { x: e.clientX - previousMousePosition.x, y: e.clientY - previousMousePosition.y };
-        targetRotation.x -= deltaMove.y * 0.0035; // pitch
-        targetRotation.y -= deltaMove.x * 0.0035; // yaw
+        const dx = e.clientX - previousMousePosition.x;
+        const dy = e.clientY - previousMousePosition.y;
+        targetRotation.y -= dx * 0.003;
+        targetRotation.x -= dy * 0.003;
         targetRotation.x = Math.max(-Math.PI/3, Math.min(Math.PI/3, targetRotation.x));
         previousMousePosition = { x: e.clientX, y: e.clientY };
+      }
+      // Hover detection
+      if (!activeMonolith && !isDragging) {
+        mouse.x = (e.clientX / window.innerWidth)  * 2 - 1;
+        mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+        const hits = raycaster.intersectObjects(monoliths);
+        const nowHovered = hits.length > 0 ? hits[0].object : null;
+        if (nowHovered !== hoveredMonolith) {
+          hoveredMonolith = nowHovered;
+          cursorEl.classList.toggle('hover', !!hoveredMonolith);
+        }
       }
     }
 
     function onPointerUp(e) {
       isDragging = false;
-      const deltaX = Math.abs(e.clientX - clickStartPosition.x);
-      const deltaY = Math.abs(e.clientY - clickStartPosition.y);
-      const isClick = (deltaX < 5 && deltaY < 5);
+      cursorEl.classList.remove('drag');
+      lastInteractionTime = Date.now();
 
-      if (isClick) {
-        mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-        raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects(monoliths);
-        
-        if (activeMonolith) {
-          if (intersects.length === 0 || intersects[0].object !== activeMonolith) {
-            closeMonolith();
-          }
-        } else {
-          if (intersects.length > 0) {
-            openMonolith(intersects[0].object);
-          }
-        }
+      const dx = Math.abs(e.clientX - clickStartPosition.x);
+      const dy = Math.abs(e.clientY - clickStartPosition.y);
+      if (dx > 6 || dy > 6) return; // was a drag, not a click
+
+      mouse.x = (e.clientX / window.innerWidth)  * 2 - 1;
+      mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObjects(monoliths);
+
+      if (activeMonolith) {
+        if (hits.length === 0 || hits[0].object !== activeMonolith) closeMonolith();
+      } else {
+        if (hits.length > 0) openMonolith(hits[0].object);
       }
     }
 
+    /* ──────────────── OPEN / CLOSE ──────────────── */
     function openMonolith(mesh) {
       activeMonolith = mesh;
-      
-      const dist = 3.2; // camera distance from screen
+      hoveredMonolith = null;
+      cursorEl.classList.remove('hover');
+
+      const dist     = 3.0;
       const targetPos = new THREE.Vector3(0, 0, dist);
       targetPos.applyEuler(mesh.rotation);
       targetPos.add(mesh.position);
 
       new TWEEN.Tween(camera.position)
-        .to({ x: targetPos.x, y: targetPos.y, z: targetPos.z }, 1200)
-        .easing(TWEEN.Easing.Cubic.InOut)
-        .start();
+        .to({ x: targetPos.x, y: targetPos.y, z: targetPos.z }, 1400)
+        .easing(TWEEN.Easing.Cubic.InOut).start();
 
       new TWEEN.Tween(camera.rotation)
-        .to({ x: mesh.rotation.x, y: mesh.rotation.y, z: mesh.rotation.z }, 1200)
+        .to({ x: mesh.rotation.x, y: mesh.rotation.y, z: mesh.rotation.z }, 1400)
+        .easing(TWEEN.Easing.Cubic.InOut).start();
+
+      // FOV punch-in
+      new TWEEN.Tween({ fov: camera.fov })
+        .to({ fov: 48 }, 1400)
         .easing(TWEEN.Easing.Cubic.InOut)
+        .onUpdate(o => { camera.fov = o.fov; camera.updateProjectionMatrix(); })
         .start();
 
       monoliths.forEach(m => {
-        if (m !== mesh) m.userData.sound.setVolume(0.05);
-        else m.userData.sound.setVolume(1.0);
+        m.userData.sound.setVolume(m === mesh ? 1.0 : 0.04);
       });
 
       uiTitle.textContent = mesh.userData.data.title;
-      uiDesc.textContent = mesh.userData.data.desc;
+      uiDesc.textContent  = mesh.userData.data.desc;
       uiLayer.classList.add('show');
-      // backBtn.classList.add('show');
-      document.getElementById('hint').style.display = 'none';
+      focusOverlay.classList.add('show');
+      hintEl.style.opacity = '0';
     }
 
     function closeMonolith() {
       activeMonolith = null;
       uiLayer.classList.remove('show');
-      // backBtn.classList.remove('show');
-      document.getElementById('hint').style.display = 'block';
+      focusOverlay.classList.remove('show');
+      hintEl.style.opacity = '1';
 
       monoliths.forEach(m => m.userData.sound.setVolume(1.0));
 
       new TWEEN.Tween(camera.position)
-        .to({ x: 0, y: 0, z: 0 }, 1200)
+        .to({ x: 0, y: 0, z: 0 }, 1400)
+        .easing(TWEEN.Easing.Cubic.InOut).start();
+
+      new TWEEN.Tween({ fov: camera.fov })
+        .to({ fov: 55 }, 1400)
         .easing(TWEEN.Easing.Cubic.InOut)
+        .onUpdate(o => { camera.fov = o.fov; camera.updateProjectionMatrix(); })
         .start();
     }
 
     function onResize() {
-      if(!camera) return;
+      if (!camera) return;
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
-    function animate(time) {
+    /* ──────────────── ANIMATE ──────────────── */
+    function animate() {
       requestAnimationFrame(animate);
       TWEEN.update();
 
-      const elapsed = clock.getElapsedTime();
+      const elapsed  = clock.getElapsedTime();
+      const idleFor  = Date.now() - lastInteractionTime;
 
+      /* ── Camera rotation (drag + mouse parallax + auto-rotate) ── */
       if (!activeMonolith) {
-        currentRotation.x += (targetRotation.x - currentRotation.x) * 0.1;
-        currentRotation.y += (targetRotation.y - currentRotation.y) * 0.1;
+        // Auto-rotate when idle
+        if (idleFor > IDLE_DELAY) {
+          targetRotation.y += 0.0006;
+        }
+        // Subtle mouse parallax (only when not dragging)
+        const parallaxStrength = isDragging ? 0 : 0.12;
+        const parallaxX = -mouseNorm.y * parallaxStrength;
+        const parallaxY = -mouseNorm.x * parallaxStrength;
+
+        currentRotation.x += (targetRotation.x + parallaxX - currentRotation.x) * 0.08;
+        currentRotation.y += (targetRotation.y + parallaxY - currentRotation.y) * 0.08;
+
         const euler = new THREE.Euler(currentRotation.x, currentRotation.y, 0, 'YXZ');
         camera.quaternion.setFromEuler(euler);
       }
 
+      /* ── Monolith float + hover glow ── */
       monoliths.forEach((m, i) => {
-        m.position.y = m.userData.basePos.y + Math.sin(elapsed * 1.5 + i) * 0.15;
+        m.position.y = m.userData.basePos.y + Math.sin(elapsed * 1.2 + i * 1.4) * 0.18;
+
+        // Glow intensity: strong on active, medium on hovered, low otherwise
+        const isActive  = m === activeMonolith;
+        const isHovered = m === hoveredMonolith;
+        const targetIntensity = isActive ? 3.5 : isHovered ? 1.8 : 0.2;
+        m.userData.glow.intensity += (targetIntensity - m.userData.glow.intensity) * 0.08;
       });
 
+      /* ── Particles drift ── */
       if (window.particles) {
-        window.particles.rotation.y = elapsed * 0.05;
+        window.particles.rotation.y = elapsed * 0.04;
+        window.particles.rotation.x = Math.sin(elapsed * 0.05) * 0.04;
       }
 
-      // Ambilight effect
+      /* ── Ambilight ── */
       if (activeMonolith) {
-        const video = activeMonolith.userData.video;
-        if (video.readyState >= video.HAVE_CURRENT_DATA) {
-          colorCtx.drawImage(video, 0, 0, 4, 4);
+        const vid = activeMonolith.userData.video;
+        if (vid.readyState >= vid.HAVE_CURRENT_DATA) {
+          colorCtx.drawImage(vid, 0, 0, 4, 4);
           const data = colorCtx.getImageData(0, 0, 4, 4).data;
-          
-          let r = 0, g = 0, b = 0;
-          let maxL = -1;
-          
-          // Encontrar el pixel más brillante (evita que videos oscuros se promedien a negro)
-          for(let i=0; i<data.length; i+=4) {
-             let lum = data[i]*0.299 + data[i+1]*0.587 + data[i+2]*0.114;
-             if (lum > maxL) {
-               maxL = lum;
-               r = data[i]; g = data[i+1]; b = data[i+2];
-             }
+          let r = 0, g = 0, b = 0, maxL = -1;
+          for (let i = 0; i < data.length; i += 4) {
+            const lum = data[i]*0.299 + data[i+1]*0.587 + data[i+2]*0.114;
+            if (lum > maxL) { maxL = lum; r = data[i]; g = data[i+1]; b = data[i+2]; }
           }
-          
-          // Atenuar para efecto atmosférico
-          targetColor.setRGB(r/255 * 0.35, g/255 * 0.35, b/255 * 0.35);
+          targetColor.setRGB(r/255 * 0.3, g/255 * 0.3, b/255 * 0.3);
         }
       } else {
         targetColor.copy(baseColor);
       }
-      
-      scene.fog.color.lerp(targetColor, 0.03);
-      document.body.style.backgroundColor = `rgb(${Math.round(scene.fog.color.r*255)}, ${Math.round(scene.fog.color.g*255)}, ${Math.round(scene.fog.color.b*255)})`;
+      scene.fog.color.lerp(targetColor, 0.025);
+      document.body.style.backgroundColor = `rgb(${
+        Math.round(scene.fog.color.r*255)},${
+        Math.round(scene.fog.color.g*255)},${
+        Math.round(scene.fog.color.b*255)})`;
 
       renderer.render(scene, camera);
     }
