@@ -1,26 +1,21 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
-import UploadZone       from './ui/UploadZone'
-import SpaceScreen      from './screens/SpaceScreen'
+import { useState, useRef, useEffect } from 'react'
+import UploadZone        from './ui/UploadZone'
+import SpaceScreen       from './screens/SpaceScreen'
 import { AudioAnalyzer } from './audio/AudioAnalyzer'
-import { generateVisualConfig, generateNewPalette } from './visual/visualConfig'
+import { generateVisualConfig } from './visual/visualConfig'
 import './App.css'
 
 export default function App() {
-  const [screen,  setScreen]  = useState('upload')
-  const [error,   setError]   = useState('')
-  const [config,  setConfig]  = useState(null)
+  const [screen, setScreen] = useState('upload')
+  const [error,  setError]  = useState('')
+  const [config, setConfig] = useState(null)
   const analyzerRef = useRef(null)
 
   useEffect(() => {
     return () => analyzerRef.current?.destroy()
   }, [])
 
-  // Randomize: ONLY swap palette — no geometry rebuild, no scene reset
-  const randomize = useCallback(() => {
-    setConfig(prev => prev ? { ...prev, palette: generateNewPalette() } : generateVisualConfig())
-  }, [])
-
-  // Load audio file — used for both initial load AND song replacement
+  // Shared audio load logic
   async function loadAudio(file) {
     setError('')
     analyzerRef.current?.destroy()
@@ -34,10 +29,11 @@ export default function App() {
     } catch (err) {
       console.error('[AudioAnalyzer]', err)
       az.destroy()
-      const msg = err?.name === 'NotAllowedError'
-        ? 'El navegador bloqueó el audio. Haz clic en la página primero.'
-        : 'No se pudo cargar. Prueba MP3, WAV u OGG.'
-      setError(msg)
+      setError(
+        err?.name === 'NotAllowedError'
+          ? 'El navegador bloqueó el audio. Haz clic en la página primero.'
+          : 'No se pudo cargar. Prueba MP3, WAV u OGG.'
+      )
       return false
     }
   }
@@ -51,13 +47,10 @@ export default function App() {
     }
   }
 
-  // Replace song while staying in space (no page reload)
+  // Replace song while staying in space
   async function handleNewFile(file) {
     const ok = await loadAudio(file)
-    if (ok) {
-      // Fresh random visuals for the new track
-      setConfig(generateVisualConfig())
-    }
+    if (ok) setConfig(generateVisualConfig())
   }
 
   return (
@@ -69,7 +62,6 @@ export default function App() {
         <SpaceScreen
           analyzer={analyzerRef.current}
           config={config}
-          onRandomize={randomize}
           onNewFile={handleNewFile}
         />
       )}

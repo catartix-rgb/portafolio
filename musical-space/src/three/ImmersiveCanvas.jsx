@@ -1,3 +1,9 @@
+/* ─── ImmersiveCanvas ──────────────────────────────────────────
+   Wrapped in React.memo — only re-renders when a new song loads
+   (config reference changes). Palette changes go through paletteRef
+   and never cause a re-render here at all.
+──────────────────────────────────────────────────────────────── */
+import { memo } from 'react'
 import { Canvas } from '@react-three/fiber'
 import ParticleField      from './ParticleField'
 import GeometricCore      from './GeometricCore'
@@ -6,7 +12,7 @@ import VolumetricFog      from './VolumetricFog'
 import CameraRig          from './CameraRig'
 import PostFX             from './PostFX'
 
-export default function ImmersiveCanvas({ audioRef, config }) {
+export default memo(function ImmersiveCanvas({ audioRef, config, paletteRef }) {
   return (
     <Canvas
       gl={{
@@ -21,11 +27,11 @@ export default function ImmersiveCanvas({ audioRef, config }) {
     >
       <ambientLight intensity={0.04} />
       <CameraRig          audioRef={audioRef} />
-      <ParticleField      audioRef={audioRef} config={config} />
-      <GeometricCore      audioRef={audioRef} config={config} />
-      <ArchitecturalRings audioRef={audioRef} config={config} />
+      <ParticleField      audioRef={audioRef} config={config} paletteRef={paletteRef} />
+      <GeometricCore      audioRef={audioRef} config={config} paletteRef={paletteRef} />
+      <ArchitecturalRings audioRef={audioRef} config={config} paletteRef={paletteRef} />
       <VolumetricFog      audioRef={audioRef} />
       <PostFX             audioRef={audioRef} config={config} />
     </Canvas>
   )
-}
+})

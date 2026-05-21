@@ -1,4 +1,4 @@
-import { useRef, useMemo, useEffect } from 'react'
+import { useRef, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import vertGLSL from '../shaders/core.vert.glsl?raw'
@@ -14,46 +14,48 @@ function buildGeometry(type, scale) {
   }
 }
 
-export default function GeometricCore({ audioRef, config }) {
+export default function GeometricCore({ audioRef, config, paletteRef }) {
   const meshRef = useRef()
 
   const geometry = useMemo(() =>
     buildGeometry(config.geometry, config.geometryScale),
   [config.geometry, config.geometryScale])
 
-  // Stable uniforms ref — update color in-place, no scene reset
+  // Stable uniforms ref — created once, updated via paletteRef in useFrame
   const uniformsRef = useRef(null)
   if (uniformsRef.current === null) {
-    const [pR, pG, pB] = config.palette?.primary ?? [0.78, 0.66, 0.30]
+    const p   = paletteRef?.current ?? config.palette
+    const [pR, pG, pB] = (p?.primary ?? [0.78, 0.66, 0.30]).map(v =>
+      (v === undefined || isNaN(v)) ? 0.3 : Math.max(0.04, v)
+    )
     uniformsRef.current = {
       uTime     : { value: 0 },
       uBass     : { value: 0 },
       uSubBass  : { value: 0 },
       uAmplitude: { value: 0 },
-      uColor    : { value: new THREE.Vector3(
-        Math.max(0.04, pR || 0.78),
-        Math.max(0.04, pG || 0.66),
-        Math.max(0.04, pB || 0.30)
-      )},
+      uColor    : { value: new THREE.Vector3(pR, pG, pB) },
     }
   }
 
-  // Update color when palette changes — in-place
-  useEffect(() => {
-    if (!config?.palette?.primary || !uniformsRef.current) return
-    const [pR, pG, pB] = config.palette.primary
-    if ([pR, pG, pB].some(v => v === undefined || isNaN(v))) return
-    uniformsRef.current.uColor.value.set(
-      Math.max(0.04, pR),
-      Math.max(0.04, pG),
-      Math.max(0.04, pB)
-    )
-  }, [config.palette])
+  // Detect palette changes
+  const lastPaletteRef = useRef(paletteRef?.current)
 
   useFrame(({ clock }) => {
     const u   = uniformsRef.current
     const ad  = audioRef.current
     const spd = config.rotSpeed || 1
+
+    // ── Color sync on palette change ──
+    const palette = paletteRef?.current
+    if (palette && palette !== lastPaletteRef.current) {
+      lastPaletteRef.current = palette
+      const raw = palette.primary ?? [0.78, 0.66, 0.30]
+      const [pR, pG, pB] = raw.map(v =>
+        (v === undefined || isNaN(v)) ? 0.3 : Math.max(0.04, v)
+      )
+      u.uColor.value.set(pR, pG, pB)
+    }
+
     u.uTime.value      = clock.getElapsedTime()
     u.uBass.value      = ad.bass      ?? 0
     u.uSubBass.value   = ad.subBass   ?? 0
