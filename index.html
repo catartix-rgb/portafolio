@@ -9,7 +9,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,700;0,14..32,900;1,14..32,300;1,14..32,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,700;0,14..32,900;1,14..32,300;1,14..32,400&family=Permanent+Marker&family=Rubik+Glitch&family=Sedgwick+Ave+Display&display=swap" rel="stylesheet">
 
   <style>
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -337,6 +337,96 @@
       display: block;
       transform: translateY(115%);
       transition: transform 1.3s var(--ease);
+    }
+
+    .castro-flicker {
+      display: inline-block;
+      transition: color 0.15s var(--ease), transform 0.15s var(--ease);
+    }
+
+    .castro-flicker.glitch-active {
+      animation: graffiti-flicker 1.4s steps(1) forwards;
+    }
+
+    @keyframes graffiti-flicker {
+      0% {
+        font-family: var(--font);
+        transform: none;
+        color: var(--ink);
+        opacity: 1;
+      }
+      5% {
+        font-family: 'Permanent Marker', cursive;
+        transform: skewX(-8deg) scale(0.96) rotate(-2deg);
+        color: #D12B2B;
+        opacity: 0.9;
+      }
+      10% {
+        font-family: var(--font);
+        transform: none;
+        color: var(--ink);
+        opacity: 0.2;
+      }
+      15% {
+        font-family: 'Rubik Glitch', display;
+        transform: skewY(6deg) scale(1.05) rotate(3deg) translateX(-3px);
+        color: var(--ink);
+        opacity: 1;
+      }
+      20% {
+        font-family: 'Permanent Marker', cursive;
+        transform: scale(0.92) rotate(-1deg);
+        color: var(--ink);
+        opacity: 0;
+      }
+      25% {
+        font-family: 'Sedgwick Ave Display', cursive;
+        transform: skewX(10deg) scale(1.1) rotate(-4deg) translateY(3px);
+        color: #D12B2B;
+        opacity: 0.95;
+      }
+      30% {
+        font-family: var(--font);
+        transform: none;
+        color: var(--ink);
+        opacity: 1;
+      }
+      35% {
+        font-family: 'Rubik Glitch', display;
+        transform: translateY(-4px) scale(0.97) skewX(-8deg);
+        color: var(--ink);
+        opacity: 0.3;
+      }
+      40% {
+        font-family: 'Permanent Marker', cursive;
+        transform: skewX(-5deg) rotate(1.5deg) scale(1.01);
+        color: var(--ink);
+        opacity: 1;
+      }
+      45% {
+        font-family: var(--font);
+        transform: none;
+        color: var(--ink);
+        opacity: 0.1;
+      }
+      50% {
+        font-family: 'Sedgwick Ave Display', cursive;
+        transform: scale(1.08) rotate(2deg) translateY(-2px);
+        color: #D12B2B;
+        opacity: 1;
+      }
+      55% {
+        font-family: var(--font);
+        transform: none;
+        color: var(--ink);
+        opacity: 1;
+      }
+      100% {
+        font-family: var(--font);
+        transform: none;
+        color: var(--ink);
+        opacity: 1;
+      }
     }
 
     .hero-name .word-inner.up {
@@ -944,7 +1034,7 @@
       <h1 class="hero-name" id="hero-name" aria-label="Juan Pablo Castro Casillas">
         <span class="word"><span class="word-inner">Juan</span></span>
         <span class="word"><span class="word-inner">Pablo</span></span>
-        <span class="word"><span class="word-inner">Castro</span></span>
+        <span class="word"><span class="word-inner"><span class="castro-flicker">Castro</span></span></span>
         <span class="word"><span class="word-inner">Casillas</span></span>
       </h1>
 
@@ -1325,7 +1415,7 @@
 
     // Cursor states
     const hoverEls = document.querySelectorAll(
-      'a, button, .proj-row, .svc-table tbody tr, .foot-up'
+      'a, button, .proj-row, .svc-table tbody tr, .foot-up, .castro-flicker'
     );
     hoverEls.forEach(el => {
       el.addEventListener('mouseenter', () => document.body.classList.add('cur-active'));
@@ -1355,6 +1445,36 @@
         el.classList.add('up');
       });
     });
+
+    /* ── Castro Glitch/Flicker Effect ───────────── */
+    const castroEl = document.querySelector('.castro-flicker');
+    if (castroEl) {
+      const triggerGlitch = () => {
+        if (castroEl.classList.contains('glitch-active')) return;
+        castroEl.classList.add('glitch-active');
+        
+        // Remove class when animation finishes
+        const onAnimEnd = () => {
+          castroEl.classList.remove('glitch-active');
+          castroEl.removeEventListener('animationend', onAnimEnd);
+          scheduleGlitch(); // Schedule next random glitch
+        };
+        castroEl.addEventListener('animationend', onAnimEnd);
+      };
+
+      const scheduleGlitch = () => {
+        const nextDelay = 4000 + Math.random() * 6000; // 4 to 10 seconds
+        setTimeout(triggerGlitch, nextDelay);
+      };
+
+      // Start the cycle after page load
+      window.addEventListener('load', () => {
+        setTimeout(scheduleGlitch, 3000);
+      });
+
+      // Hover trigger
+      castroEl.addEventListener('mouseenter', triggerGlitch);
+    }
 
     /* ── Intersection Observer (section reveals) ─── */
     const io = new IntersectionObserver(entries => {
