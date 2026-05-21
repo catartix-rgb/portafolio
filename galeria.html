@@ -147,15 +147,7 @@
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
        PIECE COUNTER (bottom-left)
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-    #counter {
-      position: fixed; left: 52px; bottom: 52px; z-index: 600;
-      pointer-events: none;
-    }
-    #counter-name {
-      font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
-      color: rgba(237,236,234,.28);
-      margin-top: 10px;
-    }
+
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
        HINTS
@@ -315,7 +307,6 @@
     @media (max-width: 768px) {
       .gal-nav { padding: 18px 24px; }
       #gal-index { display: none; }
-      #counter { left: 24px; bottom: 30px; }
       #drag-hint { right: 24px; bottom: 30px; }
       #detail-panel { padding: 80px 28px 40px; }
     }
@@ -346,10 +337,6 @@
   <!-- Side dots -->
   <div id="gal-index"></div>
 
-  <!-- Piece counter -->
-  <div id="counter">
-    <div id="counter-name">Alta Tensión</div>
-  </div>
 
   <!-- Drag hint -->
   <div id="drag-hint">
@@ -736,8 +723,6 @@
   function updateActive(idx) {
     activeIdx = idx;
     const p   = PIECES[idx];
-
-    document.getElementById('counter-name').textContent = p.name;
 
     document.querySelectorAll('.gi-dot').forEach((d, i) => {
       d.classList.toggle('active', i === idx);
