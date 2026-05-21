@@ -395,6 +395,7 @@
     <button class="filter-pill" data-filter="Editorial">Editorial</button>
     <button class="filter-pill" data-filter="UX/UI">UX/UI</button>
     <button class="filter-pill" data-filter="Fotografía">Fotografía</button>
+    <button class="filter-pill" data-filter="Cartelismo">Cartelismo</button>
     <button class="filter-pill" data-filter="2024">2024</button>
     <button class="filter-pill" data-filter="2025">2025</button>
   </div>
@@ -508,9 +509,11 @@
     }
   ];
 
-  const N      = PIECES.length;
+  let PIECES_ACTIVE = [...PIECES];
+  const FULL_PIECES = [...PIECES];
+  let N      = PIECES_ACTIVE.length;
   const RADIUS = 5.6;
-  const STEP   = (Math.PI * 2) / N;
+  let STEP   = (Math.PI * 2) / N;
 
   /* ════════════════════════════════════════════════
      RENDERER
@@ -849,6 +852,7 @@
   }
 
   function navigateTo(idx) {
+    if (frames.length === 0) return;
     const target     = idx * STEP;
     const raw        = target - currentRot;
     const normalized = ((raw % (Math.PI * 2)) + Math.PI * 3) % (Math.PI * 2) - Math.PI;
@@ -856,8 +860,9 @@
   }
 
   function updateActive(idx) {
+    if (frames.length === 0) return;
     activeIdx = idx;
-    const p   = PIECES[idx];
+    const p   = PIECES_ACTIVE[idx];
 
     document.querySelectorAll('.gi-dot').forEach((d, i) => {
       d.classList.toggle('active', i === idx);
@@ -1009,7 +1014,8 @@
      DETAIL PANEL
   ════════════════════════════════════════════════ */
   function openPanel(idx = activeIdx) {
-    const p = PIECES[idx];
+    if (frames.length === 0) return;
+    const p = PIECES_ACTIVE[idx];
     document.getElementById('dp-ghost').textContent = p.num;
     document.getElementById('dp-name').textContent  = p.name;
     document.getElementById('dp-desc').textContent  = p.desc;
