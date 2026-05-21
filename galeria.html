@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Galería — Juan Pablo Castro Casillas. Explora los trabajos en formato museo.">
+  <title>Galería — JPCC</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,700;0,14..32,900;1,14..32,300;1,14..32,400&display=swap" rel="stylesheet">
+
+  <style>
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       RESET & BASE
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg:           #EDECEA;
+      --bg-dark:      #0A0A0A;
+      --ink:          #080808;
+      --ink-muted:    #6B6B6B;
+      --ink-ghost:    #CACAC8;
+      --border:       rgba(8, 8, 8, 0.10);
+      --border-hard:  rgba(8, 8, 8, 0.85);
+      --font:         'Inter', 'Helvetica Neue', Arial, sans-serif;
+      --ease:         cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in:      cubic-bezier(0.7, 0, 1, 1);
+    }
+
+    html {
+      font-size: 16px;
+    }
+
+    body {
+      background: var(--bg-dark);
+      color: var(--bg);
+      font-family: var(--font);
+      overflow-x: hidden;
+      cursor: none;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Grain */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9998;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       CUSTOM CURSOR
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #cur-dot {
+      position: fixed;
+      width: 7px;
+      height: 7px;
+      background: var(--bg);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 10000;
+      transform: translate(-50%, -50%);
+      transition: width 0.25s var(--ease), height 0.25s var(--ease);
+      will-change: left, top;
+    }
+
+    #cur-ring {
+      position: fixed;
+      width: 38px;
+      height: 38px;
+      border: 1.5px solid rgba(237, 236, 234, 0.35);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 10000;
+      transform: translate(-50%, -50%);
+      transition: width 0.35s var(--ease), height 0.35s var(--ease);
+      will-change: left, top;
+    }
+
+    body.cur-active #cur-dot {
+      width: 11px;
+      height: 11px;
+    }
+
+    body.cur-active #cur-ring {
+      width: 62px;
+      height: 62px;
+      border-color: rgba(237, 236, 234, 0.2);
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       SCROLL PROGRESS
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #scroll-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 2px;
+      background: var(--bg);
+      z-index: 9999;
+      width: 0%;
+      transition: width 0.08s linear;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       TOP NAV
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .gal-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 52px;
+      mix-blend-mode: difference;
+    }
+
+    .gal-nav a {
+      font-size: 10.5px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--bg);
+      position: relative;
+      padding-bottom: 2px;
+    }
+
+    .gal-nav a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: var(--bg);
+      transform: scaleX(0);
+      transform-origin: right;
+      transition: transform 0.35s var(--ease);
+    }
+
+    .gal-nav a:hover::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       SIDE INDEX
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .gal-index {
+      position: fixed;
+      right: 52px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: flex-end;
+    }
+
+    .gal-index-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(237, 236, 234, 0.3);
+      background: transparent;
+      transition: all 0.4s var(--ease);
+      cursor: none;
+    }
+
+    .gal-index-dot.active {
+      background: var(--bg);
+      border-color: var(--bg);
+      width: 10px;
+      height: 10px;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       GALLERY HERO
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .gal-hero {
+      height: 100svh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 52px 64px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gal-hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 52px;
+      width: 1px;
+      height: 100%;
+      background: rgba(237, 236, 234, 0.06);
+    }
+
+    .gal-hero-title {
+      font-size: clamp(64px, 12vw, 200px);
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      line-height: 0.85;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translateY(60px);
+      animation: heroIn 1.4s var(--ease) 0.2s forwards;
+    }
+
+    .gal-hero-sub {
+      margin-top: 32px;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(237, 236, 234, 0.4);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: heroIn 1s var(--ease) 0.6s forwards;
+    }
+
+    .gal-hero-scroll {
+      position: absolute;
+      bottom: 28px;
+      right: 52px;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(237, 236, 234, 0.3);
+      writing-mode: vertical-rl;
+      opacity: 0;
+      animation: heroIn 1s var(--ease) 1s forwards;
+    }
+
+    @keyframes heroIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       PIECE (each work = full viewport)
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .piece {
+      position: relative;
+      min-height: 100svh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      overflow: hidden;
+    }
+
+    /* Left: image side */
+    .piece-visual {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 52px;
+      overflow: hidden;
+    }
+
+    .piece-visual::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 10, 10, 0.15);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .piece-img {
+      width: 100%;
+      max-width: 580px;
+      height: auto;
+      max-height: 75vh;
+      object-fit: contain;
+      position: relative;
+      z-index: 2;
+      opacity: 0;
+      transform: scale(0.92) translateY(40px);
+      transition: opacity 1.2s var(--ease), transform 1.4s var(--ease);
+      filter: brightness(0.95) contrast(1.02);
+    }
+
+    .piece.in-view .piece-img {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+
+    /* Right: info side */
+    .piece-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 80px 80px 64px;
+      border-left: 1px solid rgba(237, 236, 234, 0.06);
+      position: relative;
+    }
+
+    .piece-num {
+      font-size: clamp(100px, 14vw, 180px);
+      font-weight: 900;
+      letter-spacing: -0.06em;
+      line-height: 0.8;
+      color: rgba(237, 236, 234, 0.04);
+      position: absolute;
+      top: 50%;
+      right: 60px;
+      transform: translateY(-50%);
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .piece-label {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(237, 236, 234, 0.35);
+      margin-bottom: 48px;
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: all 0.8s var(--ease) 0.2s;
+    }
+
+    .piece-label::before {
+      content: '';
+      width: 28px;
+      height: 1px;
+      background: currentColor;
+      flex-shrink: 0;
+    }
+
+    .piece.in-view .piece-label {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .piece-name {
+      font-size: clamp(36px, 4.5vw, 72px);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 0.9;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 1s var(--ease) 0.35s;
+    }
+
+    .piece.in-view .piece-name {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .piece-desc {
+      font-size: 14px;
+      font-weight: 300;
+      line-height: 1.9;
+      color: rgba(237, 236, 234, 0.55);
+      max-width: 400px;
+      margin-bottom: 52px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.9s var(--ease) 0.5s;
+    }
+
+    .piece.in-view .piece-desc {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Meta tags */
+    .piece-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border-top: 1px solid rgba(237, 236, 234, 0.08);
+      opacity: 0;
+      transform: translateY(16px);
+      transition: all 0.8s var(--ease) 0.65s;
+    }
+
+    .piece.in-view .piece-meta {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .piece-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(237, 236, 234, 0.06);
+    }
+
+    .piece-meta-key {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(237, 236, 234, 0.3);
+    }
+
+    .piece-meta-val {
+      font-size: 12.5px;
+      font-weight: 400;
+      color: rgba(237, 236, 234, 0.65);
+    }
+
+    /* Separator between pieces */
+    .piece-divider {
+      width: 100%;
+      height: 1px;
+      background: rgba(237, 236, 234, 0.06);
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       ALTERNATING LAYOUT
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .piece:nth-child(even) {
+      direction: rtl;
+    }
+
+    .piece:nth-child(even) > * {
+      direction: ltr;
+    }
+
+    .piece:nth-child(even) .piece-info {
+      border-left: none;
+      border-right: 1px solid rgba(237, 236, 234, 0.06);
+    }
+
+    .piece:nth-child(even) .piece-num {
+      right: auto;
+      left: 60px;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       FOOTER
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .gal-footer {
+      padding: 32px 52px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(237, 236, 234, 0.06);
+    }
+
+    .gal-footer span {
+      font-size: 10.5px;
+      letter-spacing: 0.1em;
+      color: rgba(237, 236, 234, 0.3);
+      text-transform: uppercase;
+    }
+
+    .gal-footer a {
+      font-size: 10.5px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: rgba(237, 236, 234, 0.5);
+      transition: color 0.3s;
+    }
+
+    .gal-footer a:hover {
+      color: var(--bg);
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       RESPONSIVE
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    @media (max-width: 900px) {
+      .piece {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+
+      .piece:nth-child(even) {
+        direction: ltr;
+      }
+
+      .piece:nth-child(even) .piece-info {
+        border-right: none;
+      }
+
+      .piece-visual {
+        min-height: 60svh;
+        padding: 100px 32px 40px;
+      }
+
+      .piece-info {
+        border-left: none;
+        padding: 48px 32px 72px;
+      }
+
+      .piece-num {
+        font-size: 80px;
+        right: 24px;
+        top: 20px;
+        transform: none;
+      }
+
+      .piece:nth-child(even) .piece-num {
+        left: auto;
+        right: 24px;
+      }
+
+      .gal-nav {
+        padding: 18px 24px;
+      }
+
+      .gal-hero {
+        padding: 0 24px 48px;
+      }
+
+      .gal-index {
+        display: none;
+      }
+
+      .gal-footer {
+        padding: 24px;
+        flex-direction: column;
+        gap: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Cursor -->
+  <div id="cur-dot"></div>
+  <div id="cur-ring"></div>
+
+  <!-- Progress -->
+  <div id="scroll-bar"></div>
+
+  <!-- Nav -->
+  <nav class="gal-nav">
+    <a href="index.html">← Portafolio</a>
+    <a href="index.html#trabajo">Índice</a>
+  </nav>
+
+  <!-- Side index dots -->
+  <div class="gal-index" id="gal-index"></div>
+
+  <!-- Hero -->
+  <section class="gal-hero">
+    <h1 class="gal-hero-title">Galería</h1>
+    <p class="gal-hero-sub">Juan Pablo Castro Casillas — Selección de trabajo</p>
+    <span class="gal-hero-scroll">Scroll ↓</span>
+  </section>
+
+  <!-- Gallery pieces -->
+  <main id="gallery">
+
+    <div class="piece-divider"></div>
+
+    <article class="piece" data-piece="0">
+      <div class="piece-visual">
+        <img class="piece-img" src="img/alta-tension.jpg" alt="Alta Tensión" loading="lazy">
+      </div>
+      <div class="piece-info">
+        <span class="piece-num">01</span>
+        <div class="piece-label">Caso de estudio</div>
+        <h2 class="piece-name">Alta<br>Tensión</h2>
+        <p class="piece-desc">
+          Exploración de identidad gráfica aplicada a indumentaria. Lenguaje visual crudo inspirado en señalización industrial y simbología de peligro como vehículo estético.
+        </p>
+        <div class="piece-meta">
+          <div class="piece-meta-row">
+            <span class="piece-meta-key">Año</span>
+            <span class="piece-meta-val">2025</span>
+          </div>
+          <div class="piece-meta-row">
+            <span class="piece-meta-key">Categoría</span>
+            <span class="piece-meta-val">Identidad / Indumentaria</span>
+          </div>
+          <div class="piece-meta-row">
+            <span class="piece-meta-key">Disciplina</span>
+            <span class="piece-meta-val">Diseño Gráfico · Textil</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <div class="piece-divider"></div>
+
+    <article class="piece" data-piece="1">
+      <div class="piece-visual">
+        <img class="piece-img" src="img/not-different.jpg" alt="Not Different" loading="lazy">
+      </div>
+      <div class="piece-info">
+        <span class="piece-num">02</span>
+        <div class="piece-label">Caso de estudio</div>
+        <h2 class="piece-name">Not<br>Different</h2>
+        <p class="piece-desc">
+          Una exploración de branding e identidad para marca. Concepto visual centrado en la idea de que lo auténtico no necesita diferenciarse — simplemente es.
+        </p>
+        <div class="piece-meta">
+          <div class="piece-meta-row">
+            <span class="piece-meta-key">Año</span>
+            <span class="piece-meta-val">2025</span>
+          </div>
+          <div class="piece-meta-row">
+            <span class="piece-meta-key">Categoría</span>
+            <span class="piece-meta-val">Branding / Identidad</span>
+          </div>
+          <div class="piece-meta-row">
+            <span class="piece-meta-key">Disciplina</span>
+            <span class="piece-meta-val">Diseño Gráfico</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <div class="piece-divider"></div>
+
+    <article class="piece" data-piece="2">
+      <div class="piece-visual">
+        <img class="piece-img" src="img/catartix-popup.jpg" alt="Catartix Pop Up" loading="lazy">
+      </div>
+      <div class="piece-info">
+        <span class="piece-num">03</span>
+        <div class="piece-label">Caso de estudio</div>
+        <h2 class="piece-name">Catartix<br>Pop Up</h2>
+        <p class="piece-desc">
+          Póster para evento musical. Exploración gráfica experimentando con alto contraste de colores y texturas de semitono como recurso visual.
+        </p>
+        <div class="piece-meta">
+          <div class="piece-meta-row">
+            <span class="piece-meta-key">Año</span>
+            <span class="piece-meta-val">2025</span>
+          </div>
+          <div class="piece-meta-row">
+            <span class="piece-meta-key">Categoría</span>
+            <span class="piece-meta-val">Cartelismo / Evento</span>
+          </div>
+          <div class="piece-meta-row">
+            <span class="piece-meta-key">Disciplina</span>
+            <span class="piece-meta-val">Diseño Gráfico</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <div class="piece-divider"></div>
+
+    <article class="piece" data-piece="3">
+      <div class="piece-visual">
+        <img class="piece-img" src="img/editorial-1.jpg" alt="Producción Editorial I" loading="lazy">
+      </div>
+      <div class="piece-info">
+        <span class="piece-num">04</span>
+        <div class="piece-label">Caso de estudio</div>
+        <h2 class="piece-name">Producción<br>Editorial I</h2>
+        <p class="piece-desc">
+          Dirección de arte y fotografía para producción editorial. Exploración visual de estética de moda y lifestyle con enfoque en movimiento y textura.
+        </p>
+        <div class="piece-meta">
+          <div class="piece-meta-row">
+            <span class="piece-meta-key">Año</span>
+            <span class="piece-meta-val">2025</span>
+          </div>
+          <div class="piece-meta-row">
+            <span class="piece-meta-key">Categoría</span>
+            <span class="piece-meta-val">Fotografía / Editorial</span>
+          </div>
+          <div class="piece-meta-row">
+            <span class="piece-meta-key">Disciplina</span>
+            <span class="piece-meta-val">Dirección de Arte</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <div class="piece-divider"></div>
+
+    <article class="piece" data-piece="4">
+      <div class="piece-visual">
+        <img class="piece-img" src="img/editorial-2.jpg" alt="Producción Editorial II" loading="lazy">
+      </div>
+      <div class="piece-info">
+        <span class="piece-num">05</span>
+        <div class="piece-label">Caso de estudio</div>
+        <h2 class="piece-name">Producción<br>Editorial II</h2>
+        <p class="piece-desc">
+          Segunda parte de la serie fotográfica, centrada en composición visual, indumentaria y los detalles en los accesorios.
+        </p>
+        <div class="piece-meta">
+          <div class="piece-meta-row">
+            <span class="piece-meta-key">Año</span>
+            <span class="piece-meta-val">2025</span>
+          </div>
+          <div class="piece-meta-row">
+            <span class="piece-meta-key">Categoría</span>
+            <span class="piece-meta-val">Fotografía / Editorial</span>
+          </div>
+          <div class="piece-meta-row">
+            <span class="piece-meta-key">Disciplina</span>
+            <span class="piece-meta-val">Dirección de Arte</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <div class="piece-divider"></div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="gal-footer">
+    <span>© 2025 Juan Pablo Castro Casillas</span>
+    <a href="#" id="back-top">Volver arriba ↑</a>
+  </footer>
+
+  <script>
+    /* ── Custom Cursor ──────────────────────────── */
+    const dot  = document.getElementById('cur-dot');
+    const ring = document.getElementById('cur-ring');
+    let mx = -100, my = -100, dx = -100, dy = -100;
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX;
+      my = e.clientY;
+      dot.style.left = mx + 'px';
+      dot.style.top  = my + 'px';
+    });
+
+    (function cursorLoop() {
+      dx += (mx - dx) * 0.12;
+      dy += (my - dy) * 0.12;
+      ring.style.left = dx + 'px';
+      ring.style.top  = dy + 'px';
+      requestAnimationFrame(cursorLoop);
+    })();
+
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => document.body.classList.add('cur-active'));
+      el.addEventListener('mouseleave', () => document.body.classList.remove('cur-active'));
+    });
+
+    /* ── Scroll Progress ────────────────────────── */
+    const scrollBar = document.getElementById('scroll-bar');
+    window.addEventListener('scroll', () => {
+      const sy  = window.scrollY;
+      const max = document.body.scrollHeight - window.innerHeight;
+      scrollBar.style.width = (sy / max * 100) + '%';
+    }, { passive: true });
+
+    /* ── Intersection Observer for pieces ────────── */
+    const pieces = document.querySelectorAll('.piece');
+
+    const pieceObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+        }
+      });
+    }, { threshold: 0.2 });
+
+    pieces.forEach(p => pieceObserver.observe(p));
+
+    /* ── Side Index Dots ────────────────────────── */
+    const indexContainer = document.getElementById('gal-index');
+
+    pieces.forEach((p, i) => {
+      const dot = document.createElement('div');
+      dot.classList.add('gal-index-dot');
+      dot.dataset.index = i;
+      dot.addEventListener('click', () => {
+        p.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      indexContainer.appendChild(dot);
+    });
+
+    const dots = document.querySelectorAll('.gal-index-dot');
+
+    const dotObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        const idx = entry.target.dataset.piece;
+        if (entry.isIntersecting && dots[idx]) {
+          dots.forEach(d => d.classList.remove('active'));
+          dots[idx].classList.add('active');
+        }
+      });
+    }, { threshold: 0.4 });
+
+    pieces.forEach(p => dotObserver.observe(p));
+
+    /* ── Back to top ────────────────────────────── */
+    document.getElementById('back-top').addEventListener('click', e => {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>
