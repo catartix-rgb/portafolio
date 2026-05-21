@@ -50,6 +50,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
       padding: 14px 32px;
       background: rgba(8, 8, 8, 0.18);
       border: 1px solid rgba(255, 255, 255, 0.22);
@@ -87,6 +88,8 @@
       font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase;
       pointer-events: auto; transition: color 0.3s;
       position: relative;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
     .gal-nav a:hover {
       color: rgba(237, 236, 234, 1);
@@ -302,15 +305,25 @@
     @media (max-width: 768px) {
       .gal-nav {
         top: 16px;
-        left: 16px;
-        right: 16px;
-        padding: 12px 20px;
+        left: 12px;
+        right: 12px;
+        padding: 11px 16px;
+        gap: 8px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
       }
+      .gal-nav::-webkit-scrollbar { display: none; }
+      .gal-nav a { font-size: 10px; letter-spacing: 0.14em; }
       #ui-layer {
         width: calc(100% - 32px);
         white-space: normal;
         padding: 16px 20px;
         bottom: 24px;
+      }
+      .ld-btn {
+        padding: 14px 44px;
+        font-size: 11px;
       }
     }
   </style>

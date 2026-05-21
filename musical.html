@@ -112,6 +112,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
       padding: 14px 32px;
       background: rgba(8, 8, 12, 0.14);
       border: 1px solid rgba(255, 255, 255, 0.22);
@@ -153,6 +154,8 @@
       text-transform: uppercase;
       transition: color 0.3s;
       position: relative;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
     .gal-nav a:hover {
       color: rgba(237, 236, 234, 1);
@@ -172,17 +175,23 @@
       100% { background-position: 0% 50%; }
     }
 
-    @media (max-width: 768px) {
+    /* ── MOBILE: ocultar panel completo, solo escena 3D ── */
+    @media (max-width: 1024px) {
+      .control-panel { display: none !important; }
+      .title-panel   { display: none !important; }
+      .drag-hint     { display: none !important; }
       .gal-nav {
         top: 16px;
-        left: 20px;
-        right: 20px;
-        padding: 12px 20px;
+        left: 12px;
+        right: 12px;
+        padding: 11px 18px;
+        gap: 8px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
       }
-      .gal-nav a {
-        font-size: 9px;
-        letter-spacing: 0.1em;
-      }
+      .gal-nav::-webkit-scrollbar { display: none; }
+      .gal-nav a { font-size: 10px; letter-spacing: 0.12em; }
     }
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -628,67 +637,16 @@
     }
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-       RESPONSIVE DESIGN ADAPTATIONS
+       RESPONSIVE — solo desktop (1025px+)
+       El panel ya se oculta en <=1024px arriba.
        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-    @media (max-width: 1024px) {
-      .title-panel {
-        top: 90px;
-        left: 32px;
-      }
+    @media (min-width: 1025px) {
+      /* Tablet/Desktop: panel lateral visible */
       .control-panel {
-        top: auto;
-        right: 32px;
-        left: 32px;
-        bottom: 32px;
-        width: auto;
-        height: 380px;
-        padding: 24px;
-        justify-content: flex-start;
+        display: flex;
       }
-      .panel-section {
-        margin-bottom: 16px;
-      }
-      .album-desc {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-      }
-      .drag-hint {
-        display: none;
-      }
-    }
-
-    @media (max-width: 768px) {
       .title-panel {
-        left: 20px;
-        top: 80px;
-      }
-      .control-panel {
-        left: 20px;
-        right: 20px;
-        bottom: 20px;
-        height: auto;
-        padding: 20px;
-      }
-      .album-title {
-        font-size: 20px;
-        margin-bottom: 6px;
-      }
-      .album-desc {
-        font-size: 11px;
-        -webkit-line-clamp: 2;
-      }
-      .step-grid {
-        gap: 4px;
-        margin-bottom: 16px;
-      }
-      .audio-controls {
-        margin-bottom: 16px;
-      }
-      .mode-selector {
-        margin-bottom: 16px;
-        gap: 8px;
+        display: block;
       }
     }
   </style>
