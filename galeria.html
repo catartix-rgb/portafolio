@@ -151,12 +151,6 @@
       position: fixed; left: 52px; bottom: 52px; z-index: 600;
       pointer-events: none;
     }
-    #counter-num {
-      font-size: clamp(72px,9vw,130px);
-      font-weight: 900; letter-spacing: -.06em; line-height: .85;
-      color: rgba(237,236,234,.05);
-      transition: opacity .6s var(--ease);
-    }
     #counter-name {
       font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
       color: rgba(237,236,234,.28);
@@ -354,7 +348,6 @@
 
   <!-- Piece counter -->
   <div id="counter">
-    <div id="counter-num">01</div>
     <div id="counter-name">Alta Tensión</div>
   </div>
 
@@ -743,7 +736,6 @@
     activeIdx = idx;
     const p   = PIECES[idx];
 
-    document.getElementById('counter-num').textContent  = p.num;
     document.getElementById('counter-name').textContent = p.name;
 
     document.querySelectorAll('.gi-dot').forEach((d, i) => {
