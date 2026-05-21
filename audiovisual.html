@@ -83,6 +83,22 @@
       color: rgba(237, 236, 234, 1);
     }
 
+    .nav-music {
+      background: linear-gradient(90deg, #00f2fe, #4facfe, #00f2fe);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      mix-blend-mode: normal !important;
+      animation: cyanGlow 3s ease infinite;
+      font-weight: 700 !important;
+    }
+
+    @keyframes cyanGlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
     /* ── Loading screen ── */
     #loading {
       position: fixed; inset: 0; background: #030303; z-index: 9999;
@@ -291,6 +307,7 @@
   <nav class="gal-nav">
     <a href="index.html">← Portafolio</a>
     <a href="galeria.html">Galería 3D</a>
+    <a href="musical.html" class="nav-music">Música 3D</a>
   </nav>
 
   <canvas id="three-canvas"></canvas>

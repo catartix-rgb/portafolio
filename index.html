@@ -212,6 +212,22 @@
       font-weight: 700 !important;
     }
 
+    .nav-music {
+      background: linear-gradient(90deg, #00f2fe, #4facfe, #00f2fe);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      mix-blend-mode: normal !important;
+      animation: cyanGlow 3s ease infinite;
+      font-weight: 700 !important;
+    }
+
+    @keyframes cyanGlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
     @keyframes rainbow {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
@@ -1004,6 +1020,7 @@
       <li><a href="#trabajo">Trabajo</a></li>
       <li><a href="galeria.html">Galería</a></li>
       <li><a href="audiovisual.html" class="nav-audio">Audiovisual</a></li>
+      <li><a href="musical.html" class="nav-music">Música 3D</a></li>
       <li><a href="#servicios">Servicios</a></li>
       <li><a href="#sobre">Sobre mí</a></li>
     </ul>
