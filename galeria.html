@@ -223,6 +223,32 @@
     }
     #detail-panel.open { transform: translateX(0); }
 
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       LARGE IMAGE VIEW
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #large-view {
+      position: fixed; left: 0; top: 0; bottom: 0;
+      right: min(420px, 88vw);
+      z-index: 650;
+      display: flex; align-items: center; justify-content: center;
+      padding: 40px;
+      opacity: 0; pointer-events: none;
+      transition: opacity .75s var(--ease);
+      background: rgba(8,8,8,0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    #large-view.open { opacity: 1; pointer-events: auto; }
+    #large-view img {
+      max-width: 100%; max-height: 100%;
+      border-radius: 2px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+    }
+
+    @media (max-width: 768px) {
+      #large-view { right: 0; padding: 20px; z-index: 750; }
+    }
+
     .dp-close {
       position: absolute; top: 22px; right: 22px;
       width: 40px; height: 40px;
@@ -367,6 +393,11 @@
     </div>
   </div>
 
+  <!-- Large Image View -->
+  <div id="large-view">
+    <img id="lv-img" src="" alt="Vista en grande">
+  </div>
+
   <!-- Three.js -->
   <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
   <script>
@@ -460,6 +491,22 @@
   const coolLight = new THREE.PointLight(0xc8d8ff, 0.35, 10);
   coolLight.position.set(-RADIUS * .55, .8, RADIUS * .55);
   scene.add(coolLight);
+
+  /* ════════════════════════════════════════════════
+     FLASHLIGHT (LINTERNA)
+  ════════════════════════════════════════════════ */
+  const flashLight = new THREE.SpotLight(0xffffff, 0); // starts off
+  flashLight.angle = Math.PI / 8;
+  flashLight.penumbra = 0.6;
+  flashLight.decay = 1.5;
+  flashLight.distance = 25;
+  camera.add(flashLight);
+  scene.add(camera);
+
+  const flashTarget = new THREE.Object3D();
+  camera.add(flashTarget);
+  flashTarget.position.set(0, 0, -5);
+  flashLight.target = flashTarget;
 
   /* ════════════════════════════════════════════════
      GALLERY GROUP — rotates around Y
@@ -817,10 +864,16 @@
     document.getElementById('dp-cat').textContent   = p.cat;
     document.getElementById('dp-disc').textContent  = p.disc;
     document.getElementById('detail-panel').classList.add('open');
+
+    // Show large image
+    const lv = document.getElementById('large-view');
+    document.getElementById('lv-img').src = p.img;
+    lv.classList.add('open');
   }
 
   function closePanel() {
     document.getElementById('detail-panel').classList.remove('open');
+    document.getElementById('large-view').classList.remove('open');
   }
 
   document.getElementById('dp-close').addEventListener('click', closePanel);
@@ -843,12 +896,25 @@
   const curDot  = document.getElementById('cur-dot');
   const curRing = document.getElementById('cur-ring');
   let cmx = -100, cmy = -100, cdx = -100, cdy = -100;
+  
+  // Normalized mouse coords for flashlight
+  const mouseNorm = new THREE.Vector2(0, 0);
+  let mouseActive = false;
 
   document.addEventListener('mousemove', e => {
     cmx = e.clientX; cmy = e.clientY;
     curDot.style.left = cmx + 'px';
     curDot.style.top  = cmy + 'px';
+    
+    mouseNorm.x = (e.clientX / window.innerWidth) * 2 - 1;
+    mouseNorm.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    mouseActive = true;
   });
+  
+  document.addEventListener('mouseleave', () => {
+    mouseActive = false;
+  });
+
   (function curLoop() {
     cdx += (cmx - cdx) * 0.12;
     cdy += (cmy - cdy) * 0.12;
@@ -904,6 +970,16 @@
       f.scale.y     += (tgt - f.scale.y) * .055;
       f.scale.z     += (tgt - f.scale.z) * .055;
     });
+
+    /* — Flashlight effect — */
+    const isPanelOpen = document.getElementById('detail-panel').classList.contains('open');
+    if (mouseActive && !isPanelOpen && !dragging) {
+      flashLight.intensity += (20.0 - flashLight.intensity) * 0.08;
+      flashTarget.position.x += (mouseNorm.x * 6 - flashTarget.position.x) * 0.1;
+      flashTarget.position.y += (mouseNorm.y * 4 - flashTarget.position.y) * 0.1;
+    } else {
+      flashLight.intensity += (0 - flashLight.intensity) * 0.08;
+    }
 
     /* — Particle drift — */
     if (window._particles) {
