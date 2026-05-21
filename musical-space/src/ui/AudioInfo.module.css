@@ -1,0 +1,55 @@
+.root {
+  position: fixed;
+  bottom: 36px;
+  left: 44px;
+  z-index: 200;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+.root.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.name {
+  font-family: 'Inter', monospace;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.28);
+  margin-bottom: 5px;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bpm {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.bpmVal {
+  font-family: 'Inter', monospace;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: rgba(201, 168, 76, 0.55);
+}
+
+.bpmUnit {
+  font-family: 'Inter', sans-serif;
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  color: rgba(201, 168, 76, 0.35);
+}
+
+@media (max-width: 600px) {
+  .root { bottom: 24px; left: 20px; }
+}
