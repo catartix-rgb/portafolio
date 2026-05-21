@@ -1,0 +1,62 @@
+/* ── Bottom-left oscilloscope mode dock ─────────────────────── */
+.dock {
+  position: fixed;
+  bottom: 36px;
+  left: 28px;
+  z-index: 500;          /* above canvas, below nothing */
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 8px;
+  background: rgba(0, 20, 0, 0.55);
+  border: 1px solid rgba(0, 255, 65, 0.22);
+  border-radius: 8px;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 rgba(0, 255, 65, 0.12),
+    0 8px 24px rgba(0, 0, 0, 0.6),
+    0 0 16px rgba(0, 255, 65, 0.06);
+  pointer-events: auto;
+  user-select: none;
+}
+
+.sep {
+  width: 1px;
+  height: 16px;
+  background: rgba(0, 255, 65, 0.18);
+  flex-shrink: 0;
+}
+
+.btn {
+  font-family: 'Courier New', 'Inter', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  padding: 6px 14px;
+  border-radius: 5px;
+  border: none;
+  background: transparent;
+  color: rgba(0, 255, 65, 0.38);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, text-shadow 0.2s;
+  pointer-events: auto;
+}
+
+.btn:hover {
+  color: rgba(0, 255, 65, 0.85);
+  background: rgba(0, 255, 65, 0.07);
+}
+
+.active {
+  color: #00ff41;
+  background: rgba(0, 255, 65, 0.12);
+  text-shadow:
+    0 0 6px rgba(0, 255, 65, 0.9),
+    0 0 16px rgba(0, 255, 65, 0.4);
+}
+
+@media (max-width: 480px) {
+  .dock { bottom: 90px; left: 14px; }
+  .btn  { font-size: 8px; padding: 5px 10px; }
+}
