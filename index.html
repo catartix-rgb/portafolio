@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Juan Pablo Castro Casillas — Diseñador. Lo imperfecto es lo más real, auténtico.">
+  <meta name="author" content="Juan Pablo Castro Casillas">
+  <title>JPCC — Diseñador</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,700;0,14..32,900;1,14..32,300;1,14..32,400&display=swap" rel="stylesheet">
+
+  <style>
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       RESET & BASE
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg:           #EDECEA;
+      --bg-dark:      #0A0A0A;
+      --ink:          #080808;
+      --ink-muted:    #6B6B6B;
+      --ink-ghost:    #CACAC8;
+      --border:       rgba(8, 8, 8, 0.10);
+      --border-hard:  rgba(8, 8, 8, 0.85);
+      --font:         'Inter', 'Helvetica Neue', Arial, sans-serif;
+      --ease:         cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in:      cubic-bezier(0.7, 0, 1, 1);
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font);
+      overflow-x: hidden;
+      cursor: none;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       GRAIN TEXTURE
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9998;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      opacity: 1;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       CUSTOM CURSOR
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #cur-dot {
+      position: fixed;
+      width: 7px;
+      height: 7px;
+      background: var(--ink);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 10000;
+      transform: translate(-50%, -50%);
+      transition: width 0.25s var(--ease), height 0.25s var(--ease), background 0.25s;
+      will-change: left, top;
+    }
+
+    #cur-ring {
+      position: fixed;
+      width: 38px;
+      height: 38px;
+      border: 1.5px solid rgba(8, 8, 8, 0.35);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 10000;
+      transform: translate(-50%, -50%);
+      transition: width 0.35s var(--ease), height 0.35s var(--ease), border-color 0.25s;
+      will-change: left, top;
+    }
+
+    body.cur-active #cur-dot {
+      width: 11px;
+      height: 11px;
+    }
+
+    body.cur-active #cur-ring {
+      width: 62px;
+      height: 62px;
+      border-color: rgba(8, 8, 8, 0.2);
+    }
+
+    body.cur-dark #cur-dot {
+      background: var(--bg);
+    }
+
+    body.cur-dark #cur-ring {
+      border-color: rgba(237, 236, 234, 0.4);
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       SCROLL PROGRESS
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #scroll-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 2px;
+      background: var(--ink);
+      z-index: 9999;
+      width: 0%;
+      transition: width 0.08s linear;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       NAV
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 52px;
+      transition: padding 0.4s var(--ease);
+    }
+
+    nav.scrolled {
+      padding: 16px 52px;
+      background: rgba(237, 236, 234, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--ink);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 44px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 10.5px;
+      font-weight: 400;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--ink);
+      position: relative;
+      padding-bottom: 2px;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: var(--ink);
+      transform: scaleX(0);
+      transform-origin: right;
+      transition: transform 0.35s var(--ease);
+    }
+
+    .nav-links a:hover::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       REVEAL SYSTEM
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .rev {
+      opacity: 0;
+      transform: translateY(36px);
+      transition: opacity 1s var(--ease), transform 1s var(--ease);
+    }
+
+    .rev.in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .rev-d1 { transition-delay: 0.1s; }
+    .rev-d2 { transition-delay: 0.22s; }
+    .rev-d3 { transition-delay: 0.36s; }
+    .rev-d4 { transition-delay: 0.52s; }
+    .rev-d5 { transition-delay: 0.68s; }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       LAYOUT BASE
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .wrap {
+      max-width: 1480px;
+      margin: 0 auto;
+    }
+
+    section {
+      padding: 120px 52px;
+      border-bottom: 1px solid var(--border-hard);
+    }
+
+    .sec-label {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 72px;
+    }
+
+    .sec-label::before {
+      content: '';
+      width: 28px;
+      height: 1px;
+      background: currentColor;
+      flex-shrink: 0;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       HERO
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #hero {
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding-top: 130px;
+      padding-bottom: 64px;
+      border-bottom: 1px solid var(--border-hard);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Vertical index line */
+    #hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 52px;
+      width: 1px;
+      height: 100%;
+      background: var(--border);
+    }
+
+    .hero-eyebrow {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 52px;
+    }
+
+    .hero-tag {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      line-height: 2.4;
+    }
+
+    .hero-tag--right {
+      text-align: right;
+    }
+
+    /* Massive name */
+    .hero-name {
+      font-size: clamp(68px, 11.8vw, 186px);
+      font-weight: 900;
+      line-height: 0.87;
+      letter-spacing: -0.045em;
+      text-transform: uppercase;
+      margin-bottom: 56px;
+    }
+
+    .hero-name .word {
+      display: inline-block;
+      overflow: hidden;
+      vertical-align: top;
+      margin-right: 0.08em;
+    }
+
+    .hero-name .word-inner {
+      display: block;
+      transform: translateY(115%);
+      transition: transform 1.3s var(--ease);
+    }
+
+    .hero-name .word-inner.up {
+      transform: translateY(0%);
+    }
+
+    .hero-name .word:nth-child(1) .word-inner { transition-delay: 0.00s; }
+    .hero-name .word:nth-child(2) .word-inner { transition-delay: 0.07s; }
+    .hero-name .word:nth-child(3) .word-inner { transition-delay: 0.14s; }
+    .hero-name .word:nth-child(4) .word-inner { transition-delay: 0.22s; }
+
+    .hero-footer {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 48px;
+      align-items: end;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+    }
+
+    .hero-manifesto {
+      font-size: clamp(15px, 1.9vw, 22px);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.5;
+      color: var(--ink);
+      max-width: 520px;
+    }
+
+    .hero-manifesto strong {
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    .hero-specs {
+      text-align: right;
+      font-size: 10.5px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      line-height: 2.6;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       MARQUEE STRIP
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .marquee-wrap {
+      background: var(--bg-dark);
+      color: var(--bg);
+      overflow: hidden;
+      border-bottom: 1px solid #000;
+      padding: 0;
+    }
+
+    .marquee-track {
+      display: flex;
+      white-space: nowrap;
+      animation: slide 22s linear infinite;
+    }
+
+    .marquee-track:hover { animation-play-state: paused; }
+
+    .m-item {
+      display: inline-flex;
+      align-items: center;
+      font-size: clamp(12px, 1.4vw, 16px);
+      font-weight: 400;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      padding: 20px 0;
+      flex-shrink: 0;
+    }
+
+    .m-sep {
+      display: inline-block;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+      margin: 0 36px;
+      opacity: 0.5;
+    }
+
+    @keyframes slide {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       WORK / PROYECTOS
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #trabajo {
+      padding-bottom: 0;
+    }
+
+    .work-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 1px solid var(--border-hard);
+      padding-bottom: 20px;
+      margin-bottom: 0;
+    }
+
+    .work-header .sec-label { margin-bottom: 0; }
+
+    .work-count {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+    }
+
+    /* Column header */
+    .work-cols {
+      display: grid;
+      grid-template-columns: 56px 1fr 100px 180px 160px;
+      gap: 20px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 9.5px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+    }
+
+    /* Empty state */
+    .work-empty {
+      padding: 96px 0 108px;
+    }
+
+    .work-empty-headline {
+      font-size: clamp(64px, 12vw, 160px);
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      line-height: 0.85;
+      text-transform: uppercase;
+      color: rgba(8, 8, 8, 0.06);
+      user-select: none;
+      margin-bottom: 48px;
+    }
+
+    .work-empty-sub {
+      border-top: 1px solid var(--border);
+      padding-top: 24px;
+      max-width: 380px;
+    }
+
+    .work-empty-sub p {
+      font-size: 12.5px;
+      color: var(--ink-muted);
+      line-height: 1.85;
+      letter-spacing: 0.02em;
+    }
+
+    /* Project row (for future use) */
+    .proj-row {
+      display: grid;
+      grid-template-columns: 56px 1fr 100px 180px 160px;
+      gap: 20px;
+      padding: 26px 0;
+      border-bottom: 1px solid var(--border);
+      cursor: none;
+      transition: background 0.25s;
+      position: relative;
+    }
+
+    .proj-row:hover { background: rgba(8,8,8,0.025); }
+
+    .proj-num {
+      font-size: 11px;
+      color: var(--ink-muted);
+      padding-top: 4px;
+    }
+
+    .proj-body {}
+
+    .proj-name {
+      font-size: clamp(20px, 2.4vw, 32px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+    }
+
+    .proj-desc {
+      font-size: 12px;
+      color: var(--ink-muted);
+      line-height: 1.75;
+      font-style: italic;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.55s var(--ease), opacity 0.4s var(--ease), margin-top 0.4s;
+    }
+
+    .proj-row:hover .proj-desc {
+      max-height: 80px;
+      opacity: 1;
+      margin-top: 10px;
+    }
+
+    .proj-year, .proj-cat, .proj-stack {
+      font-size: 11.5px;
+      color: var(--ink-muted);
+      align-self: start;
+      padding-top: 6px;
+      letter-spacing: 0.03em;
+    }
+
+    /* Project image preview (hover float) */
+    .proj-img-float {
+      position: fixed;
+      width: 280px;
+      height: 340px;
+      object-fit: cover;
+      pointer-events: none;
+      z-index: 600;
+      opacity: 0;
+      transform: scale(0.85) rotate(-2deg);
+      transition: opacity 0.4s var(--ease), transform 0.5s var(--ease);
+      border: 1px solid var(--border);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.18);
+      will-change: left, top, opacity, transform;
+    }
+
+    .proj-img-float.visible {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+    }
+
+    /* Inline project image (mobile) */
+    .proj-thumb {
+      display: none;
+      width: 100%;
+      max-width: 320px;
+      height: auto;
+      margin-top: 14px;
+      border: 1px solid var(--border);
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       STATEMENT SECTION
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #statement {
+      background: var(--bg-dark);
+      color: var(--bg);
+      padding: 100px 52px;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    #statement .sec-label { color: rgba(237,236,234,0.4); }
+    #statement .sec-label::before { background: rgba(237,236,234,0.4); }
+
+    .statement-text {
+      font-size: clamp(32px, 5.5vw, 80px);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 0.9;
+      text-transform: uppercase;
+      max-width: 1200px;
+    }
+
+    .statement-text em {
+      font-style: italic;
+      font-weight: 300;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       SERVICIOS
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #servicios {
+      padding-bottom: 100px;
+    }
+
+    .svc-layout {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 96px;
+      align-items: start;
+    }
+
+    .svc-sidebar {
+      position: sticky;
+      top: 100px;
+    }
+
+    .svc-title {
+      font-size: clamp(42px, 4.5vw, 68px);
+      font-weight: 900;
+      letter-spacing: -0.045em;
+      line-height: 0.88;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+
+    .svc-blurb {
+      font-size: 12.5px;
+      color: var(--ink-muted);
+      line-height: 1.9;
+      max-width: 260px;
+    }
+
+    /* Services table */
+    .svc-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .svc-table thead tr {
+      border-bottom: 1px solid var(--border-hard);
+    }
+
+    .svc-table thead th {
+      font-size: 9.5px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      padding-bottom: 14px;
+      text-align: left;
+      font-weight: 400;
+    }
+
+    .svc-table tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.22s;
+    }
+
+    .svc-table tbody tr:hover {
+      background: rgba(8,8,8,0.028);
+    }
+
+    .svc-table td {
+      padding: 22px 0;
+      vertical-align: middle;
+    }
+
+    .svc-table td.col-num {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      color: var(--ink-muted);
+      width: 72px;
+    }
+
+    .svc-table td.col-name {
+      font-size: clamp(16px, 2vw, 22px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .svc-table td.col-tags {
+      font-size: 11px;
+      color: var(--ink-muted);
+      padding-left: 32px;
+      line-height: 1.9;
+    }
+
+    .svc-table td.col-note {
+      font-size: 11px;
+      color: var(--ink-muted);
+      text-align: right;
+      padding-left: 16px;
+      width: 180px;
+      letter-spacing: 0.04em;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       SOBRE MÍ
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #sobre {
+      padding-bottom: 100px;
+    }
+
+    .about-layout {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .about-left {}
+
+    .about-headline {
+      font-size: clamp(42px, 6vw, 92px);
+      font-weight: 900;
+      letter-spacing: -0.045em;
+      line-height: 0.88;
+      text-transform: uppercase;
+      margin-bottom: 52px;
+    }
+
+    .about-headline em {
+      font-style: italic;
+      font-weight: 300;
+    }
+
+    .about-body {
+      font-size: 14px;
+      color: var(--ink-muted);
+      line-height: 1.9;
+      max-width: 540px;
+      border-top: 1px solid var(--border);
+      padding-top: 28px;
+    }
+
+    /* Meta table */
+    .about-meta {
+      border-top: 1px solid var(--border-hard);
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 18px 0;
+      border-bottom: 1px solid var(--border);
+      gap: 16px;
+    }
+
+    .meta-label {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      flex-shrink: 0;
+    }
+
+    .meta-val {
+      font-size: 12.5px;
+      font-weight: 400;
+      text-align: right;
+      line-height: 1.5;
+    }
+
+    .meta-val.italic { font-style: italic; }
+
+    .meta-val a {
+      color: var(--ink);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border);
+      transition: border-color 0.25s;
+    }
+
+    .meta-val a:hover { border-color: var(--ink); }
+
+    /* Status dot */
+    .status-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      background: #4caf50;
+      border-radius: 50%;
+      margin-right: 8px;
+      animation: pulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       FOOTER
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    footer {
+      padding: 28px 52px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: none;
+    }
+
+    .foot-copy {
+      font-size: 10.5px;
+      letter-spacing: 0.1em;
+      color: var(--ink-muted);
+      text-transform: uppercase;
+    }
+
+    .foot-up {
+      font-size: 10.5px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: gap 0.25s;
+    }
+
+    .foot-up:hover { gap: 18px; }
+
+    .foot-up::after {
+      content: '↑';
+      font-size: 14px;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       RESPONSIVE
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    @media (max-width: 1024px) {
+      .svc-layout    { grid-template-columns: 1fr; gap: 52px; }
+      .svc-sidebar   { position: static; }
+      .about-layout  { grid-template-columns: 1fr; gap: 52px; }
+      .svc-table td.col-note { display: none; }
+    }
+
+    @media (max-width: 768px) {
+      section        { padding: 80px 24px; }
+      nav            { padding: 18px 24px; }
+      nav.scrolled   { padding: 14px 24px; }
+      footer         { padding: 22px 24px; }
+
+      #hero          { padding: 110px 24px 52px; }
+      #hero::before  { left: 24px; }
+
+      .hero-eyebrow  { flex-direction: column; gap: 12px; }
+      .hero-tag--right { text-align: left; }
+      .hero-footer   { grid-template-columns: 1fr; gap: 24px; }
+      .hero-specs    { text-align: left; }
+
+      .work-cols     { display: none; }
+      .proj-row      {
+        grid-template-columns: 40px 1fr;
+        grid-template-rows: auto auto;
+        gap: 8px 14px;
+      }
+      .proj-year, .proj-cat, .proj-stack {
+        grid-column: 2;
+        font-size: 10.5px;
+      }
+
+      .proj-thumb { display: block; }
+      .proj-img-float { display: none; }
+
+      .statement-text { font-size: clamp(28px, 9vw, 56px); }
+
+      .svc-table td.col-tags { display: none; }
+      .svc-table td.col-name { font-size: 16px; }
+
+      .nav-links { gap: 20px; }
+    }
+
+    @media (max-width: 520px) {
+      .nav-links { display: none; }
+      .hero-name {
+        font-size: clamp(52px, 17vw, 100px);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Custom Cursor -->
+  <div id="cur-dot"></div>
+  <div id="cur-ring"></div>
+
+  <!-- Scroll Progress Bar -->
+  <div id="scroll-bar"></div>
+
+  <!-- ━━━━━━━━━━━━━━ NAV ━━━━━━━━━━━━━━ -->
+  <nav id="nav">
+    <a href="#hero" class="nav-logo">JPCC</a>
+    <ul class="nav-links">
+      <li><a href="#trabajo">Trabajo</a></li>
+      <li><a href="#servicios">Servicios</a></li>
+      <li><a href="#sobre">Sobre mí</a></li>
+    </ul>
+  </nav>
+
+  <!-- ━━━━━━━━━━━━━━ HERO ━━━━━━━━━━━━━━ -->
+  <section id="hero">
+    <div class="wrap">
+
+      <div class="hero-eyebrow">
+        <div class="hero-tag rev">
+          <span>Diseñador</span><br>
+          <span>Portafolio 2025</span>
+        </div>
+        <div class="hero-tag hero-tag--right rev">
+          <span>Disponible</span><br>
+          <span>México</span>
+        </div>
+      </div>
+
+      <h1 class="hero-name" id="hero-name" aria-label="Juan Pablo Castro Casillas">
+        <span class="word"><span class="word-inner">Juan</span></span>
+        <span class="word"><span class="word-inner">Pablo</span></span>
+        <span class="word"><span class="word-inner">Castro</span></span>
+        <span class="word"><span class="word-inner">Casillas</span></span>
+      </h1>
+
+      <div class="hero-footer">
+        <blockquote class="hero-manifesto rev rev-d3">
+          &ldquo;Lo imperfecto<br>es lo más <strong>real, auténtico.</strong>&rdquo;
+        </blockquote>
+        <div class="hero-specs rev rev-d4">
+          <div>Diseño Visual</div>
+          <div>Identidad de Marca</div>
+          <div>Experiencia Digital</div>
+          <div>Arte &amp; Dirección</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ━━━━━━━━━━━━━━ MARQUEE ━━━━━━━━━━━━━━ -->
+  <div class="marquee-wrap">
+    <div class="marquee-track" aria-hidden="true">
+      <!-- Set 1 -->
+      <span class="m-item">Diseño<span class="m-sep"></span></span>
+      <span class="m-item">Juan Pablo Castro Casillas<span class="m-sep"></span></span>
+      <span class="m-item">Lo imperfecto es lo más real<span class="m-sep"></span></span>
+      <span class="m-item">Identidad Visual<span class="m-sep"></span></span>
+      <span class="m-item">Experiencia Digital<span class="m-sep"></span></span>
+      <span class="m-item">Diseñador<span class="m-sep"></span></span>
+      <span class="m-item">Arte &amp; Dirección<span class="m-sep"></span></span>
+      <!-- Set 2 (duplicate for seamless loop) -->
+      <span class="m-item">Diseño<span class="m-sep"></span></span>
+      <span class="m-item">Juan Pablo Castro Casillas<span class="m-sep"></span></span>
+      <span class="m-item">Lo imperfecto es lo más real<span class="m-sep"></span></span>
+      <span class="m-item">Identidad Visual<span class="m-sep"></span></span>
+      <span class="m-item">Experiencia Digital<span class="m-sep"></span></span>
+      <span class="m-item">Diseñador<span class="m-sep"></span></span>
+      <span class="m-item">Arte &amp; Dirección<span class="m-sep"></span></span>
+    </div>
+  </div>
+
+  <!-- ━━━━━━━━━━━━━━ TRABAJO ━━━━━━━━━━━━━━ -->
+  <section id="trabajo">
+    <div class="wrap">
+
+      <div class="work-header rev">
+        <div class="sec-label" style="margin-bottom:0;">01 — Trabajo</div>
+        <span class="work-count" id="proj-count">— casos de estudio</span>
+      </div>
+
+      <!-- Column labels (shown when projects exist) -->
+      <div class="work-cols rev rev-d1">
+        <span>N°</span>
+        <span>Proyecto</span>
+        <span>Año</span>
+        <span>Categoría</span>
+        <span>Stack</span>
+      </div>
+
+      <!-- PROJECT ROWS -->
+      <div class="proj-row rev" data-img="img/alta-tension.jpg">
+        <span class="proj-num">01</span>
+        <div class="proj-body">
+          <div class="proj-name">Alta Tensión</div>
+          <div class="proj-desc">
+            Exploración de identidad gráfica aplicada a indumentaria. Lenguaje visual crudo inspirado en señalización industrial y simbología de peligro como vehículo estético.
+          </div>
+          <img class="proj-thumb" src="img/alta-tension.jpg" alt="Alta Tensión — Playera" loading="lazy">
+        </div>
+        <span class="proj-year">2025</span>
+        <span class="proj-cat">Identidad / Indumentaria</span>
+        <span class="proj-stack">Diseño Gráfico · Textil</span>
+      </div>
+
+      <!-- Floating image for hover -->
+      <img id="proj-float-img" class="proj-img-float" src="" alt="" aria-hidden="true">
+
+    </div>
+  </section>
+
+  <!-- ━━━━━━━━━━━━━━ STATEMENT ━━━━━━━━━━━━━━ -->
+  <section id="statement">
+    <div class="wrap">
+      <div class="sec-label rev">— Filosofía</div>
+      <p class="statement-text rev rev-d1">
+        Diseño que<br>
+        no pide<br>
+        <em>permiso.</em>
+      </p>
+    </div>
+  </section>
+
+  <!-- ━━━━━━━━━━━━━━ SERVICIOS ━━━━━━━━━━━━━━ -->
+  <section id="servicios">
+    <div class="wrap">
+      <div class="svc-layout">
+
+        <div class="svc-sidebar">
+          <div class="sec-label rev">02 — Servicios</div>
+          <h2 class="svc-title rev rev-d1">Capaci-<br>dades</h2>
+          <p class="svc-blurb rev rev-d2">
+            Trabajo en la intersección del pensamiento crítico y la ejecución visual. Cada proyecto es un sistema, no una decoración.
+          </p>
+        </div>
+
+        <div>
+          <table class="svc-table" role="table" aria-label="Capacidades y servicios">
+            <thead>
+              <tr>
+                <th class="col-num">Área</th>
+                <th class="col-name">Disciplina</th>
+                <th class="col-tags">Alcance</th>
+                <th class="col-note" style="text-align:right;">Modalidad</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="rev">
+                <td class="col-num">01</td>
+                <td class="col-name">Identidad Visual</td>
+                <td class="col-tags">Marcas, logotipos, sistemas gráficos,<br>manuales de identidad corporativa.</td>
+                <td class="col-note">Proyecto / Retención</td>
+              </tr>
+              <tr class="rev rev-d1">
+                <td class="col-num">02</td>
+                <td class="col-name">Diseño Editorial</td>
+                <td class="col-tags">Publicaciones, catálogos, libros de marca,<br>layouts de alta densidad informacional.</td>
+                <td class="col-note">Proyecto</td>
+              </tr>
+              <tr class="rev rev-d2">
+                <td class="col-num">03</td>
+                <td class="col-name">Interfaz Digital</td>
+                <td class="col-tags">UI/UX, sistemas de diseño, prototipado,<br>design tokens y handoff.</td>
+                <td class="col-note">Proyecto / Retención</td>
+              </tr>
+              <tr class="rev rev-d3">
+                <td class="col-num">04</td>
+                <td class="col-name">Dirección de Arte</td>
+                <td class="col-tags">Concepto visual, fotografía, campaña,<br>narrativa de marca y storytelling.</td>
+                <td class="col-note">Proyecto</td>
+              </tr>
+              <tr class="rev rev-d4">
+                <td class="col-num">05</td>
+                <td class="col-name">Diseño de Experiencia</td>
+                <td class="col-tags">Espacios, instalaciones, señalética<br>y exhibiciones.</td>
+                <td class="col-note">Consultoría</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ━━━━━━━━━━━━━━ SOBRE MÍ ━━━━━━━━━━━━━━ -->
+  <section id="sobre">
+    <div class="wrap">
+      <div class="sec-label rev">03 — Sobre mí</div>
+
+      <div class="about-layout">
+        <div class="about-left">
+          <h2 class="about-headline rev">
+            Diseñador<br>
+            <em>que cree</em><br>
+            en lo<br>
+            imperfecto.
+          </h2>
+          <p class="about-body rev rev-d2">
+            Soy Juan Pablo Castro Casillas. Creo que el diseño más honesto nace de aceptar lo imperfecto como parte del proceso, no como un error a corregir. Mi trabajo busca traducir ideas complejas en sistemas visuales claros, directos y memorables.
+          </p>
+        </div>
+
+        <div class="about-meta rev rev-d2">
+          <div class="meta-row">
+            <span class="meta-label">Nombre</span>
+            <span class="meta-val">Juan Pablo Castro Casillas</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Rol</span>
+            <span class="meta-val">Diseñador</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Ubicación</span>
+            <span class="meta-val">México</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Disponibilidad</span>
+            <span class="meta-val">
+              <span class="status-dot"></span>Disponible para proyectos
+            </span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Filosofía</span>
+            <span class="meta-val italic">Lo imperfecto es lo más real, auténtico.</span>
+          </div>
+          <div class="meta-row" style="border-bottom: none;">
+            <span class="meta-label">Contacto</span>
+            <span class="meta-val">
+              <a href="#">Próximamente</a>
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ━━━━━━━━━━━━━━ FOOTER ━━━━━━━━━━━━━━ -->
+  <footer>
+    <span class="foot-copy">© 2025 Juan Pablo Castro Casillas</span>
+    <a href="#hero" class="foot-up">Volver arriba</a>
+  </footer>
+
+  <!-- ━━━━━━━━━━━━━━ JAVASCRIPT ━━━━━━━━━━━━━━ -->
+  <script>
+    'use strict';
+
+    /* ── Custom Cursor ─────────────────────────── */
+    const dot  = document.getElementById('cur-dot');
+    const ring = document.getElementById('cur-ring');
+    let mx = -100, my = -100;
+    let rx = -100, ry = -100;
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX;
+      my = e.clientY;
+      dot.style.left = mx + 'px';
+      dot.style.top  = my + 'px';
+    });
+
+    (function loop() {
+      rx += (mx - rx) * 0.11;
+      ry += (my - ry) * 0.11;
+      ring.style.left = rx + 'px';
+      ring.style.top  = ry + 'px';
+      requestAnimationFrame(loop);
+    })();
+
+    // Cursor states
+    const hoverEls = document.querySelectorAll(
+      'a, button, .proj-row, .svc-table tbody tr, .foot-up'
+    );
+    hoverEls.forEach(el => {
+      el.addEventListener('mouseenter', () => document.body.classList.add('cur-active'));
+      el.addEventListener('mouseleave', () => document.body.classList.remove('cur-active'));
+    });
+
+    const darkSections = document.querySelectorAll('#statement, .marquee-wrap');
+    darkSections.forEach(sec => {
+      sec.addEventListener('mouseenter', () => document.body.classList.add('cur-dark'));
+      sec.addEventListener('mouseleave', () => document.body.classList.remove('cur-dark'));
+    });
+
+    /* ── Scroll: Nav + Progress ─────────────────── */
+    const nav      = document.getElementById('nav');
+    const scrollBar = document.getElementById('scroll-bar');
+
+    window.addEventListener('scroll', () => {
+      const sy  = window.scrollY;
+      const max = document.body.scrollHeight - window.innerHeight;
+      nav.classList.toggle('scrolled', sy > 50);
+      scrollBar.style.width = (sy / max * 100) + '%';
+    }, { passive: true });
+
+    /* ── Hero Name Reveal (after load) ──────────── */
+    window.addEventListener('load', () => {
+      document.querySelectorAll('.word-inner').forEach(el => {
+        el.classList.add('up');
+      });
+    });
+
+    /* ── Intersection Observer (section reveals) ─── */
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+
+    document.querySelectorAll('.rev').forEach(el => io.observe(el));
+
+    /* ── Project Count ───────────────────────────── */
+    const rows    = document.querySelectorAll('.proj-row');
+    const counter = document.getElementById('proj-count');
+    if (rows.length === 0) {
+      counter.textContent = '— casos de estudio';
+    } else {
+      counter.textContent = rows.length + (rows.length === 1 ? ' caso de estudio' : ' casos de estudio');
+    }
+
+    /* ── Smooth scroll for anchor links ─────────── */
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    /* ── Project Image Float (desktop hover) ─────── */
+    const floatImg = document.getElementById('proj-float-img');
+    let fix = -200, fiy = -200;
+
+    document.querySelectorAll('.proj-row[data-img]').forEach(row => {
+      row.addEventListener('mouseenter', () => {
+        floatImg.src = row.dataset.img;
+        floatImg.classList.add('visible');
+      });
+      row.addEventListener('mouseleave', () => {
+        floatImg.classList.remove('visible');
+      });
+      row.addEventListener('mousemove', e => {
+        fix = e.clientX + 28;
+        fiy = e.clientY - 80;
+      });
+    });
+
+    (function floatLoop() {
+      if (floatImg) {
+        const cfx = parseFloat(floatImg.style.left) || fix;
+        const cfy = parseFloat(floatImg.style.top)  || fiy;
+        floatImg.style.left = (cfx + (fix - cfx) * 0.09) + 'px';
+        floatImg.style.top  = (cfy + (fiy - cfy) * 0.09) + 'px';
+      }
+      requestAnimationFrame(floatLoop);
+    })();
+  </script>
+
+</body>
+</html>
