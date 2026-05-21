@@ -21,7 +21,7 @@
       overflow: hidden;
       user-select: none;
       -webkit-user-select: none;
-      cursor: none;
+      cursor: crosshair;
     }
 
     /* ── Custom Cursor ── */
@@ -119,13 +119,7 @@
     #mute-btn:hover { background: rgba(255,255,255,0.15); }
     #mute-btn.muted { border-color: rgba(255,60,60,0.5); }
 
-    /* ── Focus overlay (darken others when monolith open) ── */
-    #focus-overlay {
-      position: fixed; inset: 0; z-index: 400; pointer-events: none;
-      background: rgba(0,0,0,0.5);
-      opacity: 0; transition: opacity 0.8s var(--ease);
-    }
-    #focus-overlay.show { opacity: 1; }
+
   </style>
 </head>
 <body>
@@ -140,7 +134,7 @@
     </svg>
   </div>
 
-  <div id="focus-overlay"></div>
+
 
   <div id="loading">
     <div class="ld-logo">Juan Pablo Castro</div>
