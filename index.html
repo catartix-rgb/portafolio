@@ -199,14 +199,19 @@
     }
 
     .nav-audio {
-      color: #fff !important;
-      text-shadow: 0 0 8px rgba(255,255,255,0.6);
-      animation: pulseGlow 2s infinite alternate;
+      background: linear-gradient(90deg, #ff2a2a, #ff7a2a, #e8ff2a, #2aff3b, #2a8cff, #a22aff, #ff2a8c);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      mix-blend-mode: normal !important;
+      animation: rainbow 4s linear infinite;
+      font-weight: 700 !important;
     }
 
-    @keyframes pulseGlow {
-      0% { text-shadow: 0 0 5px rgba(255,255,255,0.4); }
-      100% { text-shadow: 0 0 12px rgba(255,255,255,0.9); }
+    @keyframes rainbow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

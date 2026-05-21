@@ -69,14 +69,8 @@
     .ui-desc { font-size: 11px; color: rgba(255,255,255,0.6); max-width: 300px; margin: 0 auto; line-height: 1.5; }
     
     #back-btn {
-      position: fixed; bottom: 40px; left: 40px; z-index: 600; pointer-events: auto;
-      background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white;
-      padding: 10px 20px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
-      cursor: pointer; opacity: 0; transform: translateY(20px);
-      transition: all 0.4s var(--ease);
+      display: none;
     }
-    #back-btn.show { opacity: 1; transform: translateY(0); }
-    #back-btn:hover { background: white; color: black; }
 
     #hint {
       position: fixed; bottom: 40px; right: 40px; font-size: 10px; letter-spacing: 0.1em;
@@ -122,6 +116,7 @@
     // Interaction state
     let isDragging = false;
     let previousMousePosition = { x: 0, y: 0 };
+    let clickStartPosition = { x: 0, y: 0 };
     let targetRotation = { x: 0, y: 0 };
     let currentRotation = { x: 0, y: 0 };
     let activeMonolith = null;
@@ -253,7 +248,7 @@
       canvas.addEventListener('pointerdown', onPointerDown);
       window.addEventListener('pointermove', onPointerMove);
       window.addEventListener('pointerup', onPointerUp);
-      backBtn.addEventListener('click', closeMonolith);
+      // Removed backBtn listener since we close by clicking outside
 
       // Tunnel entrance animation
       new TWEEN.Tween(camera.position)
@@ -265,9 +260,13 @@
     }
 
     function onPointerDown(e) {
-      if (activeMonolith) return;
+      if (activeMonolith) {
+        clickStartPosition = { x: e.clientX, y: e.clientY };
+        return;
+      }
       isDragging = true;
       previousMousePosition = { x: e.clientX, y: e.clientY };
+      clickStartPosition = { x: e.clientX, y: e.clientY };
     }
 
     function onPointerMove(e) {
@@ -282,13 +281,24 @@
 
     function onPointerUp(e) {
       isDragging = false;
-      if (!activeMonolith) {
+      const deltaX = Math.abs(e.clientX - clickStartPosition.x);
+      const deltaY = Math.abs(e.clientY - clickStartPosition.y);
+      const isClick = (deltaX < 5 && deltaY < 5);
+
+      if (isClick) {
         mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
         mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
         raycaster.setFromCamera(mouse, camera);
         const intersects = raycaster.intersectObjects(monoliths);
-        if (intersects.length > 0) {
-          openMonolith(intersects[0].object);
+        
+        if (activeMonolith) {
+          if (intersects.length === 0 || intersects[0].object !== activeMonolith) {
+            closeMonolith();
+          }
+        } else {
+          if (intersects.length > 0) {
+            openMonolith(intersects[0].object);
+          }
         }
       }
     }
@@ -319,14 +329,14 @@
       uiTitle.textContent = mesh.userData.data.title;
       uiDesc.textContent = mesh.userData.data.desc;
       uiLayer.classList.add('show');
-      backBtn.classList.add('show');
+      // backBtn.classList.add('show');
       document.getElementById('hint').style.display = 'none';
     }
 
     function closeMonolith() {
       activeMonolith = null;
       uiLayer.classList.remove('show');
-      backBtn.classList.remove('show');
+      // backBtn.classList.remove('show');
       document.getElementById('hint').style.display = 'block';
 
       monoliths.forEach(m => m.userData.sound.setVolume(1.0));
