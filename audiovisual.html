@@ -116,8 +116,8 @@
     
     // Color extraction
     const colorCanvas = document.createElement('canvas');
-    colorCanvas.width = 1;
-    colorCanvas.height = 1;
+    colorCanvas.width = 4;
+    colorCanvas.height = 4;
     const colorCtx = colorCanvas.getContext('2d', { willReadFrequently: true });
     const baseColor = new THREE.Color(0x030303);
     const targetColor = new THREE.Color(0x030303);
@@ -388,10 +388,23 @@
       if (activeMonolith) {
         const video = activeMonolith.userData.video;
         if (video.readyState >= video.HAVE_CURRENT_DATA) {
-          colorCtx.drawImage(video, 0, 0, 1, 1);
-          const data = colorCtx.getImageData(0, 0, 1, 1).data;
-          // Dim it for atmospheric effect
-          targetColor.setRGB(data[0]/255 * 0.35, data[1]/255 * 0.35, data[2]/255 * 0.35);
+          colorCtx.drawImage(video, 0, 0, 4, 4);
+          const data = colorCtx.getImageData(0, 0, 4, 4).data;
+          
+          let r = 0, g = 0, b = 0;
+          let maxL = -1;
+          
+          // Encontrar el pixel más brillante (evita que videos oscuros se promedien a negro)
+          for(let i=0; i<data.length; i+=4) {
+             let lum = data[i]*0.299 + data[i+1]*0.587 + data[i+2]*0.114;
+             if (lum > maxL) {
+               maxL = lum;
+               r = data[i]; g = data[i+1]; b = data[i+2];
+             }
+          }
+          
+          // Atenuar para efecto atmosférico
+          targetColor.setRGB(r/255 * 0.35, g/255 * 0.35, b/255 * 0.35);
         }
       } else {
         targetColor.copy(baseColor);
