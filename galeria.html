@@ -3,556 +3,319 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Galería — Juan Pablo Castro Casillas. Explora los trabajos en formato museo.">
-  <title>Galería — JPCC</title>
+  <meta name="description" content="Galería 3D — Juan Pablo Castro Casillas. Explora los trabajos en un espacio tridimensional.">
+  <title>Galería 3D — JPCC</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,700;0,14..32,900;1,14..32,300;1,14..32,400&display=swap" rel="stylesheet">
 
   <style>
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
        RESET & BASE
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-    *, *::before, *::after {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --bg:           #EDECEA;
-      --bg-dark:      #0A0A0A;
-      --ink:          #080808;
-      --ink-muted:    #6B6B6B;
-      --ink-ghost:    #CACAC8;
-      --border:       rgba(8, 8, 8, 0.10);
-      --border-hard:  rgba(8, 8, 8, 0.85);
-      --font:         'Inter', 'Helvetica Neue', Arial, sans-serif;
-      --ease:         cubic-bezier(0.16, 1, 0.3, 1);
-      --ease-in:      cubic-bezier(0.7, 0, 1, 1);
+      --bg:        #EDECEA;
+      --bg-dark:   #080808;
+      --ink:       #080808;
+      --fg:        #EDECEA;
+      --fg-muted:  rgba(237,236,234,0.4);
+      --fg-ghost:  rgba(237,236,234,0.08);
+      --border:    rgba(237,236,234,0.07);
+      --font:      'Inter','Helvetica Neue',Arial,sans-serif;
+      --ease:      cubic-bezier(0.16,1,0.3,1);
     }
 
-    html {
-      font-size: 16px;
-    }
-
-    body {
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
       background: var(--bg-dark);
-      color: var(--bg);
+      color: var(--fg);
       font-family: var(--font);
-      overflow-x: hidden;
       cursor: none;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
 
-    /* Grain */
-    body::after {
-      content: '';
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       CANVAS
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #three-canvas {
       position: fixed;
       inset: 0;
+      width: 100%; height: 100%;
+      display: block;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       CUSTOM CURSOR
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #cur-dot {
+      position: fixed; width: 7px; height: 7px;
+      background: var(--fg); border-radius: 50%;
+      pointer-events: none; z-index: 10000;
+      transform: translate(-50%,-50%);
+      transition: width .25s var(--ease), height .25s var(--ease), background .2s;
+      will-change: left,top;
+    }
+    #cur-ring {
+      position: fixed; width: 38px; height: 38px;
+      border: 1.5px solid rgba(237,236,234,.3);
+      border-radius: 50%; pointer-events: none; z-index: 10000;
+      transform: translate(-50%,-50%);
+      transition: width .35s var(--ease), height .35s var(--ease), border-color .25s;
+      will-change: left,top;
+    }
+    body.cur-active #cur-dot  { width: 12px; height: 12px; }
+    body.cur-active #cur-ring { width: 64px; height: 64px; border-color: rgba(237,236,234,.15); }
+    body.cur-drag   #cur-ring { width: 50px; height: 50px; }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       LOADING SCREEN
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #loading {
+      position: fixed; inset: 0; z-index: 2000;
+      background: var(--bg-dark);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 28px;
+      transition: opacity .8s var(--ease);
+    }
+    #loading.fade { opacity: 0; pointer-events: none; }
+    .ld-logo {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: .3em; text-transform: uppercase;
+      color: var(--fg-muted);
+    }
+    .ld-bar-wrap {
+      width: 160px; height: 1px;
+      background: rgba(237,236,234,.08);
+      overflow: hidden;
+    }
+    .ld-bar {
+      height: 100%; background: rgba(237,236,234,.5);
+      width: 0%; transition: width .3s linear;
+    }
+    .ld-label {
+      font-size: 9.5px; letter-spacing: .22em;
+      text-transform: uppercase; color: var(--fg-muted);
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       NAV
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .gal-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 600;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 22px 52px;
+    }
+    .gal-nav a {
+      font-size: 10.5px; font-weight: 500;
+      letter-spacing: .22em; text-transform: uppercase;
+      text-decoration: none; color: var(--fg);
+      position: relative; padding-bottom: 2px;
+      opacity: .55; transition: opacity .3s;
+    }
+    .gal-nav a:hover { opacity: 1; }
+    .gal-nav a::after {
+      content: ''; position: absolute; bottom: 0; left: 0;
+      width: 100%; height: 1px; background: var(--fg);
+      transform: scaleX(0); transform-origin: right;
+      transition: transform .35s var(--ease);
+    }
+    .gal-nav a:hover::after { transform: scaleX(1); transform-origin: left; }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       SIDE DOT INDEX
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #gal-index {
+      position: fixed; right: 52px; top: 50%; transform: translateY(-50%);
+      z-index: 600; display: flex; flex-direction: column; gap: 12px; align-items: flex-end;
+    }
+    .gi-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      border: 1.5px solid rgba(237,236,234,.22);
+      background: transparent; cursor: none;
+      transition: all .4s var(--ease);
+    }
+    .gi-dot.active {
+      background: var(--fg); border-color: var(--fg);
+      width: 8px; height: 8px;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       PIECE COUNTER (bottom-left)
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #counter {
+      position: fixed; left: 52px; bottom: 52px; z-index: 600;
       pointer-events: none;
-      z-index: 9998;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+    }
+    #counter-num {
+      font-size: clamp(72px,9vw,130px);
+      font-weight: 900; letter-spacing: -.06em; line-height: .85;
+      color: rgba(237,236,234,.05);
+      transition: opacity .6s var(--ease);
+    }
+    #counter-name {
+      font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+      color: rgba(237,236,234,.28);
+      margin-top: 10px;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       HINTS
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #drag-hint {
+      position: fixed; right: 52px; bottom: 52px; z-index: 600;
+      text-align: right; pointer-events: none;
+      transition: opacity 1s var(--ease);
+    }
+    #drag-hint.gone { opacity: 0; }
+    .dh-text {
+      font-size: 9.5px; letter-spacing: .2em; text-transform: uppercase;
+      color: rgba(237,236,234,.22); display: block; margin-bottom: 8px;
+    }
+    .dh-arrows {
+      font-size: 18px; color: rgba(237,236,234,.18);
+      animation: sway 2.2s ease-in-out infinite;
+    }
+    @keyframes sway {
+      0%,100% { transform: translateX(0); }
+      50%      { transform: translateX(-6px); }
+    }
+
+    #click-hint {
+      position: fixed; left: 50%; bottom: 42px; transform: translateX(-50%);
+      z-index: 600; pointer-events: none;
+      font-size: 9.5px; letter-spacing: .22em; text-transform: uppercase;
+      color: rgba(237,236,234,.32);
+      opacity: 0; transition: opacity .6s var(--ease);
+    }
+    #click-hint.show { opacity: 1; }
+
+    /* Keyboard nav hint (top-center) */
+    #key-hint {
+      position: fixed; top: 26px; left: 50%; transform: translateX(-50%);
+      z-index: 600; pointer-events: none;
+      font-size: 9px; letter-spacing: .2em; text-transform: uppercase;
+      color: rgba(237,236,234,.18);
+      opacity: 0; transition: opacity .5s;
+    }
+    #key-hint.show { opacity: 1; }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       DETAIL PANEL
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #detail-panel {
+      position: fixed; right: 0; top: 0; bottom: 0;
+      width: min(420px, 88vw);
+      background: rgba(8,8,8,.96);
+      border-left: 1px solid var(--border);
+      z-index: 700;
+      padding: 96px 48px 52px;
+      display: flex; flex-direction: column;
+      transform: translateX(105%);
+      transition: transform .75s var(--ease);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      overflow-y: auto;
+    }
+    #detail-panel.open { transform: translateX(0); }
+
+    .dp-close {
+      position: absolute; top: 22px; right: 22px;
+      width: 40px; height: 40px;
+      border: 1px solid rgba(237,236,234,.12);
+      border-radius: 50%; background: transparent;
+      color: var(--fg); font-size: 14px; cursor: none;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .25s, border-color .25s;
+    }
+    .dp-close:hover { background: rgba(237,236,234,.07); border-color: rgba(237,236,234,.28); }
+
+    .dp-ghost-num {
+      font-size: clamp(80px,11vw,110px);
+      font-weight: 900; letter-spacing: -.06em; line-height: .8;
+      color: rgba(237,236,234,.04);
+      position: absolute; top: 82px; right: 48px;
+      pointer-events: none; user-select: none;
+    }
+
+    .dp-label {
+      font-size: 10px; font-weight: 500;
+      letter-spacing: .22em; text-transform: uppercase;
+      color: rgba(237,236,234,.3);
+      margin-bottom: 36px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .dp-label::before {
+      content: ''; width: 24px; height: 1px;
+      background: currentColor; flex-shrink: 0;
+    }
+
+    .dp-name {
+      font-size: clamp(28px, 3.5vw, 48px);
+      font-weight: 900; letter-spacing: -.04em;
+      line-height: .9; text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+
+    .dp-desc {
+      font-size: 13.5px; font-weight: 300;
+      line-height: 1.95; color: rgba(237,236,234,.5);
+      margin-bottom: 48px; flex: 1;
+    }
+
+    .dp-meta { border-top: 1px solid var(--border); }
+    .dp-meta-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      padding: 14px 0; border-bottom: 1px solid rgba(237,236,234,.04);
+    }
+    .dp-key {
+      font-size: 9.5px; font-weight: 500;
+      letter-spacing: .2em; text-transform: uppercase;
+      color: rgba(237,236,234,.28);
+    }
+    .dp-val { font-size: 12.5px; color: rgba(237,236,234,.6); }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       GRAIN
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    body::after {
+      content: ''; position: fixed; inset: 0;
+      pointer-events: none; z-index: 9998;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.065'/%3E%3C/svg%3E");
       background-repeat: repeat;
     }
 
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-       CUSTOM CURSOR
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-    #cur-dot {
-      position: fixed;
-      width: 7px;
-      height: 7px;
-      background: var(--bg);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 10000;
-      transform: translate(-50%, -50%);
-      transition: width 0.25s var(--ease), height 0.25s var(--ease);
-      will-change: left, top;
-    }
-
-    #cur-ring {
-      position: fixed;
-      width: 38px;
-      height: 38px;
-      border: 1.5px solid rgba(237, 236, 234, 0.35);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 10000;
-      transform: translate(-50%, -50%);
-      transition: width 0.35s var(--ease), height 0.35s var(--ease);
-      will-change: left, top;
-    }
-
-    body.cur-active #cur-dot {
-      width: 11px;
-      height: 11px;
-    }
-
-    body.cur-active #cur-ring {
-      width: 62px;
-      height: 62px;
-      border-color: rgba(237, 236, 234, 0.2);
-    }
-
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-       SCROLL PROGRESS
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-    #scroll-bar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 2px;
-      background: var(--bg);
-      z-index: 9999;
-      width: 0%;
-      transition: width 0.08s linear;
-    }
-
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-       TOP NAV
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-    .gal-nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 500;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 22px 52px;
-      mix-blend-mode: difference;
-    }
-
-    .gal-nav a {
-      font-size: 10.5px;
-      font-weight: 500;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      text-decoration: none;
-      color: var(--bg);
-      position: relative;
-      padding-bottom: 2px;
-    }
-
-    .gal-nav a::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 1px;
-      background: var(--bg);
-      transform: scaleX(0);
-      transform-origin: right;
-      transition: transform 0.35s var(--ease);
-    }
-
-    .gal-nav a:hover::after {
-      transform: scaleX(1);
-      transform-origin: left;
-    }
-
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-       SIDE INDEX
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-    .gal-index {
-      position: fixed;
-      right: 52px;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 500;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      align-items: flex-end;
-    }
-
-    .gal-index-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      border: 1.5px solid rgba(237, 236, 234, 0.3);
-      background: transparent;
-      transition: all 0.4s var(--ease);
-      cursor: none;
-    }
-
-    .gal-index-dot.active {
-      background: var(--bg);
-      border-color: var(--bg);
-      width: 10px;
-      height: 10px;
-    }
-
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-       GALLERY HERO
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-    .gal-hero {
-      height: 100svh;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 0 52px 64px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .gal-hero::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 52px;
-      width: 1px;
-      height: 100%;
-      background: rgba(237, 236, 234, 0.06);
-    }
-
-    .gal-hero-title {
-      font-size: clamp(64px, 12vw, 200px);
-      font-weight: 900;
-      letter-spacing: -0.05em;
-      line-height: 0.85;
-      text-transform: uppercase;
-      opacity: 0;
-      transform: translateY(60px);
-      animation: heroIn 1.4s var(--ease) 0.2s forwards;
-    }
-
-    .gal-hero-sub {
-      margin-top: 32px;
-      font-size: 11px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: rgba(237, 236, 234, 0.4);
-      opacity: 0;
-      transform: translateY(20px);
-      animation: heroIn 1s var(--ease) 0.6s forwards;
-    }
-
-    .gal-hero-scroll {
-      position: absolute;
-      bottom: 28px;
-      right: 52px;
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: rgba(237, 236, 234, 0.3);
-      writing-mode: vertical-rl;
-      opacity: 0;
-      animation: heroIn 1s var(--ease) 1s forwards;
-    }
-
-    @keyframes heroIn {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-       PIECE (each work = full viewport)
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-    .piece {
-      position: relative;
-      min-height: 100svh;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      overflow: hidden;
-    }
-
-    /* Left: image side */
-    .piece-visual {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 80px 52px;
-      overflow: hidden;
-    }
-
-    .piece-visual::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: rgba(10, 10, 10, 0.15);
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    .piece-img {
-      width: 100%;
-      max-width: 580px;
-      height: auto;
-      max-height: 75vh;
-      object-fit: contain;
-      position: relative;
-      z-index: 2;
-      opacity: 0;
-      transform: scale(0.92) translateY(40px);
-      transition: opacity 1.2s var(--ease), transform 1.4s var(--ease);
-      filter: brightness(0.95) contrast(1.02);
-    }
-
-    .piece.in-view .piece-img {
-      opacity: 1;
-      transform: scale(1) translateY(0);
-    }
-
-    /* Right: info side */
-    .piece-info {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 80px 80px 80px 64px;
-      border-left: 1px solid rgba(237, 236, 234, 0.06);
-      position: relative;
-    }
-
-    .piece-num {
-      font-size: clamp(100px, 14vw, 180px);
-      font-weight: 900;
-      letter-spacing: -0.06em;
-      line-height: 0.8;
-      color: rgba(237, 236, 234, 0.04);
-      position: absolute;
-      top: 50%;
-      right: 60px;
-      transform: translateY(-50%);
-      user-select: none;
-      pointer-events: none;
-    }
-
-    .piece-label {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      font-size: 10px;
-      font-weight: 500;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: rgba(237, 236, 234, 0.35);
-      margin-bottom: 48px;
-      opacity: 0;
-      transform: translateX(-20px);
-      transition: all 0.8s var(--ease) 0.2s;
-    }
-
-    .piece-label::before {
-      content: '';
-      width: 28px;
-      height: 1px;
-      background: currentColor;
-      flex-shrink: 0;
-    }
-
-    .piece.in-view .piece-label {
-      opacity: 1;
-      transform: translateX(0);
-    }
-
-    .piece-name {
-      font-size: clamp(36px, 4.5vw, 72px);
-      font-weight: 900;
-      letter-spacing: -0.04em;
-      line-height: 0.9;
-      text-transform: uppercase;
-      margin-bottom: 28px;
-      opacity: 0;
-      transform: translateY(30px);
-      transition: all 1s var(--ease) 0.35s;
-    }
-
-    .piece.in-view .piece-name {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .piece-desc {
-      font-size: 14px;
-      font-weight: 300;
-      line-height: 1.9;
-      color: rgba(237, 236, 234, 0.55);
-      max-width: 400px;
-      margin-bottom: 52px;
-      opacity: 0;
-      transform: translateY(20px);
-      transition: all 0.9s var(--ease) 0.5s;
-    }
-
-    .piece.in-view .piece-desc {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* Meta tags */
-    .piece-meta {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-      border-top: 1px solid rgba(237, 236, 234, 0.08);
-      opacity: 0;
-      transform: translateY(16px);
-      transition: all 0.8s var(--ease) 0.65s;
-    }
-
-    .piece.in-view .piece-meta {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .piece-meta-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      padding: 14px 0;
-      border-bottom: 1px solid rgba(237, 236, 234, 0.06);
-    }
-
-    .piece-meta-key {
-      font-size: 10px;
-      font-weight: 500;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: rgba(237, 236, 234, 0.3);
-    }
-
-    .piece-meta-val {
-      font-size: 12.5px;
-      font-weight: 400;
-      color: rgba(237, 236, 234, 0.65);
-    }
-
-    /* Separator between pieces */
-    .piece-divider {
-      width: 100%;
-      height: 1px;
-      background: rgba(237, 236, 234, 0.06);
-    }
-
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-       ALTERNATING LAYOUT
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-    .piece:nth-child(even) {
-      direction: rtl;
-    }
-
-    .piece:nth-child(even) > * {
-      direction: ltr;
-    }
-
-    .piece:nth-child(even) .piece-info {
-      border-left: none;
-      border-right: 1px solid rgba(237, 236, 234, 0.06);
-    }
-
-    .piece:nth-child(even) .piece-num {
-      right: auto;
-      left: 60px;
-    }
-
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-       FOOTER
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-    .gal-footer {
-      padding: 32px 52px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top: 1px solid rgba(237, 236, 234, 0.06);
-    }
-
-    .gal-footer span {
-      font-size: 10.5px;
-      letter-spacing: 0.1em;
-      color: rgba(237, 236, 234, 0.3);
-      text-transform: uppercase;
-    }
-
-    .gal-footer a {
-      font-size: 10.5px;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      text-decoration: none;
-      color: rgba(237, 236, 234, 0.5);
-      transition: color 0.3s;
-    }
-
-    .gal-footer a:hover {
-      color: var(--bg);
-    }
-
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
        RESPONSIVE
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-    @media (max-width: 900px) {
-      .piece {
-        grid-template-columns: 1fr;
-        min-height: auto;
-      }
-
-      .piece:nth-child(even) {
-        direction: ltr;
-      }
-
-      .piece:nth-child(even) .piece-info {
-        border-right: none;
-      }
-
-      .piece-visual {
-        min-height: 60svh;
-        padding: 100px 32px 40px;
-      }
-
-      .piece-info {
-        border-left: none;
-        padding: 48px 32px 72px;
-      }
-
-      .piece-num {
-        font-size: 80px;
-        right: 24px;
-        top: 20px;
-        transform: none;
-      }
-
-      .piece:nth-child(even) .piece-num {
-        left: auto;
-        right: 24px;
-      }
-
-      .gal-nav {
-        padding: 18px 24px;
-      }
-
-      .gal-hero {
-        padding: 0 24px 48px;
-      }
-
-      .gal-index {
-        display: none;
-      }
-
-      .gal-footer {
-        padding: 24px;
-        flex-direction: column;
-        gap: 12px;
-      }
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    @media (max-width: 768px) {
+      .gal-nav { padding: 18px 24px; }
+      #gal-index { display: none; }
+      #counter { left: 24px; bottom: 30px; }
+      #drag-hint { right: 24px; bottom: 30px; }
+      #detail-panel { padding: 80px 28px 40px; }
     }
   </style>
 </head>
-
 <body>
+
   <!-- Cursor -->
   <div id="cur-dot"></div>
   <div id="cur-ring"></div>
 
-  <!-- Progress -->
-  <div id="scroll-bar"></div>
+  <!-- Loading -->
+  <div id="loading">
+    <div class="ld-logo">JPCC — Galería</div>
+    <div class="ld-bar-wrap"><div class="ld-bar" id="ld-bar"></div></div>
+    <div class="ld-label" id="ld-label">Cargando espacio…</div>
+  </div>
+
+  <!-- Canvas 3D -->
+  <canvas id="three-canvas"></canvas>
 
   <!-- Nav -->
   <nav class="gal-nav">
@@ -560,348 +323,612 @@
     <a href="index.html#trabajo">Índice</a>
   </nav>
 
-  <!-- Side index dots -->
-  <div class="gal-index" id="gal-index"></div>
+  <!-- Side dots -->
+  <div id="gal-index"></div>
 
-  <!-- Hero -->
-  <section class="gal-hero">
-    <h1 class="gal-hero-title">Galería</h1>
-    <p class="gal-hero-sub">Juan Pablo Castro Casillas — Selección de trabajo</p>
-    <span class="gal-hero-scroll">Scroll ↓</span>
-  </section>
+  <!-- Piece counter -->
+  <div id="counter">
+    <div id="counter-num">01</div>
+    <div id="counter-name">Alta Tensión</div>
+  </div>
 
-  <!-- Gallery pieces -->
-  <main id="gallery">
+  <!-- Drag hint -->
+  <div id="drag-hint">
+    <span class="dh-text">Arrastra para explorar</span>
+    <span class="dh-arrows">← →</span>
+  </div>
 
-    <div class="piece-divider"></div>
+  <!-- Click hint -->
+  <div id="click-hint">↩ clic para ver detalles</div>
 
-    <article class="piece" data-piece="0">
-      <div class="piece-visual">
-        <img class="piece-img" src="img/alta-tension.jpg" alt="Alta Tensión" loading="lazy">
+  <!-- Key hint -->
+  <div id="key-hint">← → teclado · scroll · drag</div>
+
+  <!-- Detail panel -->
+  <div id="detail-panel" role="dialog" aria-modal="true" aria-label="Detalle de obra">
+    <button class="dp-close" id="dp-close" aria-label="Cerrar">✕</button>
+    <div class="dp-ghost-num" id="dp-ghost">01</div>
+    <div class="dp-label">Caso de estudio</div>
+    <h2 class="dp-name" id="dp-name">Alta Tensión</h2>
+    <p class="dp-desc" id="dp-desc"></p>
+    <div class="dp-meta">
+      <div class="dp-meta-row">
+        <span class="dp-key">Año</span>
+        <span class="dp-val" id="dp-year">2025</span>
       </div>
-      <div class="piece-info">
-        <span class="piece-num">01</span>
-        <div class="piece-label">Caso de estudio</div>
-        <h2 class="piece-name">Alta<br>Tensión</h2>
-        <p class="piece-desc">
-          Exploración de identidad gráfica aplicada a indumentaria. Lenguaje visual crudo inspirado en señalización industrial y simbología de peligro como vehículo estético.
-        </p>
-        <div class="piece-meta">
-          <div class="piece-meta-row">
-            <span class="piece-meta-key">Año</span>
-            <span class="piece-meta-val">2025</span>
-          </div>
-          <div class="piece-meta-row">
-            <span class="piece-meta-key">Categoría</span>
-            <span class="piece-meta-val">Identidad / Indumentaria</span>
-          </div>
-          <div class="piece-meta-row">
-            <span class="piece-meta-key">Disciplina</span>
-            <span class="piece-meta-val">Diseño Gráfico · Textil</span>
-          </div>
-        </div>
+      <div class="dp-meta-row">
+        <span class="dp-key">Categoría</span>
+        <span class="dp-val" id="dp-cat">—</span>
       </div>
-    </article>
-
-    <div class="piece-divider"></div>
-
-    <article class="piece" data-piece="1">
-      <div class="piece-visual">
-        <img class="piece-img" src="img/not-different.jpg" alt="Not Different" loading="lazy">
+      <div class="dp-meta-row">
+        <span class="dp-key">Disciplina</span>
+        <span class="dp-val" id="dp-disc">—</span>
       </div>
-      <div class="piece-info">
-        <span class="piece-num">02</span>
-        <div class="piece-label">Caso de estudio</div>
-        <h2 class="piece-name">Not<br>Different</h2>
-        <p class="piece-desc">
-          Una exploración de branding e identidad para marca. Concepto visual centrado en la idea de que lo auténtico no necesita diferenciarse — simplemente es.
-        </p>
-        <div class="piece-meta">
-          <div class="piece-meta-row">
-            <span class="piece-meta-key">Año</span>
-            <span class="piece-meta-val">2025</span>
-          </div>
-          <div class="piece-meta-row">
-            <span class="piece-meta-key">Categoría</span>
-            <span class="piece-meta-val">Branding / Identidad</span>
-          </div>
-          <div class="piece-meta-row">
-            <span class="piece-meta-key">Disciplina</span>
-            <span class="piece-meta-val">Diseño Gráfico</span>
-          </div>
-        </div>
-      </div>
-    </article>
+    </div>
+  </div>
 
-    <div class="piece-divider"></div>
-
-    <article class="piece" data-piece="2">
-      <div class="piece-visual">
-        <img class="piece-img" src="img/catartix-popup.jpg" alt="Catartix Pop Up" loading="lazy">
-      </div>
-      <div class="piece-info">
-        <span class="piece-num">03</span>
-        <div class="piece-label">Caso de estudio</div>
-        <h2 class="piece-name">Catartix<br>Pop Up</h2>
-        <p class="piece-desc">
-          Póster para evento musical. Exploración gráfica experimentando con alto contraste de colores y texturas de semitono como recurso visual.
-        </p>
-        <div class="piece-meta">
-          <div class="piece-meta-row">
-            <span class="piece-meta-key">Año</span>
-            <span class="piece-meta-val">2025</span>
-          </div>
-          <div class="piece-meta-row">
-            <span class="piece-meta-key">Categoría</span>
-            <span class="piece-meta-val">Cartelismo / Evento</span>
-          </div>
-          <div class="piece-meta-row">
-            <span class="piece-meta-key">Disciplina</span>
-            <span class="piece-meta-val">Diseño Gráfico</span>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <div class="piece-divider"></div>
-
-    <article class="piece" data-piece="3">
-      <div class="piece-visual">
-        <img class="piece-img" src="img/editorial-1.jpg" alt="Producción Editorial I" loading="lazy">
-      </div>
-      <div class="piece-info">
-        <span class="piece-num">04</span>
-        <div class="piece-label">Caso de estudio</div>
-        <h2 class="piece-name">Producción<br>Editorial I</h2>
-        <p class="piece-desc">
-          Dirección de arte y fotografía para producción editorial. Exploración visual de estética de moda y lifestyle con enfoque en movimiento y textura.
-        </p>
-        <div class="piece-meta">
-          <div class="piece-meta-row">
-            <span class="piece-meta-key">Año</span>
-            <span class="piece-meta-val">2025</span>
-          </div>
-          <div class="piece-meta-row">
-            <span class="piece-meta-key">Categoría</span>
-            <span class="piece-meta-val">Fotografía / Editorial</span>
-          </div>
-          <div class="piece-meta-row">
-            <span class="piece-meta-key">Disciplina</span>
-            <span class="piece-meta-val">Dirección de Arte</span>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <div class="piece-divider"></div>
-
-    <article class="piece" data-piece="4">
-      <div class="piece-visual">
-        <img class="piece-img" src="img/editorial-2.jpg" alt="Producción Editorial II" loading="lazy">
-      </div>
-      <div class="piece-info">
-        <span class="piece-num">05</span>
-        <div class="piece-label">Caso de estudio</div>
-        <h2 class="piece-name">Producción<br>Editorial II</h2>
-        <p class="piece-desc">
-          Segunda parte de la serie fotográfica, centrada en composición visual, indumentaria y los detalles en los accesorios.
-        </p>
-        <div class="piece-meta">
-          <div class="piece-meta-row">
-            <span class="piece-meta-key">Año</span>
-            <span class="piece-meta-val">2025</span>
-          </div>
-          <div class="piece-meta-row">
-            <span class="piece-meta-key">Categoría</span>
-            <span class="piece-meta-val">Fotografía / Editorial</span>
-          </div>
-          <div class="piece-meta-row">
-            <span class="piece-meta-key">Disciplina</span>
-            <span class="piece-meta-val">Dirección de Arte</span>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <div class="piece-divider"></div>
-
-    <article class="piece" data-piece="5">
-      <div class="piece-visual">
-        <img class="piece-img" src="img/editorial-libro.jpg" alt="Exploración Editorial" loading="lazy">
-      </div>
-      <div class="piece-info">
-        <span class="piece-num">06</span>
-        <div class="piece-label">Caso de estudio</div>
-        <h2 class="piece-name">Exploración<br>Editorial</h2>
-        <p class="piece-desc">
-          Diseño editorial y maquetación conceptual de un libro. Proyecto experimental enfocado en la estructura de retículas, jerarquía tipográfica y composición espacial del contenido.
-        </p>
-        <div class="piece-meta">
-          <div class="piece-meta-row">
-            <span class="piece-meta-key">Año</span>
-            <span class="piece-meta-val">2025</span>
-          </div>
-          <div class="piece-meta-row">
-            <span class="piece-meta-key">Categoría</span>
-            <span class="piece-meta-val">Diseño Editorial / Libro</span>
-          </div>
-          <div class="piece-meta-row">
-            <span class="piece-meta-key">Disciplina</span>
-            <span class="piece-meta-val">Photoshop · Illustrator · InDesign</span>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <div class="piece-divider"></div>
-
-    <article class="piece" data-piece="6">
-      <div class="piece-visual">
-        <img class="piece-img" src="img/tecnicas-illustrator-1.jpg" alt="Diseño Editorial · Illustrator I" loading="lazy">
-      </div>
-      <div class="piece-info">
-        <span class="piece-num">07</span>
-        <div class="piece-label">Caso de estudio</div>
-        <h2 class="piece-name">Diseño<br>Editorial I</h2>
-        <p class="piece-desc">
-          Exploración de técnicas en Illustrator aplicadas al diseño editorial. Maquetación tipográfica, retículas y composición de imagen en blanco y negro con recursos de semitono y simbología gráfica.
-        </p>
-        <div class="piece-meta">
-          <div class="piece-meta-row">
-            <span class="piece-meta-key">Año</span>
-            <span class="piece-meta-val">2025</span>
-          </div>
-          <div class="piece-meta-row">
-            <span class="piece-meta-key">Categoría</span>
-            <span class="piece-meta-val">Diseño Editorial</span>
-          </div>
-          <div class="piece-meta-row">
-            <span class="piece-meta-key">Disciplina</span>
-            <span class="piece-meta-val">Adobe Illustrator</span>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <div class="piece-divider"></div>
-
-    <article class="piece" data-piece="7">
-      <div class="piece-visual">
-        <img class="piece-img" src="img/tecnicas-illustrator-2.jpg" alt="Diseño Editorial · Illustrator II" loading="lazy">
-      </div>
-      <div class="piece-info">
-        <span class="piece-num">08</span>
-        <div class="piece-label">Caso de estudio</div>
-        <h2 class="piece-name">Diseño<br>Editorial II</h2>
-        <p class="piece-desc">
-          Segunda exploración del proyecto editorial. Paleta cromática restringida — naranja quemado y negro — sobre imágenes de semitono. Textura, contraste y ritmo visual como lenguaje propio.
-        </p>
-        <div class="piece-meta">
-          <div class="piece-meta-row">
-            <span class="piece-meta-key">Año</span>
-            <span class="piece-meta-val">2025</span>
-          </div>
-          <div class="piece-meta-row">
-            <span class="piece-meta-key">Categoría</span>
-            <span class="piece-meta-val">Diseño Editorial</span>
-          </div>
-          <div class="piece-meta-row">
-            <span class="piece-meta-key">Disciplina</span>
-            <span class="piece-meta-val">Adobe Illustrator</span>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <div class="piece-divider"></div>
-
-  </main>
-
-  <!-- Footer -->
-  <footer class="gal-footer">
-    <span>© 2025 Juan Pablo Castro Casillas</span>
-    <a href="#" id="back-top">Volver arriba ↑</a>
-  </footer>
-
+  <!-- Three.js -->
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
   <script>
-    /* ── Custom Cursor ──────────────────────────── */
-    const dot  = document.getElementById('cur-dot');
-    const ring = document.getElementById('cur-ring');
-    let mx = -100, my = -100, dx = -100, dy = -100;
+  /* ════════════════════════════════════════════════
+     PIECE DATA
+  ════════════════════════════════════════════════ */
+  const PIECES = [
+    {
+      img: 'img/alta-tension.jpg', num: '01', name: 'Alta Tensión',
+      desc: 'Exploración de identidad gráfica aplicada a indumentaria. Lenguaje visual crudo inspirado en señalización industrial y simbología de peligro como vehículo estético.',
+      year: '2025', cat: 'Identidad / Indumentaria', disc: 'Diseño Gráfico · Textil'
+    },
+    {
+      img: 'img/not-different.jpg', num: '02', name: 'Not Different',
+      desc: 'Una exploración de branding e identidad para marca. Concepto visual centrado en la idea de que lo auténtico no necesita diferenciarse — simplemente es.',
+      year: '2025', cat: 'Branding / Identidad', disc: 'Diseño Gráfico'
+    },
+    {
+      img: 'img/catartix-popup.jpg', num: '03', name: 'Catartix Pop Up',
+      desc: 'Póster para evento musical. Exploración gráfica experimentando con alto contraste de colores y texturas de semitono como recurso visual.',
+      year: '2025', cat: 'Cartelismo / Evento', disc: 'Diseño Gráfico'
+    },
+    {
+      img: 'img/editorial-1.jpg', num: '04', name: 'Producción Editorial I',
+      desc: 'Dirección de arte y fotografía para producción editorial. Exploración visual de estética de moda y lifestyle con enfoque en movimiento y textura.',
+      year: '2025', cat: 'Fotografía / Editorial', disc: 'Dirección de Arte'
+    },
+    {
+      img: 'img/editorial-2.jpg', num: '05', name: 'Producción Editorial II',
+      desc: 'Segunda parte de la serie fotográfica, centrada en composición visual, indumentaria y los detalles en los accesorios.',
+      year: '2025', cat: 'Fotografía / Editorial', disc: 'Dirección de Arte'
+    },
+    {
+      img: 'img/editorial-libro.jpg', num: '06', name: 'Exploración Editorial',
+      desc: 'Diseño editorial y maquetación conceptual de un libro. Proyecto experimental enfocado en retículas, jerarquía tipográfica y composición espacial del contenido.',
+      year: '2025', cat: 'Diseño Editorial / Libro', disc: 'Photoshop · Illustrator · InDesign'
+    },
+    {
+      img: 'img/tecnicas-illustrator-1.jpg', num: '07', name: 'Diseño Editorial I',
+      desc: 'Exploración de técnicas en Illustrator aplicadas al diseño editorial. Maquetación tipográfica, retículas y composición en blanco y negro con recursos de semitono y simbología gráfica.',
+      year: '2025', cat: 'Diseño Editorial', disc: 'Adobe Illustrator'
+    },
+    {
+      img: 'img/tecnicas-illustrator-2.jpg', num: '08', name: 'Diseño Editorial II',
+      desc: 'Segunda exploración del proyecto editorial. Paleta cromática restringida — naranja quemado y negro — sobre imágenes de semitono. Textura, contraste y ritmo visual como lenguaje propio.',
+      year: '2025', cat: 'Diseño Editorial', disc: 'Adobe Illustrator'
+    }
+  ];
 
-    document.addEventListener('mousemove', e => {
-      mx = e.clientX;
-      my = e.clientY;
-      dot.style.left = mx + 'px';
-      dot.style.top  = my + 'px';
+  const N      = PIECES.length;
+  const RADIUS = 5.6;
+  const STEP   = (Math.PI * 2) / N;
+
+  /* ════════════════════════════════════════════════
+     RENDERER
+  ════════════════════════════════════════════════ */
+  const canvas = document.getElementById('three-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.1;
+
+  /* ════════════════════════════════════════════════
+     SCENE
+  ════════════════════════════════════════════════ */
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x080808);
+  scene.fog = new THREE.FogExp2(0x080808, 0.058);
+
+  /* ════════════════════════════════════════════════
+     CAMERA — sits at center of the cylinder
+  ════════════════════════════════════════════════ */
+  const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 40);
+  camera.position.set(0, 0.25, 0);
+
+  /* ════════════════════════════════════════════════
+     LIGHTS
+  ════════════════════════════════════════════════ */
+  scene.add(new THREE.AmbientLight(0xfff5e8, 0.18));
+
+  const topLight = new THREE.PointLight(0xedecea, 1.1, 20);
+  topLight.position.set(0, 5, 0);
+  scene.add(topLight);
+
+  // Warm & cool accent lights for atmosphere
+  const warmLight = new THREE.PointLight(0xffe4b5, 0.55, 12);
+  warmLight.position.set(RADIUS * .55, .8, -RADIUS * .55);
+  scene.add(warmLight);
+
+  const coolLight = new THREE.PointLight(0xc8d8ff, 0.35, 10);
+  coolLight.position.set(-RADIUS * .55, .8, RADIUS * .55);
+  scene.add(coolLight);
+
+  /* ════════════════════════════════════════════════
+     GALLERY GROUP — rotates around Y
+  ════════════════════════════════════════════════ */
+  const gallery = new THREE.Group();
+  scene.add(gallery);
+
+  /* ════════════════════════════════════════════════
+     ENVIRONMENT — floor, ceiling, walls
+  ════════════════════════════════════════════════ */
+  // Floor
+  {
+    const geo = new THREE.CircleGeometry(RADIUS + 2, 96);
+    const mat = new THREE.MeshStandardMaterial({ color: 0x0b0b0b, roughness: 1, metalness: 0 });
+    const m   = new THREE.Mesh(geo, mat);
+    m.rotation.x = -Math.PI / 2;
+    m.position.y = -1.55;
+    scene.add(m);
+
+    // Floor ring glow
+    const ringGeo = new THREE.TorusGeometry(RADIUS, 0.014, 8, 96);
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0x1e1e1e });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.rotation.x = Math.PI / 2;
+    ring.position.y = -1.54;
+    scene.add(ring);
+
+    // Inner floor ring (subtle)
+    const inner = new THREE.TorusGeometry(RADIUS * .35, 0.008, 8, 60);
+    const innerMat = new THREE.MeshBasicMaterial({ color: 0x141414 });
+    const innerM = new THREE.Mesh(inner, innerMat);
+    innerM.rotation.x = Math.PI / 2;
+    innerM.position.y = -1.54;
+    scene.add(innerM);
+  }
+
+  // Ceiling
+  {
+    const geo = new THREE.CircleGeometry(RADIUS + 2, 96);
+    const mat = new THREE.MeshStandardMaterial({ color: 0x090909, roughness: 1 });
+    const m   = new THREE.Mesh(geo, mat);
+    m.rotation.x = Math.PI / 2;
+    m.position.y = 2.9;
+    scene.add(m);
+  }
+
+  // Cylinder wall (dark, backside visible from inside)
+  {
+    const geo = new THREE.CylinderGeometry(RADIUS + .4, RADIUS + .4, 4.8, 96, 1, true);
+    const mat = new THREE.MeshStandardMaterial({ color: 0x0c0c0c, side: THREE.BackSide, roughness: 1 });
+    scene.add(new THREE.Mesh(geo, mat));
+  }
+
+  /* ════════════════════════════════════════════════
+     ATMOSPHERIC PARTICLES
+  ════════════════════════════════════════════════ */
+  {
+    const count  = 150;
+    const pos    = new Float32Array(count * 3);
+    const speeds = new Float32Array(count);
+    for (let i = 0; i < count; i++) {
+      const theta = Math.random() * Math.PI * 2;
+      const r     = Math.random() * RADIUS * .85;
+      pos[i*3]   = Math.cos(theta) * r;
+      pos[i*3+1] = (Math.random() - .5) * 4;
+      pos[i*3+2] = Math.sin(theta) * r;
+      speeds[i]  = .0004 + Math.random() * .0008;
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    const mat = new THREE.PointsMaterial({ color: 0x443322, size: .022, transparent: true, opacity: .55 });
+    const pts = new THREE.Points(geo, mat);
+    scene.add(pts);
+
+    // Animate particles in render loop via closure
+    window._particles = { pts, pos, speeds, count };
+  }
+
+  /* ════════════════════════════════════════════════
+     LOAD FRAMES
+  ════════════════════════════════════════════════ */
+  const loader   = new THREE.TextureLoader();
+  const frames   = [];
+  let   loaded   = 0;
+  const ldBar    = document.getElementById('ld-bar');
+  const ldLabel  = document.getElementById('ld-label');
+
+  PIECES.forEach((p, i) => {
+    const angle = i * STEP;
+    const x     = Math.sin(angle) * RADIUS;
+    const z     = -Math.cos(angle) * RADIUS;  // piece 0 directly in front (-Z)
+
+    loader.load(
+      p.img,
+      texture => {
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.anisotropy  = renderer.capabilities.getMaxAnisotropy();
+
+        const aspect = texture.image.naturalWidth / texture.image.naturalHeight;
+        const ph = 2.5;
+        const pw = Math.min(ph * aspect, 2.2 * ph); // cap wide images
+
+        buildFrame(i, x, z, pw, ph, texture, p);
+        onFrameLoaded();
+      },
+      undefined,
+      () => {
+        // Error — placeholder dark frame
+        const geo = new THREE.PlaneGeometry(1.8, 2.5);
+        const mat = new THREE.MeshStandardMaterial({ color: 0x141414 });
+        const grp = new THREE.Group();
+        grp.add(new THREE.Mesh(geo, mat));
+        grp.position.set(x, 0, z);
+        grp.userData = { index: i, data: p, imgMat: mat };
+        gallery.add(grp);
+        frames.push(grp);
+        onFrameLoaded();
+      }
+    );
+  });
+
+  function buildFrame(i, x, z, pw, ph, texture, p) {
+    const grp = new THREE.Group();
+
+    // Soft shadow plane behind
+    const shadowGeo = new THREE.PlaneGeometry(pw + .8, ph + .8);
+    const shadowMat = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: .45 });
+    const shadow    = new THREE.Mesh(shadowGeo, shadowMat);
+    shadow.position.z = -.04;
+
+    // Frame border
+    const fGeo = new THREE.PlaneGeometry(pw + .07, ph + .07);
+    const fMat = new THREE.MeshBasicMaterial({ color: 0x1c1c1c });
+    const frame = new THREE.Mesh(fGeo, fMat);
+
+    // Image
+    const iGeo = new THREE.PlaneGeometry(pw, ph);
+    const iMat = new THREE.MeshStandardMaterial({
+      map: texture, roughness: .82, metalness: 0,
+      transparent: true, opacity: .55
+    });
+    const img  = new THREE.Mesh(iGeo, iMat);
+    img.position.z = .003;
+
+    // Top accent strip
+    const sGeo = new THREE.PlaneGeometry(pw + .07, .007);
+    const sMat = new THREE.MeshBasicMaterial({ color: 0x2a2a2a, transparent: true, opacity: .9 });
+    const strip = new THREE.Mesh(sGeo, sMat);
+    strip.position.set(0, (ph + .07) / 2 + .0035, .004);
+
+    // Wall mount pin (tiny sphere)
+    const pinGeo = new THREE.SphereGeometry(.025, 8, 8);
+    const pinMat = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: .4, metalness: .6 });
+    const pin    = new THREE.Mesh(pinGeo, pinMat);
+    pin.position.set(0, ph / 2 + .25, -.05);
+
+    // Wire from pin to frame top
+    const wirePts = [
+      new THREE.Vector3(0, ph / 2 + .25, -.05),
+      new THREE.Vector3(0, ph / 2 + .03, .0)
+    ];
+    const wireGeo = new THREE.BufferGeometry().setFromPoints(wirePts);
+    const wireMat = new THREE.LineBasicMaterial({ color: 0x1a1a1a });
+    const wire    = new THREE.Line(wireGeo, wireMat);
+
+    grp.add(shadow, frame, img, strip, pin, wire);
+    grp.position.set(x, 0, z);
+    grp.userData = { index: i, data: p, imgMat: iMat };
+    gallery.add(grp);
+    frames.push(grp);
+  }
+
+  function onFrameLoaded() {
+    loaded++;
+    ldBar.style.width = (loaded / N * 100) + '%';
+    ldLabel.textContent = `${loaded} / ${N} obras`;
+    if (loaded === N) onAllLoaded();
+  }
+
+  /* ════════════════════════════════════════════════
+     ALL LOADED
+  ════════════════════════════════════════════════ */
+  function onAllLoaded() {
+    // Short delay then fade loading
+    setTimeout(() => {
+      document.getElementById('loading').classList.add('fade');
+      setTimeout(() => document.getElementById('loading').style.display = 'none', 900);
+    }, 500);
+
+    // Build side dots
+    const indexEl = document.getElementById('gal-index');
+    PIECES.forEach((_, i) => {
+      const d = document.createElement('div');
+      d.className = 'gi-dot';
+      d.addEventListener('click', () => navigateTo(i));
+      indexEl.appendChild(d);
     });
 
-    (function cursorLoop() {
-      dx += (mx - dx) * 0.12;
-      dy += (my - dy) * 0.12;
-      ring.style.left = dx + 'px';
-      ring.style.top  = dy + 'px';
-      requestAnimationFrame(cursorLoop);
-    })();
+    // Show key hint briefly
+    const keyHint = document.getElementById('key-hint');
+    setTimeout(() => {
+      keyHint.classList.add('show');
+      setTimeout(() => keyHint.classList.remove('show'), 3500);
+    }, 1400);
 
-    document.querySelectorAll('a, button').forEach(el => {
-      el.addEventListener('mouseenter', () => document.body.classList.add('cur-active'));
-      el.addEventListener('mouseleave', () => document.body.classList.remove('cur-active'));
+    updateActive(0);
+  }
+
+  /* ════════════════════════════════════════════════
+     ROTATION STATE
+  ════════════════════════════════════════════════ */
+  let targetRot  = 0;   // target gallery.rotation.y
+  let currentRot = 0;   // smoothed current
+  let activeIdx  = 0;
+  let prevActive = -1;
+
+  function getIdxFromRot(rot) {
+    // When gallery.rotation.y = rot, which piece is at front-center?
+    // Piece i is at angle i*STEP in gallery local space.
+    // After gallery.rotation.y = rot, piece i is at world angle i*STEP + rot.
+    // For piece i to be at front (angle 0): rot ≈ -i*STEP
+    // Active: i = round(-rot / STEP)
+    let a = ((-rot) / STEP);
+    return ((Math.round(a) % N) + N) % N;
+  }
+
+  function navigateTo(idx) {
+    const target     = -idx * STEP;
+    const raw        = target - currentRot;
+    const normalized = ((raw % (Math.PI * 2)) + Math.PI * 3) % (Math.PI * 2) - Math.PI;
+    targetRot = currentRot + normalized;
+  }
+
+  function updateActive(idx) {
+    activeIdx = idx;
+    const p   = PIECES[idx];
+
+    document.getElementById('counter-num').textContent  = p.num;
+    document.getElementById('counter-name').textContent = p.name;
+
+    document.querySelectorAll('.gi-dot').forEach((d, i) => {
+      d.classList.toggle('active', i === idx);
     });
 
-    /* ── Scroll Progress ────────────────────────── */
-    const scrollBar = document.getElementById('scroll-bar');
-    window.addEventListener('scroll', () => {
-      const sy  = window.scrollY;
-      const max = document.body.scrollHeight - window.innerHeight;
-      scrollBar.style.width = (sy / max * 100) + '%';
-    }, { passive: true });
-
-    /* ── Intersection Observer for pieces ────────── */
-    const pieces = document.querySelectorAll('.piece');
-
-    const pieceObserver = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('in-view');
-        }
-      });
-    }, { threshold: 0.2 });
-
-    pieces.forEach(p => pieceObserver.observe(p));
-
-    /* ── Side Index Dots ────────────────────────── */
-    const indexContainer = document.getElementById('gal-index');
-
-    pieces.forEach((p, i) => {
-      const dot = document.createElement('div');
-      dot.classList.add('gal-index-dot');
-      dot.dataset.index = i;
-      dot.addEventListener('click', () => {
-        p.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
-      indexContainer.appendChild(dot);
+    // Brightness
+    frames.forEach(f => {
+      const mat = f.userData.imgMat;
+      if (mat) mat.opacity = f.userData.index === idx ? 1.0 : 0.52;
     });
 
-    const dots = document.querySelectorAll('.gal-index-dot');
+    // Show click hint briefly
+    const ch = document.getElementById('click-hint');
+    ch.classList.add('show');
+    setTimeout(() => ch.classList.remove('show'), 2200);
+  }
 
-    const dotObserver = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        const idx = entry.target.dataset.piece;
-        if (entry.isIntersecting && dots[idx]) {
-          dots.forEach(d => d.classList.remove('active'));
-          dots[idx].classList.add('active');
-        }
-      });
-    }, { threshold: 0.4 });
+  /* ════════════════════════════════════════════════
+     DRAG / TOUCH INTERACTION
+  ════════════════════════════════════════════════ */
+  let dragging   = false;
+  let startX     = 0;
+  let startRot   = 0;
+  let totalDelta = 0;
 
-    pieces.forEach(p => dotObserver.observe(p));
+  canvas.addEventListener('pointerdown', e => {
+    dragging   = true;
+    startX     = e.clientX;
+    startRot   = targetRot;
+    totalDelta = 0;
+    canvas.setPointerCapture(e.pointerId);
+    document.body.classList.add('cur-drag');
+  });
 
-    /* ── Back to top ────────────────────────────── */
-    document.getElementById('back-top').addEventListener('click', e => {
-      e.preventDefault();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const dx   = e.clientX - startX;
+    totalDelta = Math.abs(dx);
+    targetRot  = startRot + dx * .0072;
+  });
+
+  window.addEventListener('pointerup', () => {
+    if (!dragging) return;
+    dragging = false;
+    document.body.classList.remove('cur-drag');
+
+    if (totalDelta < 6) {
+      openPanel();
+      return;
+    }
+    // Snap
+    const idx = getIdxFromRot(targetRot);
+    navigateTo(idx);
+  });
+
+  // Touch
+  canvas.addEventListener('touchstart', e => {
+    if (e.touches.length !== 1) return;
+    dragging = true; startX = e.touches[0].clientX;
+    startRot = targetRot; totalDelta = 0;
+    e.preventDefault();
+  }, { passive: false });
+
+  canvas.addEventListener('touchmove', e => {
+    if (!dragging || e.touches.length !== 1) return;
+    const dx = e.touches[0].clientX - startX;
+    totalDelta = Math.abs(dx);
+    targetRot  = startRot + dx * .0072;
+    e.preventDefault();
+  }, { passive: false });
+
+  canvas.addEventListener('touchend', e => {
+    if (!dragging) return; dragging = false;
+    if (totalDelta < 6) { openPanel(); return; }
+    navigateTo(getIdxFromRot(targetRot));
+  });
+
+  /* ════════════════════════════════════════════════
+     SCROLL — navigate between pieces
+  ════════════════════════════════════════════════ */
+  let wheelTimer;
+  window.addEventListener('wheel', e => {
+    e.preventDefault();
+    clearTimeout(wheelTimer);
+    targetRot += e.deltaY * .0025;
+    wheelTimer = setTimeout(() => {
+      navigateTo(getIdxFromRot(targetRot));
+    }, 180);
+  }, { passive: false });
+
+  /* ════════════════════════════════════════════════
+     KEYBOARD
+  ════════════════════════════════════════════════ */
+  window.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      navigateTo((activeIdx + 1) % N);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      navigateTo(((activeIdx - 1) + N) % N);
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault(); openPanel();
+    } else if (e.key === 'Escape') {
+      closePanel();
+    }
+  });
+
+  /* ════════════════════════════════════════════════
+     DETAIL PANEL
+  ════════════════════════════════════════════════ */
+  function openPanel() {
+    const p = PIECES[activeIdx];
+    document.getElementById('dp-ghost').textContent = p.num;
+    document.getElementById('dp-name').textContent  = p.name;
+    document.getElementById('dp-desc').textContent  = p.desc;
+    document.getElementById('dp-year').textContent  = p.year;
+    document.getElementById('dp-cat').textContent   = p.cat;
+    document.getElementById('dp-disc').textContent  = p.disc;
+    document.getElementById('detail-panel').classList.add('open');
+  }
+
+  function closePanel() {
+    document.getElementById('detail-panel').classList.remove('open');
+  }
+
+  document.getElementById('dp-close').addEventListener('click', closePanel);
+  document.getElementById('dp-close').addEventListener('mouseenter', () => document.body.classList.add('cur-active'));
+  document.getElementById('dp-close').addEventListener('mouseleave', () => document.body.classList.remove('cur-active'));
+
+  /* ════════════════════════════════════════════════
+     DRAG HINT AUTO-HIDE
+  ════════════════════════════════════════════════ */
+  let hintGone = false;
+  function hideHint() {
+    if (!hintGone) { hintGone = true; document.getElementById('drag-hint').classList.add('gone'); }
+  }
+  window.addEventListener('pointermove', hideHint, { once: true });
+  window.addEventListener('touchstart',  hideHint, { once: true });
+
+  /* ════════════════════════════════════════════════
+     CUSTOM CURSOR
+  ════════════════════════════════════════════════ */
+  const curDot  = document.getElementById('cur-dot');
+  const curRing = document.getElementById('cur-ring');
+  let cmx = -100, cmy = -100, cdx = -100, cdy = -100;
+
+  document.addEventListener('mousemove', e => {
+    cmx = e.clientX; cmy = e.clientY;
+    curDot.style.left = cmx + 'px';
+    curDot.style.top  = cmy + 'px';
+  });
+  (function curLoop() {
+    cdx += (cmx - cdx) * 0.12;
+    cdy += (cmy - cdy) * 0.12;
+    curRing.style.left = cdx + 'px';
+    curRing.style.top  = cdy + 'px';
+    requestAnimationFrame(curLoop);
+  })();
+
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('cur-active'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('cur-active'));
+  });
+
+  /* ════════════════════════════════════════════════
+     RESIZE
+  ════════════════════════════════════════════════ */
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  /* ════════════════════════════════════════════════
+     RENDER LOOP
+  ════════════════════════════════════════════════ */
+  const camWP = new THREE.Vector3();
+  let   tick  = 0;
+
+  function animate() {
+    requestAnimationFrame(animate);
+    tick += .008;
+
+    /* — Smooth gallery rotation — */
+    currentRot += (targetRot - currentRot) * .065;
+    gallery.rotation.y = currentRot;
+
+    /* — Active piece tracking — */
+    const newIdx = getIdxFromRot(currentRot);
+    if (newIdx !== prevActive) {
+      prevActive = newIdx;
+      updateActive(newIdx);
+    }
+
+    /* — Billboard: every frame faces the camera — */
+    camera.getWorldPosition(camWP);
+    frames.forEach(f => f.lookAt(camWP));
+
+    /* — Active piece subtle scale pulse — */
+    frames.forEach(f => {
+      const isAct   = f.userData.index === activeIdx;
+      const tgt     = isAct ? 1.045 : 1.0;
+      f.scale.x     += (tgt - f.scale.x) * .055;
+      f.scale.y     += (tgt - f.scale.y) * .055;
+      f.scale.z     += (tgt - f.scale.z) * .055;
     });
+
+    /* — Particle drift — */
+    if (window._particles) {
+      const { pts, pos, speeds, count } = window._particles;
+      const pa = pts.geometry.attributes.position;
+      for (let i = 0; i < count; i++) {
+        pa.array[i * 3 + 1] += speeds[i];
+        if (pa.array[i * 3 + 1] > 2.2) pa.array[i * 3 + 1] = -2.2;
+      }
+      pa.needsUpdate = true;
+    }
+
+    /* — Subtle top-light breathe — */
+    topLight.intensity = .9 + Math.sin(tick * .7) * .08;
+
+    /* — Warm/cool lights slow orbit — */
+    const la = tick * .18;
+    warmLight.position.x = Math.sin(la)       * RADIUS * .6;
+    warmLight.position.z = Math.cos(la)       * RADIUS * .6;
+    coolLight.position.x = Math.sin(la + Math.PI) * RADIUS * .6;
+    coolLight.position.z = Math.cos(la + Math.PI) * RADIUS * .6;
+
+    renderer.render(scene, camera);
+  }
+
+  animate();
   </script>
 </body>
 </html>
