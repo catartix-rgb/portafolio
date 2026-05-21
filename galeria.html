@@ -72,6 +72,12 @@
     body.cur-active #cur-ring { width: 64px; height: 64px; border-color: rgba(237,236,234,.15); }
     body.cur-drag   #cur-ring { width: 50px; height: 50px; }
 
+    @media (hover: none) and (pointer: coarse) {
+      #cur-dot, #cur-ring { display: none !important; }
+      body { cursor: auto !important; }
+      .dp-close { cursor: pointer !important; }
+    }
+
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
        LOADING SCREEN
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
@@ -232,7 +238,19 @@
     }
 
     @media (max-width: 768px) {
-      #large-view { right: 0; padding: 20px; z-index: 750; }
+      .gal-nav { padding: 18px 24px; }
+      #gal-index { display: none; }
+      #drag-hint { right: 24px; bottom: 30px; }
+      #key-hint { display: none; }
+      
+      #detail-panel { 
+        width: 100%; top: auto; bottom: 0; height: 45vh; 
+        padding: 40px 24px 30px; 
+        transform: translateY(105%) translateX(0); 
+      }
+      #detail-panel.open { transform: translateY(0) translateX(0); }
+      
+      #large-view { right: 0; bottom: 45vh; padding: 20px; z-index: 650; }
     }
 
     .dp-close {
