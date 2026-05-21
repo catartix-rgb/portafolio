@@ -633,6 +633,21 @@
       .collage-grid { grid-template-columns: 1fr; grid-auto-rows: 220px; }
       .collage-card.span-tall { grid-row: span 1; }
     }
+    .nav-audio {
+      background: linear-gradient(90deg, #ff2a2a, #ff7a2a, #e8ff2a, #2aff3b, #2a8cff, #a22aff, #ff2a8c);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      mix-blend-mode: normal !important;
+      animation: rainbow 4s linear infinite;
+      font-weight: 700 !important;
+    }
+
+    @keyframes rainbow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
   </style>
 </head>
 <body>
@@ -671,7 +686,7 @@
   <!-- Nav -->
   <nav class="gal-nav">
     <a href="index.html">← Portafolio</a>
-    <a href="index.html#trabajo">Índice</a>
+    <a href="audiovisual.html" class="nav-audio">Audiovisual</a>
   </nav>
 
   <!-- View Toggle -->
