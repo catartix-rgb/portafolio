@@ -319,11 +319,11 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
     .btn-liquid.active {
-      background: linear-gradient(135deg, rgba(0, 242, 254, 0.18) 0%, rgba(79, 172, 254, 0.03) 100%);
-      border-color: rgba(0, 242, 254, 0.35);
+      background: linear-gradient(135deg, var(--track-glow-color-transparent, rgba(0, 242, 254, 0.18)) 0%, rgba(255, 255, 255, 0.02) 100%);
+      border-color: var(--track-glow-color, rgba(0, 242, 254, 0.35));
       box-shadow: 
-        0 8px 24px rgba(0, 242, 254, 0.12),
-        0 0 12px rgba(0, 242, 254, 0.18);
+        0 8px 24px rgba(0, 0, 0, 0.25),
+        0 0 12px var(--track-glow-color-transparent, rgba(0, 242, 254, 0.18));
     }
 
     /* Mode Selector */
@@ -388,6 +388,29 @@
       margin-bottom: 12px;
       text-align: center;
     }
+    .seq-tabs {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    .seq-tab-btn {
+      flex: 1;
+      padding: 6px 10px !important;
+      font-size: 8.5px !important;
+      border-radius: 12px !important;
+      text-align: center;
+      justify-content: center;
+      min-width: 0;
+      white-space: nowrap;
+    }
+    .seq-tab-btn.active {
+      background: linear-gradient(135deg, var(--track-glow-color-transparent, rgba(0, 242, 254, 0.18)) 0%, rgba(255, 255, 255, 0.02) 100%) !important;
+      border-color: var(--track-glow-color, rgba(0, 242, 254, 0.35)) !important;
+      box-shadow: 
+        0 8px 24px rgba(0, 0, 0, 0.25),
+        0 0 12px var(--track-glow-color-transparent, rgba(0, 242, 254, 0.18)) !important;
+    }
     .step-grid {
       display: grid;
       grid-template-columns: repeat(16, 1fr);
@@ -397,17 +420,30 @@
     .step-led {
       aspect-ratio: 1;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.05);
-      transition: background 0.15s ease, box-shadow 0.15s ease;
+      transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+      cursor: none;
+    }
+    .step-led:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.15);
     }
     .step-led.active {
-      background: #ffffff;
-      box-shadow: 0 0 8px #ffffff;
+      background: var(--track-glow-color, var(--cyan-glow));
+      box-shadow: 0 0 10px var(--track-glow-color, var(--cyan-glow));
+      border-color: rgba(255, 255, 255, 0.2);
     }
     .step-led.playing {
-      background: var(--cyan-glow);
-      box-shadow: 0 0 10px var(--cyan-glow), 0 0 20px var(--cyan-glow);
+      background: #ffffff;
+      box-shadow: 0 0 12px #ffffff, 0 0 24px #ffffff;
+      transform: scale(1.2);
+      border-color: #ffffff;
+    }
+    .step-led.active.playing {
+      background: #ffffff;
+      box-shadow: 0 0 12px #ffffff, 0 0 24px var(--track-glow-color, var(--cyan-glow));
+      transform: scale(1.2);
     }
 
     /* Volume and System controls */
@@ -686,6 +722,11 @@
     <!-- Sequencer Beat LED Lights -->
     <div class="panel-section">
       <div class="sequencer-title">Secuenciador (Sintetizador Web Audio)</div>
+      <div class="seq-tabs">
+        <button class="btn-liquid seq-tab-btn active" data-inst="synth">Sintetizador</button>
+        <button class="btn-liquid seq-tab-btn" data-inst="kick">Bombo</button>
+        <button class="btn-liquid seq-tab-btn" data-inst="hat">Hi-Hat</button>
+      </div>
       <div class="step-grid" id="step-grid">
         <!-- 16 steps generated dynamically -->
       </div>
@@ -809,6 +850,43 @@
 
     let currentTrackIndex = 0;
     let deviceMode = 'vinyl'; // 'vinyl' or 'mp3'
+
+    const defaultPatterns = [
+      // Track 0 (Techno)
+      {
+        kick: [true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false],
+        hat: [false, false, true, false, false, false, true, false, false, false, true, false, false, false, true, false],
+        synth: [true, false, false, true, false, true, false, false, true, false, false, true, false, true, false, false]
+      },
+      // Track 1 (Ambient)
+      {
+        kick: [true, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false],
+        hat: [false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false],
+        synth: [true, false, false, false, true, false, false, true, false, false, true, false, false, false, true, false]
+      },
+      // Track 2 (Synthwave)
+      {
+        kick: [true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false],
+        hat: [true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false],
+        synth: [true, false, true, true, false, false, true, false, true, false, true, true, false, false, true, false]
+      },
+      // Track 3 (Jazz)
+      {
+        kick: [true, false, false, false, false, false, false, false, true, false, false, true, false, false, false, false],
+        hat: [false, false, true, false, true, false, true, false, false, false, true, false, true, false, true, false],
+        synth: [true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false]
+      },
+      // Track 4 (Custom / Default)
+      {
+        kick: [true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false],
+        hat: [false, false, true, false, false, false, true, false, false, false, true, false, false, false, true, false],
+        synth: [true, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false]
+      }
+    ];
+
+    let trackPatterns = JSON.parse(JSON.stringify(defaultPatterns));
+    let currentPatterns = trackPatterns[0];
+    let activeInstrument = 'synth';
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
        CUSTOM CURSOR
@@ -1043,6 +1121,9 @@
         if (this.audioElement) {
           this.audioElement.pause();
         }
+        // Remove 'playing' class from all LEDs when paused
+        const leds = document.querySelectorAll('.step-led');
+        leds.forEach(led => led.classList.remove('playing'));
       }
 
       setVolume(val) {
@@ -1086,26 +1167,116 @@
       }
 
       scheduleNote(step, time) {
-        switch (currentTrackIndex) {
-          case 0:
-            this.scheduleTechno(step, time);
-            break;
-          case 1:
-            this.scheduleAmbient(step, time);
-            break;
-          case 2:
-            this.scheduleSynthwave(step, time);
-            break;
-          case 3:
-            this.scheduleJazz(step, time);
-            break;
+        if (!currentPatterns) return;
+
+        if (currentPatterns.kick && currentPatterns.kick[step]) {
+          this.triggerKick(time);
+        }
+        if (currentPatterns.hat && currentPatterns.hat[step]) {
+          this.triggerHiHat(time);
+        }
+        if (currentPatterns.synth && currentPatterns.synth[step]) {
+          this.triggerSynth(step, time);
         }
       }
 
-      scheduleTechno(step, time) {}
-      scheduleAmbient(step, time) {}
-      scheduleSynthwave(step, time) {}
-      scheduleJazz(step, time) {}
+      triggerKick(time) {
+        if (!this.audioCtx) return;
+        
+        const osc = this.audioCtx.createOscillator();
+        const gain = this.audioCtx.createGain();
+        
+        osc.connect(gain);
+        gain.connect(this.masterGain);
+        
+        osc.frequency.setValueAtTime(150, time);
+        osc.frequency.exponentialRampToValueAtTime(0.01, time + 0.12);
+        
+        gain.gain.setValueAtTime(0.7, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.12);
+        
+        osc.start(time);
+        osc.stop(time + 0.13);
+      }
+
+      triggerHiHat(time) {
+        if (!this.audioCtx || !this.noiseBuffer) return;
+        
+        const source = this.audioCtx.createBufferSource();
+        source.buffer = this.noiseBuffer;
+        
+        const filter = this.audioCtx.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.setValueAtTime(8000, time);
+        
+        const gain = this.audioCtx.createGain();
+        
+        source.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.masterGain);
+        
+        gain.gain.setValueAtTime(0.2, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.06);
+        
+        source.start(time);
+        source.stop(time + 0.07);
+      }
+
+      triggerSynth(step, time) {
+        if (!this.audioCtx) return;
+        
+        const scale = this.getScaleForCurrentTrack();
+        const noteIndex = step % scale.length;
+        const freq = scale[noteIndex];
+        
+        const osc = this.audioCtx.createOscillator();
+        const filter = this.audioCtx.createBiquadFilter();
+        const gain = this.audioCtx.createGain();
+        
+        osc.type = currentTrackIndex === 0 ? 'sawtooth' : 'triangle';
+        osc.frequency.setValueAtTime(freq, time);
+        
+        const prevStep = (step - 1 + 16) % 16;
+        if (currentPatterns.synth && currentPatterns.synth[prevStep]) {
+          osc.frequency.setValueAtTime(scale[prevStep % scale.length], time - 0.05);
+          osc.frequency.exponentialRampToValueAtTime(freq, time);
+        }
+        
+        filter.type = 'lowpass';
+        filter.Q.setValueAtTime(currentTrackIndex === 0 ? 8 : 3, time);
+        filter.frequency.setValueAtTime(300, time);
+        filter.frequency.exponentialRampToValueAtTime(2400, time + 0.04);
+        filter.frequency.exponentialRampToValueAtTime(100, time + 0.18);
+        
+        gain.gain.setValueAtTime(0.3, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.22);
+        
+        osc.connect(filter);
+        filter.connect(gain);
+        
+        if (this.delayNode) {
+          gain.connect(this.delayNode);
+        }
+        gain.connect(this.masterGain);
+        
+        osc.start(time);
+        osc.stop(time + 0.24);
+      }
+
+      getScaleForCurrentTrack() {
+        switch (currentTrackIndex) {
+          case 0: // Techno (Am)
+            return [110.00, 130.81, 146.83, 164.81, 196.00, 220.00, 261.63, 293.66, 329.63, 392.00, 440.00];
+          case 1: // Ambient (C/F maj)
+            return [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25, 783.99, 880.00];
+          case 2: // Synthwave (Em)
+            return [82.41, 98.00, 110.00, 123.47, 146.83, 164.81, 196.00, 220.00, 246.94, 293.66, 329.63];
+          case 3: // Jazz (Dm)
+            return [146.83, 174.61, 220.00, 261.63, 293.66, 349.23, 440.00, 523.25, 587.33, 698.46, 880.00];
+          default: // Custom / default (pentatonic minor)
+            return [110.00, 130.81, 146.83, 164.81, 196.00, 220.00, 261.63, 293.66, 329.63, 392.00, 440.00];
+        }
+      }
     }
 
     const synth = new AudioSynthEngine();
@@ -1132,13 +1303,42 @@
     const progressBar = document.getElementById('progress-bar');
     const stepGrid = document.getElementById('step-grid');
 
-    // Create 16 LEDs dynamically in DOM
+    // Update active sequencer UI states
+    function updateSequencerUI() {
+      if (!currentPatterns) return;
+      const leds = stepGrid.querySelectorAll('.step-led');
+      leds.forEach((led, i) => {
+        const isActive = currentPatterns[activeInstrument] && currentPatterns[activeInstrument][i];
+        if (isActive) {
+          led.classList.add('active');
+        } else {
+          led.classList.remove('active');
+        }
+      });
+    }
+
+    // Create 16 LEDs dynamically in DOM (now interactive buttons)
     for (let i = 0; i < 16; i++) {
       const led = document.createElement('div');
       led.className = 'step-led';
-      if (i % 4 === 0) led.classList.add('active'); // rhythm marker
+      led.dataset.step = i;
+      
+      // Toggle step on click
+      led.addEventListener('click', () => {
+        if (!currentPatterns) return;
+        currentPatterns[activeInstrument][i] = !currentPatterns[activeInstrument][i];
+        updateSequencerUI();
+      });
+
+      // Cursor hover states for custom cursor
+      led.addEventListener('mouseenter', () => document.body.classList.add('cur-active'));
+      led.addEventListener('mouseleave', () => document.body.classList.remove('cur-active'));
+
       stepGrid.appendChild(led);
     }
+
+    // Initialize sequencer view
+    updateSequencerUI();
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
        THREE.JS GRAPHICS SETUP
@@ -1641,6 +1841,16 @@
         .to({ r: glow.r, g: glow.g, b: glow.b }, 1000)
         .start();
 
+      // Update dynamic CSS Variables for track glow
+      document.documentElement.style.setProperty('--track-glow-color', track.glowColor);
+      document.documentElement.style.setProperty('--track-glow-color-transparent', track.glowColor + '2e');
+
+      // Update sequencer pattern selection and refresh UI
+      if (typeof trackPatterns !== 'undefined') {
+        currentPatterns = trackPatterns[index] || trackPatterns[4];
+        updateSequencerUI();
+      }
+
       // Slow zoom effect on track switch
       const originalZ = camera.position.z;
       new TWEEN.Tween(camera.position)
@@ -1686,6 +1896,20 @@
        DOM CONTROL EVENT LISTENERS
        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
     
+    // Sequencer instrument tabs event listeners
+    const seqTabBtns = document.querySelectorAll('.seq-tab-btn');
+    seqTabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        seqTabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeInstrument = btn.dataset.inst;
+        updateSequencerUI();
+      });
+      // Cursor hover states for custom cursor
+      btn.addEventListener('mouseenter', () => document.body.classList.add('cur-active'));
+      btn.addEventListener('mouseleave', () => document.body.classList.remove('cur-active'));
+    });
+
     // Play/Pause button
     btnPlayPause.addEventListener('click', togglePlayback);
 
