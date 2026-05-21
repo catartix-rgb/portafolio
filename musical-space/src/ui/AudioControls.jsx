@@ -3,7 +3,7 @@ import styles from './AudioControls.module.css'
 
 export default function AudioControls({ analyzer, visible }) {
   const [playing, setPlaying] = useState(true)
-  const [volume, setVolumeState]  = useState(0.8)
+  const [volume, setVolumeState] = useState(0.8)
 
   async function togglePlay() {
     await analyzer?.togglePlay()
@@ -15,8 +15,6 @@ export default function AudioControls({ analyzer, visible }) {
     setVolumeState(v)
     analyzer?.setVolume(v)
   }
-
-  if (!visible) return null
 
   return (
     <div className={styles.root}>
