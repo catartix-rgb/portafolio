@@ -1,27 +1,29 @@
 import { useRef, useState, useEffect } from 'react'
-import ImmersiveCanvas from '../three/ImmersiveCanvas'
-import NavBar         from '../ui/NavBar'
-import AudioInfo      from '../ui/AudioInfo'
-import AudioControls  from '../ui/AudioControls'
-import styles         from './SpaceScreen.module.css'
+import ImmersiveCanvas      from '../three/ImmersiveCanvas'
+import OscilloscopeScreen   from '../visual/OscilloscopeScreen'
+import NavBar               from '../ui/NavBar'
+import AudioInfo            from '../ui/AudioInfo'
+import AudioControls        from '../ui/AudioControls'
+import styles               from './SpaceScreen.module.css'
 
-export default function SpaceScreen({ analyzer }) {
+export default function SpaceScreen({ analyzer, config, onRandomize }) {
   const audioRef = useRef({
     bass: 0, mids: 0, highs: 0,
     subBass: 0, lowMids: 0, presence: 0,
     amplitude: 0, bpm: 0,
   })
 
-  const [bpm, setBpm]         = useState(0)
+  const [bpm, setBpm]       = useState(0)
   const [fileName, setFileName] = useState('')
+  const [mode, setMode]     = useState('immersive') // 'immersive' | 'oscilloscope'
 
-  // Resolve file name once on mount
+  // File name
   useEffect(() => {
     if (!analyzer) return
     setFileName(analyzer.fileName.replace(/\.[^.]+$/, '').slice(0, 48))
   }, [analyzer])
 
-  // Main animation loop: poll analyzer, fill audioRef every frame
+  // Main audio poll loop
   useEffect(() => {
     if (!analyzer) return
     let raf
@@ -49,9 +51,29 @@ export default function SpaceScreen({ analyzer }) {
   return (
     <div className={styles.root}>
       <NavBar />
-      <ImmersiveCanvas audioRef={audioRef} />
-      <AudioInfo  fileName={fileName} bpm={bpm} visible={true} />
-      <AudioControls analyzer={analyzer} visible={true} />
+
+      {/* 3D immersive */}
+      {mode === 'immersive' && (
+        <ImmersiveCanvas audioRef={audioRef} config={config} />
+      )}
+
+      {/* Oscilloscope */}
+      {mode === 'oscilloscope' && (
+        <OscilloscopeScreen analyzer={analyzer} />
+      )}
+
+      {/* Overlay UI — always visible */}
+      {mode === 'immersive' && (
+        <AudioInfo fileName={fileName} bpm={bpm} visible={true} />
+      )}
+      <AudioControls
+        analyzer={analyzer}
+        visible={true}
+        mode={mode}
+        onModeChange={setMode}
+        onRandomize={onRandomize}
+        paletteName={config?.palette?.name ?? ''}
+      />
     </div>
   )
 }
