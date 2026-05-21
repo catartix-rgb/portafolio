@@ -229,6 +229,11 @@
       max-width: 100%; max-height: 100%;
       border-radius: 2px;
       box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+      transition: transform 0.15s ease-out;
+    }
+    #large-view img:hover {
+      transform: scale(2.4);
+      cursor: zoom-in;
     }
 
     @media (max-width: 768px) {
@@ -764,15 +769,28 @@
     targetRot  = startRot + dx * .0072;
   });
 
-  window.addEventListener('pointerup', () => {
+  window.addEventListener('pointerup', e => {
     if (!dragging) return;
     dragging = false;
     document.body.classList.remove('cur-drag');
 
     if (totalDelta < 6) {
-      if (hoveredIdx !== -1) {
-        navigateTo(hoveredIdx);
-        openPanel(hoveredIdx);
+      const clickNorm = new THREE.Vector2(
+        (e.clientX / window.innerWidth) * 2 - 1,
+        -(e.clientY / window.innerHeight) * 2 + 1
+      );
+      raycaster.setFromCamera(clickNorm, camera);
+      const intersects = raycaster.intersectObjects(gallery.children, true);
+      let clickedIdx = -1;
+      if (intersects.length > 0) {
+        let obj = intersects[0].object;
+        while (obj && obj.parent && obj.userData.index === undefined) obj = obj.parent;
+        if (obj && obj.userData.index !== undefined) clickedIdx = obj.userData.index;
+      }
+
+      if (clickedIdx !== -1) {
+        navigateTo(clickedIdx);
+        openPanel(clickedIdx);
       } else {
         openPanel();
       }
@@ -784,9 +802,13 @@
   });
 
   // Touch
+  let touchClickX = 0, touchClickY = 0;
   canvas.addEventListener('touchstart', e => {
     if (e.touches.length !== 1) return;
-    dragging = true; startX = e.touches[0].clientX;
+    dragging = true; 
+    startX = e.touches[0].clientX;
+    touchClickX = e.touches[0].clientX;
+    touchClickY = e.touches[0].clientY;
     startRot = targetRot; totalDelta = 0;
     e.preventDefault();
   }, { passive: false });
@@ -801,7 +823,27 @@
 
   canvas.addEventListener('touchend', e => {
     if (!dragging) return; dragging = false;
-    if (totalDelta < 6) { openPanel(); return; }
+    if (totalDelta < 6) {
+      const clickNorm = new THREE.Vector2(
+        (touchClickX / window.innerWidth) * 2 - 1,
+        -(touchClickY / window.innerHeight) * 2 + 1
+      );
+      raycaster.setFromCamera(clickNorm, camera);
+      const intersects = raycaster.intersectObjects(gallery.children, true);
+      let clickedIdx = -1;
+      if (intersects.length > 0) {
+        let obj = intersects[0].object;
+        while (obj && obj.parent && obj.userData.index === undefined) obj = obj.parent;
+        if (obj && obj.userData.index !== undefined) clickedIdx = obj.userData.index;
+      }
+      if (clickedIdx !== -1) {
+        navigateTo(clickedIdx);
+        openPanel(clickedIdx);
+      } else {
+        openPanel();
+      }
+      return; 
+    }
     navigateTo(getIdxFromRot(targetRot));
   });
 
@@ -860,6 +902,17 @@
   document.getElementById('dp-close').addEventListener('click', closePanel);
   document.getElementById('dp-close').addEventListener('mouseenter', () => document.body.classList.add('cur-active'));
   document.getElementById('dp-close').addEventListener('mouseleave', () => document.body.classList.remove('cur-active'));
+
+  const lvImg = document.getElementById('lv-img');
+  lvImg.addEventListener('mousemove', e => {
+    const rect = lvImg.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    lvImg.style.transformOrigin = `${x}% ${y}%`;
+  });
+  lvImg.addEventListener('mouseleave', () => {
+    lvImg.style.transformOrigin = 'center center';
+  });
 
   /* ════════════════════════════════════════════════
      DRAG HINT AUTO-HIDE
