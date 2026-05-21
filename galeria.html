@@ -47,6 +47,7 @@
       inset: 0;
       width: 100%; height: 100%;
       display: block;
+      transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1);
     }
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -370,6 +371,134 @@
       #drag-hint { right: 24px; bottom: 30px; }
       #detail-panel { padding: 80px 28px 40px; }
     }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       VIEW TOGGLE
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #view-toggle {
+      position: fixed; top: 22px; left: 50%; transform: translateX(-50%);
+      z-index: 700;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(237,236,234,0.15);
+      color: rgba(237,236,234,0.65);
+      font-family: var(--font);
+      font-size: 9.5px; font-weight: 500; letter-spacing: 0.22em;
+      text-transform: uppercase;
+      padding: 9px 22px;
+      border-radius: 40px;
+      cursor: none;
+      transition: background 0.3s, color 0.3s, border-color 0.3s;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      white-space: nowrap;
+    }
+    #view-toggle:hover {
+      background: rgba(237,236,234,0.12);
+      color: rgba(237,236,234,0.95);
+      border-color: rgba(237,236,234,0.35);
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       COLLAGE VIEW
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #collage-view {
+      position: fixed; inset: 0;
+      z-index: 10;
+      background: #080808;
+      overflow-y: auto;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.65s cubic-bezier(0.16,1,0.3,1);
+      padding: 88px 36px 72px;
+    }
+    #collage-view.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .collage-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-rows: 220px;
+      gap: 6px;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    .collage-card {
+      position: relative;
+      overflow: hidden;
+      cursor: none;
+      background: #111;
+      border: 1px solid rgba(237,236,234,0.04);
+    }
+    .collage-card.span-tall  { grid-row: span 2; }
+    .collage-card.span-wide  { grid-column: span 2; }
+
+    .collage-card img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: brightness(0.65);
+      transform: scale(1);
+      transition:
+        filter  0.55s cubic-bezier(0.16,1,0.3,1),
+        transform 0.7s cubic-bezier(0.16,1,0.3,1);
+      will-change: filter, transform;
+    }
+    .collage-card:hover img {
+      filter: brightness(1);
+      transform: scale(1.04);
+    }
+
+    .collage-card-info {
+      position: absolute; left: 0; right: 0; bottom: 0;
+      padding: 18px 20px 20px;
+      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%);
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.4s cubic-bezier(0.16,1,0.3,1), transform 0.4s cubic-bezier(0.16,1,0.3,1);
+    }
+    .collage-card:hover .collage-card-info {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .collage-card-name {
+      font-size: 13px; font-weight: 700; letter-spacing: -0.02em;
+      color: rgba(237,236,234,0.95); margin-bottom: 3px;
+      line-height: 1.2;
+    }
+    .collage-card-cat {
+      font-size: 9.5px; font-weight: 400; letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(237,236,234,0.42);
+    }
+
+    .collage-card-num {
+      position: absolute; bottom: 8px; right: 14px;
+      font-size: clamp(52px,7vw,80px); font-weight: 900; letter-spacing: -0.06em; line-height: 0.8;
+      color: rgba(237,236,234,0.05);
+      pointer-events: none; user-select: none;
+      transition: color 0.4s;
+    }
+    .collage-card:hover .collage-card-num {
+      color: rgba(237,236,234,0.09);
+    }
+
+    .collage-card.col-hidden { display: none; }
+
+    @media (max-width: 1024px) {
+      .collage-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 768px) {
+      #collage-view { padding: 80px 12px 52px; }
+      .collage-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 170px; gap: 5px; }
+      .collage-card.span-wide { grid-column: span 1; }
+    }
+    @media (max-width: 480px) {
+      .collage-grid { grid-template-columns: 1fr; grid-auto-rows: 220px; }
+      .collage-card.span-tall { grid-row: span 1; }
+    }
   </style>
 </head>
 <body>
@@ -388,6 +517,11 @@
   <!-- Canvas 3D -->
   <canvas id="three-canvas"></canvas>
 
+  <!-- Collage View -->
+  <div id="collage-view">
+    <div class="collage-grid" id="collage-grid"></div>
+  </div>
+
   <!-- Filters -->
   <div class="gal-filters" id="gal-filters">
     <button class="filter-pill active" data-filter="all">Todos</button>
@@ -405,6 +539,9 @@
     <a href="index.html">← Portafolio</a>
     <a href="index.html#trabajo">Índice</a>
   </nav>
+
+  <!-- View Toggle -->
+  <button id="view-toggle" aria-label="Cambiar vista">Collage ↗</button>
 
   <!-- Side dots -->
   <div id="gal-index"></div>
@@ -1192,6 +1329,93 @@
   }
 
   animate();
+
+  /* ════════════════════════════════════════════════
+     COLLAGE MODE
+  ════════════════════════════════════════════════ */
+  let viewMode = '3d';
+
+  // Which cards get special sizing (index → class)
+  const SPAN_CONFIG = { 0: 'span-tall', 2: 'span-wide', 5: 'span-tall', 7: 'span-wide' };
+
+  function buildCollageCards() {
+    const grid = document.getElementById('collage-grid');
+    grid.innerHTML = '';
+    PIECES.forEach((p, i) => {
+      const card = document.createElement('div');
+      card.className = 'collage-card';
+      card.dataset.index = i;
+      card.dataset.cat   = p.cat  || '';
+      card.dataset.disc  = p.disc || '';
+      card.dataset.year  = p.year || '';
+      if (SPAN_CONFIG[i]) card.classList.add(SPAN_CONFIG[i]);
+
+      card.innerHTML = `
+        <img src="${p.img}" alt="${p.name}" loading="lazy">
+        <div class="collage-card-info">
+          <div class="collage-card-name">${p.name}</div>
+          <div class="collage-card-cat">${p.cat}</div>
+        </div>
+        <div class="collage-card-num">${p.num}</div>
+      `;
+
+      card.addEventListener('click', () => openPanel(i));
+      card.addEventListener('mouseenter', () => document.body.classList.add('cur-active'));
+      card.addEventListener('mouseleave', () => document.body.classList.remove('cur-active'));
+      grid.appendChild(card);
+    });
+  }
+
+  function updateCollageFilter(filterVal) {
+    document.querySelectorAll('.collage-card').forEach(card => {
+      if (filterVal === 'all') { card.classList.remove('col-hidden'); return; }
+      const year  = card.dataset.year || '';
+      const cat   = card.dataset.cat  || '';
+      const disc  = card.dataset.disc || '';
+      const match = year === filterVal || cat.includes(filterVal) || disc.includes(filterVal);
+      card.classList.toggle('col-hidden', !match);
+    });
+  }
+
+  function toggleView() {
+    const btn    = document.getElementById('view-toggle');
+    const cview  = document.getElementById('collage-view');
+    const cvs    = document.getElementById('three-canvas');
+    const hints  = [document.getElementById('drag-hint'), document.getElementById('click-hint'),
+                    document.getElementById('gal-index'), document.getElementById('key-hint')];
+
+    if (viewMode === '3d') {
+      viewMode = 'collage';
+      cview.classList.add('active');
+      cvs.style.opacity = '0';
+      cvs.style.pointerEvents = 'none';
+      hints.forEach(h => h && (h.style.opacity = '0'));
+      btn.textContent = '← Vista 3D';
+      closePanel();
+    } else {
+      viewMode = '3d';
+      cview.classList.remove('active');
+      cvs.style.opacity = '1';
+      cvs.style.pointerEvents = '';
+      hints.forEach(h => h && (h.style.opacity = ''));
+      btn.textContent = 'Collage ↗';
+      closePanel();
+    }
+  }
+
+  // Build collage on load
+  buildCollageCards();
+
+  // Wire toggle button
+  const vt = document.getElementById('view-toggle');
+  vt.addEventListener('click', toggleView);
+  vt.addEventListener('mouseenter', () => document.body.classList.add('cur-active'));
+  vt.addEventListener('mouseleave', () => document.body.classList.remove('cur-active'));
+
+  // Hook existing filter pills into collage mode as well
+  document.querySelectorAll('.filter-pill').forEach(btn => {
+    btn.addEventListener('click', e => updateCollageFilter(e.target.dataset.filter));
+  });
   </script>
 </body>
 </html>
