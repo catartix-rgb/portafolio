@@ -650,7 +650,8 @@
      LOAD FRAMES
   ════════════════════════════════════════════════ */
   const loader   = new THREE.TextureLoader();
-  const frames   = [];
+  let frames     = [];
+  const allFrames = [];
   let   loaded   = 0;
   const ldBar    = document.getElementById('ld-bar');
   const ldLabel  = document.getElementById('ld-label');
