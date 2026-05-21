@@ -318,7 +318,7 @@
 
     /* Massive name */
     .hero-name {
-      font-size: clamp(36px, 8.2vw, 124px);
+      font-size: clamp(40px, 11.8vw, 186px);
       font-weight: 900;
       line-height: 0.87;
       letter-spacing: -0.045em;
@@ -339,7 +339,7 @@
       transition: transform 1.3s var(--ease);
     }
 
-    .hero-name .word:has(.glitch-active) {
+    .hero-name.revealed .word {
       overflow: visible;
     }
 
@@ -1422,6 +1422,10 @@
       document.querySelectorAll('.word-inner').forEach(el => {
         el.classList.add('up');
       });
+      setTimeout(() => {
+        const heroName = document.getElementById('hero-name');
+        if (heroName) heroName.classList.add('revealed');
+      }, 1400);
     });
 
     /* ── Castro Glitch/Flicker Effect ───────────── */
