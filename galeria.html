@@ -258,10 +258,10 @@
     .gal-filters { -ms-overflow-style: none; scrollbar-width: none; }
 
     .filter-pill {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      color: rgba(237,236,234,0.6);
-      padding: 8px 16px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: rgba(237,236,234,0.75);
+      padding: 8px 18px;
       border-radius: 40px;
       font-size: 10.5px;
       font-weight: 500;
@@ -269,14 +269,45 @@
       text-transform: uppercase;
       cursor: pointer;
       white-space: nowrap;
-      transition: all 0.25s ease;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.22),
+        inset 0 -1px 0 rgba(0,0,0,0.18),
+        0 4px 20px rgba(0,0,0,0.28),
+        0 1px 4px rgba(0,0,0,0.15);
+      transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+      position: relative;
+      overflow: hidden;
     }
-    .filter-pill:hover, .filter-pill.active {
-      background: rgba(237,236,234,0.9);
-      color: #080808;
-      border-color: rgba(237,236,234,0.9);
+    .filter-pill::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 50%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.1) 0%, transparent 100%);
+      border-radius: 40px 40px 0 0;
+      pointer-events: none;
+    }
+    .filter-pill:hover {
+      background: rgba(255,255,255,0.14);
+      border-color: rgba(255,255,255,0.32);
+      color: rgba(237,236,234,0.95);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.35),
+        inset 0 -1px 0 rgba(0,0,0,0.1),
+        0 8px 32px rgba(0,0,0,0.35),
+        0 2px 8px rgba(0,0,0,0.2);
+      transform: translateY(-1px);
+    }
+    .filter-pill.active {
+      background: rgba(237,236,234,0.15);
+      border-color: rgba(255,255,255,0.45);
+      color: rgba(237,236,234,1);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.5),
+        inset 0 -1px 0 rgba(0,0,0,0.08),
+        0 8px 32px rgba(0,0,0,0.35),
+        0 0 0 1px rgba(255,255,255,0.08);
     }
     
     @media (max-width: 768px) {
@@ -299,13 +330,38 @@
     .dp-close {
       position: absolute; top: 22px; right: 22px;
       width: 40px; height: 40px;
-      border: 1px solid rgba(237,236,234,.12);
-      border-radius: 50%; background: transparent;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.18);
       color: var(--fg); font-size: 14px; cursor: none;
       display: flex; align-items: center; justify-content: center;
-      transition: background .25s, border-color .25s;
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.22),
+        inset 0 -1px 0 rgba(0,0,0,0.18),
+        0 4px 16px rgba(0,0,0,0.3);
+      transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+      position: absolute;
+      overflow: hidden;
     }
-    .dp-close:hover { background: rgba(237,236,234,.07); border-color: rgba(237,236,234,.28); }
+    .dp-close::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 50%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.15) 0%, transparent 100%);
+      border-radius: 50% 50% 0 0;
+      pointer-events: none;
+    }
+    .dp-close:hover {
+      background: rgba(255,255,255,0.15);
+      border-color: rgba(255,255,255,0.35);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.38),
+        inset 0 -1px 0 rgba(0,0,0,0.1),
+        0 6px 24px rgba(0,0,0,0.4);
+      transform: scale(1.05);
+    }
 
     .dp-ghost-num {
       font-size: clamp(80px,11vw,110px);
@@ -378,24 +434,45 @@
     #view-toggle {
       position: fixed; top: 22px; left: 50%; transform: translateX(-50%);
       z-index: 700;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(237,236,234,0.15);
-      color: rgba(237,236,234,0.65);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(237,236,234,0.8);
       font-family: var(--font);
       font-size: 9.5px; font-weight: 500; letter-spacing: 0.22em;
       text-transform: uppercase;
-      padding: 9px 22px;
+      padding: 10px 24px;
       border-radius: 40px;
       cursor: none;
-      transition: background 0.3s, color 0.3s, border-color 0.3s;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.28),
+        inset 0 -1px 0 rgba(0,0,0,0.2),
+        0 6px 28px rgba(0,0,0,0.3),
+        0 2px 6px rgba(0,0,0,0.18);
+      transition: all 0.35s cubic-bezier(0.16,1,0.3,1);
       white-space: nowrap;
+      position: relative;
+      overflow: hidden;
+    }
+    #view-toggle::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 50%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.12) 0%, transparent 100%);
+      border-radius: 40px 40px 0 0;
+      pointer-events: none;
     }
     #view-toggle:hover {
-      background: rgba(237,236,234,0.12);
-      color: rgba(237,236,234,0.95);
-      border-color: rgba(237,236,234,0.35);
+      background: rgba(255,255,255,0.14);
+      border-color: rgba(255,255,255,0.38);
+      color: rgba(237,236,234,0.98);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.42),
+        inset 0 -1px 0 rgba(0,0,0,0.12),
+        0 10px 40px rgba(0,0,0,0.38),
+        0 3px 10px rgba(0,0,0,0.25);
+      transform: translateX(-50%) translateY(-1px);
     }
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
