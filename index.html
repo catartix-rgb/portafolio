@@ -339,13 +339,19 @@
       transition: transform 1.3s var(--ease);
     }
 
+    .hero-name .word:has(.glitch-active) {
+      overflow: visible;
+    }
+
     .castro-flicker {
       display: inline-block;
       transition: color 0.15s var(--ease), transform 0.15s var(--ease);
+      transform-origin: center center;
     }
 
     .castro-flicker.glitch-active {
       animation: graffiti-flicker 1.4s steps(1) forwards;
+      font-size: 0.82em;
     }
 
     @keyframes graffiti-flicker {
