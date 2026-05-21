@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>JPCC | Audiovisual - El Vacío Monolítico</title>
+  <meta name="description" content="Zona audiovisual inmersiva de Juan Pablo Castro.">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #030303;
+      --ink: #ffffff;
+      --ease: cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    body, html {
+      margin: 0; padding: 0; width: 100%; height: 100%;
+      background-color: var(--bg);
+      color: var(--ink);
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* Grain */
+    body::after {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9998;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    }
+
+    #three-canvas {
+      position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+      display: block; cursor: crosshair;
+    }
+
+    .gal-nav {
+      position: fixed; top: 0; left: 0; width: 100%;
+      padding: 24px 32px; box-sizing: border-box;
+      display: flex; justify-content: space-between; z-index: 500;
+      pointer-events: none;
+    }
+    .gal-nav a {
+      color: var(--ink); text-decoration: none; font-size: 11px;
+      font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase;
+      pointer-events: auto; mix-blend-mode: difference;
+    }
+
+    #loading {
+      position: fixed; inset: 0; background: #030303; z-index: 9999;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: opacity 1s var(--ease);
+    }
+    #loading.fade { opacity: 0; pointer-events: none; }
+    .ld-logo { font-size: 12px; letter-spacing: 0.3em; margin-bottom: 30px; text-transform: uppercase; font-weight: 500; }
+    .ld-btn {
+      padding: 14px 32px; background: transparent; border: 1px solid rgba(255,255,255,0.2);
+      color: white; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+      cursor: pointer; transition: all 0.3s;
+    }
+    .ld-btn:hover { background: white; color: black; }
+
+    #ui-layer {
+      position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+      z-index: 500; pointer-events: none; text-align: center;
+      opacity: 0; transition: opacity 0.5s;
+    }
+    #ui-layer.show { opacity: 1; }
+    .ui-title { font-size: 14px; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 500; margin-bottom: 8px; }
+    .ui-desc { font-size: 11px; color: rgba(255,255,255,0.6); max-width: 300px; margin: 0 auto; line-height: 1.5; }
+    
+    #back-btn {
+      position: fixed; bottom: 40px; left: 40px; z-index: 600; pointer-events: auto;
+      background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white;
+      padding: 10px 20px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: pointer; opacity: 0; transform: translateY(20px);
+      transition: all 0.4s var(--ease);
+    }
+    #back-btn.show { opacity: 1; transform: translateY(0); }
+    #back-btn:hover { background: white; color: black; }
+
+    #hint {
+      position: fixed; bottom: 40px; right: 40px; font-size: 10px; letter-spacing: 0.1em;
+      text-transform: uppercase; color: rgba(255,255,255,0.4); z-index: 500;
+    }
+  </style>
+</head>
+<body>
+  <div id="loading">
+    <div class="ld-logo">El Vacío Monolítico</div>
+    <button class="ld-btn" id="enter-btn">Ingresar al Espacio</button>
+  </div>
+
+  <nav class="gal-nav">
+    <a href="index.html">← Portafolio</a>
+    <a href="galeria.html">Galería 3D</a>
+  </nav>
+
+  <canvas id="three-canvas"></canvas>
+
+  <div id="ui-layer">
+    <div class="ui-title" id="ui-title">Video Title</div>
+    <div class="ui-desc" id="ui-desc">Description of the video</div>
+  </div>
+
+  <button id="back-btn">Volver al Vacío</button>
+  <div id="hint">Arrastra para mirar alrededor</div>
+
+  <!-- Three.js + Tween.js -->
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/@tweenjs/tween.js@18.6.4/dist/tween.umd.js"></script>
+  
+  <script>
+    const VIDEOS = [
+      { id: 'vid1', src: 'video/vid1.mp4', title: 'Exploración Audiovisual', desc: 'Prueba de audiovisual en espacio 3D inmersivo con sonido espacial.' },
+      { id: 'vid2', src: 'video/vid2.mp4', title: 'Escape Abstracto', desc: 'Una dimensión donde el sonido y la luz convergen.' }
+    ];
+
+    let scene, camera, renderer;
+    let monoliths = [];
+    let audioListener;
+    let contextResumed = false;
+    
+    // Interaction state
+    let isDragging = false;
+    let previousMousePosition = { x: 0, y: 0 };
+    let targetRotation = { x: 0, y: 0 };
+    let currentRotation = { x: 0, y: 0 };
+    let activeMonolith = null;
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    let clock = new THREE.Clock();
+
+    const canvas = document.getElementById('three-canvas');
+    const uiLayer = document.getElementById('ui-layer');
+    const uiTitle = document.getElementById('ui-title');
+    const uiDesc = document.getElementById('ui-desc');
+    const backBtn = document.getElementById('back-btn');
+
+    document.getElementById('enter-btn').addEventListener('click', init);
+
+    function init() {
+      if(contextResumed) return;
+      contextResumed = true;
+
+      document.getElementById('loading').classList.add('fade');
+      setTimeout(() => document.getElementById('loading').style.display = 'none', 1000);
+
+      scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x030303, 0.06);
+
+      camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 100);
+      camera.position.set(0, 0, 0);
+
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      // Audio Listener
+      audioListener = new THREE.AudioListener();
+      camera.add(audioListener);
+
+      // Lights
+      const ambient = new THREE.AmbientLight(0xffffff, 0.1);
+      scene.add(ambient);
+
+      // Create Monoliths
+      const radius = 6;
+      const angleStep = (Math.PI * 2) / Math.max(VIDEOS.length, 3); // space evenly even if 2 items
+
+      VIDEOS.forEach((v, i) => {
+        const video = document.createElement('video');
+        video.src = v.src;
+        video.crossOrigin = 'anonymous';
+        video.loop = true;
+        video.playsInline = true;
+        // Mute initially so play() doesn't fail, we rely on PositionalAudio
+        video.muted = true;
+        video.play().then(() => {
+          // Unmute once playing is started and user interacted
+          video.muted = false;
+        });
+
+        const texture = new THREE.VideoTexture(video);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        
+        const aspect = 16 / 9;
+        const w = 4.2;
+        const h = w / aspect;
+
+        const geo = new THREE.PlaneGeometry(w, h);
+        const mat = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
+        const mesh = new THREE.Mesh(geo, mat);
+
+        const angle = i * angleStep;
+        mesh.position.x = Math.sin(angle) * radius;
+        mesh.position.z = -Math.cos(angle) * radius;
+        mesh.position.y = (Math.random() - 0.5) * 1.5; 
+        
+        mesh.lookAt(0, mesh.position.y, 0);
+
+        // Frame
+        const frameGeo = new THREE.BoxGeometry(w + 0.1, h + 0.1, 0.3);
+        const frameMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.8, metalness: 0.2 });
+        const frame = new THREE.Mesh(frameGeo, frameMat);
+        frame.position.copy(mesh.position);
+        frame.rotation.copy(mesh.rotation);
+        frame.position.z -= 0.16 * Math.cos(angle);
+        frame.position.x += 0.16 * Math.sin(angle);
+        scene.add(frame);
+
+        // Spatial Audio
+        const sound = new THREE.PositionalAudio(audioListener);
+        const source = audioListener.context.createMediaElementSource(video);
+        sound.setNodeSource(source);
+        sound.setRefDistance(2);
+        sound.setVolume(1.0);
+        sound.setDistanceModel('exponential');
+        sound.setRolloffFactor(2);
+        mesh.add(sound);
+
+        mesh.userData = { 
+          video: video, 
+          sound: sound, 
+          data: v, 
+          basePos: mesh.position.clone()
+        };
+        scene.add(mesh);
+        monoliths.push(mesh);
+
+        // Point Light
+        const plight = new THREE.PointLight(0xffffff, 2, 8);
+        plight.position.copy(mesh.position);
+        plight.position.z += 0.5 * Math.cos(angle);
+        plight.position.x -= 0.5 * Math.sin(angle);
+        scene.add(plight);
+      });
+
+      // Particles
+      const pCount = 1200;
+      const pGeo = new THREE.BufferGeometry();
+      const pPos = new Float32Array(pCount * 3);
+      for(let i=0; i<pCount; i++){
+        pPos[i*3] = (Math.random() - 0.5) * 25;
+        pPos[i*3+1] = (Math.random() - 0.5) * 25;
+        pPos[i*3+2] = (Math.random() - 0.5) * 25;
+      }
+      pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+      const pMat = new THREE.PointsMaterial({ color: 0xcccccc, size: 0.035, transparent: true, opacity: 0.3 });
+      window.particles = new THREE.Points(pGeo, pMat);
+      scene.add(window.particles);
+
+      window.addEventListener('resize', onResize);
+      
+      canvas.addEventListener('pointerdown', onPointerDown);
+      window.addEventListener('pointermove', onPointerMove);
+      window.addEventListener('pointerup', onPointerUp);
+      backBtn.addEventListener('click', closeMonolith);
+
+      animate();
+    }
+
+    function onPointerDown(e) {
+      if (activeMonolith) return;
+      isDragging = true;
+      previousMousePosition = { x: e.clientX, y: e.clientY };
+    }
+
+    function onPointerMove(e) {
+      if (isDragging && !activeMonolith) {
+        const deltaMove = { x: e.clientX - previousMousePosition.x, y: e.clientY - previousMousePosition.y };
+        targetRotation.x -= deltaMove.y * 0.0035; // pitch
+        targetRotation.y -= deltaMove.x * 0.0035; // yaw
+        targetRotation.x = Math.max(-Math.PI/3, Math.min(Math.PI/3, targetRotation.x));
+        previousMousePosition = { x: e.clientX, y: e.clientY };
+      }
+    }
+
+    function onPointerUp(e) {
+      isDragging = false;
+      if (!activeMonolith) {
+        mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(monoliths);
+        if (intersects.length > 0) {
+          openMonolith(intersects[0].object);
+        }
+      }
+    }
+
+    function openMonolith(mesh) {
+      activeMonolith = mesh;
+      
+      const dist = 3.2; // camera distance from screen
+      const targetPos = new THREE.Vector3(0, 0, dist);
+      targetPos.applyEuler(mesh.rotation);
+      targetPos.add(mesh.position);
+
+      new TWEEN.Tween(camera.position)
+        .to({ x: targetPos.x, y: targetPos.y, z: targetPos.z }, 1200)
+        .easing(TWEEN.Easing.Cubic.InOut)
+        .start();
+
+      new TWEEN.Tween(camera.rotation)
+        .to({ x: mesh.rotation.x, y: mesh.rotation.y, z: mesh.rotation.z }, 1200)
+        .easing(TWEEN.Easing.Cubic.InOut)
+        .start();
+
+      monoliths.forEach(m => {
+        if (m !== mesh) m.userData.sound.setVolume(0.05);
+        else m.userData.sound.setVolume(1.0);
+      });
+
+      uiTitle.textContent = mesh.userData.data.title;
+      uiDesc.textContent = mesh.userData.data.desc;
+      uiLayer.classList.add('show');
+      backBtn.classList.add('show');
+      document.getElementById('hint').style.display = 'none';
+    }
+
+    function closeMonolith() {
+      activeMonolith = null;
+      uiLayer.classList.remove('show');
+      backBtn.classList.remove('show');
+      document.getElementById('hint').style.display = 'block';
+
+      monoliths.forEach(m => m.userData.sound.setVolume(1.0));
+
+      new TWEEN.Tween(camera.position)
+        .to({ x: 0, y: 0, z: 0 }, 1200)
+        .easing(TWEEN.Easing.Cubic.InOut)
+        .start();
+    }
+
+    function onResize() {
+      if(!camera) return;
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function animate(time) {
+      requestAnimationFrame(animate);
+      TWEEN.update();
+
+      const elapsed = clock.getElapsedTime();
+
+      if (!activeMonolith) {
+        currentRotation.x += (targetRotation.x - currentRotation.x) * 0.1;
+        currentRotation.y += (targetRotation.y - currentRotation.y) * 0.1;
+        const euler = new THREE.Euler(currentRotation.x, currentRotation.y, 0, 'YXZ');
+        camera.quaternion.setFromEuler(euler);
+      }
+
+      monoliths.forEach((m, i) => {
+        m.position.y = m.userData.basePos.y + Math.sin(elapsed * 1.5 + i) * 0.15;
+      });
+
+      if (window.particles) {
+        window.particles.rotation.y = elapsed * 0.05;
+      }
+
+      renderer.render(scene, camera);
+    }
+  </script>
+</body>
+</html>

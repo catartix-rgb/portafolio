@@ -198,6 +198,17 @@
       transform-origin: left;
     }
 
+    .nav-audio {
+      color: #fff !important;
+      text-shadow: 0 0 8px rgba(255,255,255,0.6);
+      animation: pulseGlow 2s infinite alternate;
+    }
+
+    @keyframes pulseGlow {
+      0% { text-shadow: 0 0 5px rgba(255,255,255,0.4); }
+      100% { text-shadow: 0 0 12px rgba(255,255,255,0.9); }
+    }
+
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
        REVEAL SYSTEM
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
@@ -890,6 +901,7 @@
     <ul class="nav-links">
       <li><a href="#trabajo">Trabajo</a></li>
       <li><a href="galeria.html">Galería</a></li>
+      <li><a href="audiovisual.html" class="nav-audio">Audiovisual</a></li>
       <li><a href="#servicios">Servicios</a></li>
       <li><a href="#sobre">Sobre mí</a></li>
     </ul>
