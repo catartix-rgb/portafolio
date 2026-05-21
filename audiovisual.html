@@ -113,6 +113,14 @@
     let audioListener;
     let contextResumed = false;
     
+    // Color extraction
+    const colorCanvas = document.createElement('canvas');
+    colorCanvas.width = 1;
+    colorCanvas.height = 1;
+    const colorCtx = colorCanvas.getContext('2d', { willReadFrequently: true });
+    const baseColor = new THREE.Color(0x030303);
+    const targetColor = new THREE.Color(0x030303);
+    
     // Interaction state
     let isDragging = false;
     let previousMousePosition = { x: 0, y: 0 };
@@ -374,6 +382,22 @@
       if (window.particles) {
         window.particles.rotation.y = elapsed * 0.05;
       }
+
+      // Ambilight effect
+      if (activeMonolith) {
+        const video = activeMonolith.userData.video;
+        if (video.readyState >= video.HAVE_CURRENT_DATA) {
+          colorCtx.drawImage(video, 0, 0, 1, 1);
+          const data = colorCtx.getImageData(0, 0, 1, 1).data;
+          // Dim it for atmospheric effect
+          targetColor.setRGB(data[0]/255 * 0.35, data[1]/255 * 0.35, data[2]/255 * 0.35);
+        }
+      } else {
+        targetColor.copy(baseColor);
+      }
+      
+      scene.fog.color.lerp(targetColor, 0.03);
+      document.body.style.backgroundColor = `rgb(${Math.round(scene.fog.color.r*255)}, ${Math.round(scene.fog.color.g*255)}, ${Math.round(scene.fog.color.b*255)})`;
 
       renderer.render(scene, camera);
     }
