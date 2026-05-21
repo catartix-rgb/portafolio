@@ -5,6 +5,7 @@ import NavBar             from '../ui/NavBar'
 import AudioControls      from '../ui/AudioControls'
 import MiniPlayer         from '../ui/MiniPlayer'
 import OscModeSelector    from '../ui/OscModeSelector'
+import OscColorPicker     from '../ui/OscColorPicker'
 import styles             from './SpaceScreen.module.css'
 
 export default function SpaceScreen({ analyzer, config, onRandomize, onNewFile }) {
@@ -16,16 +17,15 @@ export default function SpaceScreen({ analyzer, config, onRandomize, onNewFile }
 
   const [bpm, setBpm]           = useState(0)
   const [fileName, setFileName] = useState('')
-  const [mode, setMode]         = useState('immersive')    // 'immersive' | 'oscilloscope'
-  const [oscMode, setOscMode]   = useState('wave')         // 'wave' | 'lissajous'
+  const [mode, setMode]         = useState('immersive')
+  const [oscMode, setOscMode]   = useState('wave')
+  const [scopeColor, setScopeColor] = useState('#00ff41')
 
-  // File name from analyzer
   useEffect(() => {
     if (!analyzer) return
     setFileName(analyzer.fileName.replace(/\.[^.]+$/, '').slice(0, 48))
   }, [analyzer])
 
-  // Main audio poll loop — runs always, feeds audioRef for R3F components
   useEffect(() => {
     if (!analyzer) return
     let raf
@@ -51,40 +51,50 @@ export default function SpaceScreen({ analyzer, config, onRandomize, onNewFile }
 
   return (
     <div className={styles.root}>
-      {/* Nav — z:600 */}
-      <NavBar />
+      {/* ── Canvas layers — pointer-events: none on wrappers ── */}
+      <div className={styles.canvasLayer}>
+        {mode === 'immersive' && (
+          <ImmersiveCanvas audioRef={audioRef} config={config} />
+        )}
+        {mode === 'oscilloscope' && (
+          <Immersive3DScope
+            analyzer={analyzer}
+            subMode={oscMode}
+            scopeColor={scopeColor}
+          />
+        )}
+      </div>
 
-      {/* ── Canvases — z:0 ───────────────────────────── */}
-      {mode === 'immersive' && (
-        <ImmersiveCanvas audioRef={audioRef} config={config} />
-      )}
-      {mode === 'oscilloscope' && (
-        <Immersive3DScope analyzer={analyzer} subMode={oscMode} />
-      )}
+      {/* ── UI layer — all pointer-events: auto ─────────────── */}
+      <div className={styles.uiLayer}>
+        {/* Top — nav */}
+        <NavBar />
 
-      {/* ── UI overlay — all above canvases ──────────── */}
+        {/* Bottom center — main controls */}
+        <AudioControls
+          analyzer={analyzer}
+          mode={mode}
+          onModeChange={setMode}
+          onRandomize={onRandomize}
+          paletteName={config?.palette?.name ?? ''}
+        />
 
-      {/* Mini Player — bottom right, z:250 */}
-      <MiniPlayer
-        analyzer={analyzer}
-        fileName={fileName}
-        bpm={bpm}
-        onNewFile={onNewFile}
-      />
+        {/* Bottom right — mini player */}
+        <MiniPlayer
+          analyzer={analyzer}
+          fileName={fileName}
+          bpm={bpm}
+          onNewFile={onNewFile}
+        />
 
-      {/* Osc sub-mode selector — bottom LEFT, z:500, only in scope mode */}
-      {mode === 'oscilloscope' && (
-        <OscModeSelector subMode={oscMode} onChange={setOscMode} />
-      )}
-
-      {/* Main controls — bottom center, z:200 */}
-      <AudioControls
-        analyzer={analyzer}
-        mode={mode}
-        onModeChange={setMode}
-        onRandomize={onRandomize}
-        paletteName={config?.palette?.name ?? ''}
-      />
+        {/* Bottom left — oscilloscope mode dock (only in osc mode) */}
+        {mode === 'oscilloscope' && (
+          <>
+            <OscModeSelector subMode={oscMode} onChange={setOscMode} />
+            <OscColorPicker color={scopeColor} onChange={setScopeColor} />
+          </>
+        )}
+      </div>
     </div>
   )
 }

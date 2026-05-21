@@ -1,12 +1,34 @@
+/* ── SpaceScreen layer system ───────────────────────────────── */
 .root {
   position: fixed;
   inset: 0;
   background: #000;
+  overflow: hidden;
 }
 
-/* Canvas fills parent completely */
-.root canvas {
-  display: block;
-  width: 100% !important;
-  height: 100% !important;
+/* Canvas layer: sits at z:0, no pointer-events on wrapper */
+.canvasLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;  /* let canvas handle its own events */
+}
+
+/* The actual canvas must still receive pointer events for OrbitControls */
+.canvasLayer canvas,
+.canvasLayer > * {
+  pointer-events: auto;
+}
+
+/* UI layer: all UI floats above canvas */
+.uiLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;  /* transparent by default */
+}
+
+/* All interactive elements inside uiLayer get pointer events back */
+.uiLayer > * {
+  pointer-events: auto;
 }

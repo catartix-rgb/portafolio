@@ -1,68 +1,63 @@
 /* ─── Immersive 3D 360° Oscilloscope ──────────────────────────
-   Full React Three Fiber scene — camera inside a waveform tunnel.
-   Sub-modes: 'wave' (tunnel rings) | 'lissajous' (3D XY figure)
+   Full R3F scene — waveform tunnel + XY Lissajous
+   Accepts `scopeColor` prop — updates in real-time, no resets
 ──────────────────────────────────────────────────────────────── */
-import { useRef, useMemo } from 'react'
+import { useRef, useMemo, useEffect } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { EffectComposer, Bloom } from '@react-three/postprocessing'
 import * as THREE from 'three'
 
-/* ── Constants ─────────────────────────────────────────────── */
-const GREEN      = new THREE.Color('#00ff41')
-const GREEN_DIM  = new THREE.Color('#004d14')
-const RING_SEGS  = 256     // vertices per waveform ring
-const RING_COUNT = 14      // rings in the tunnel
-const TUNNEL_HALF = 60     // half-length of tunnel in world units
-const BASE_R      = 14     // base ring radius
+const RING_SEGS   = 256
+const RING_COUNT  = 14
+const TUNNEL_HALF = 60
+const BASE_R      = 14
 const PARTICLE_COUNT = 2800
 
 /* ── Waveform ring ─────────────────────────────────────────── */
-function WaveRing({ analyzer, zPos, radius, opacity, freqShift }) {
-  const loopRef = useRef()
+function WaveRing({ analyzer, zPos, radius, opacity, freqShift, colorRef }) {
+  const matRef = useRef()
+  const timeDomain = useRef(new Uint8Array(2048))
 
   const geo = useMemo(() => {
-    const g = new THREE.BufferGeometry()
+    const g   = new THREE.BufferGeometry()
     const pos = new Float32Array(RING_SEGS * 3)
     g.setAttribute('position', new THREE.BufferAttribute(pos, 3))
     return g
   }, [])
 
-  // We share a single timeDomain buffer per render (allocated once)
-  const timeDomain = useRef(new Uint8Array(2048))
-
   useFrame(() => {
     if (!analyzer?.analyser) return
-
     analyzer.analyser.getByteTimeDomainData(timeDomain.current)
-    const td  = timeDomain.current
-    const len = td.length
+    const td   = timeDomain.current
+    const len  = td.length
     const bass = analyzer.bands?.bass || 0
     const mids = analyzer.bands?.mids || 0
     const pos  = geo.attributes.position.array
-
-    // Radius breathes with bass, deforms with mids
-    const r = radius + bass * 6
+    const r    = radius + bass * 6
 
     for (let i = 0; i < RING_SEGS; i++) {
       const angle = (i / RING_SEGS) * Math.PI * 2
       const sIdx  = Math.floor(((i + freqShift) / RING_SEGS) * len) % len
       const v     = (td[sIdx] / 128.0) - 1.0
-
-      // Bass pushes ring outward, mids deform waveform shape
       const rFinal = r + v * (2.5 + mids * 4)
       pos[i * 3]     = Math.cos(angle) * rFinal
       pos[i * 3 + 1] = Math.sin(angle) * rFinal
       pos[i * 3 + 2] = zPos
     }
-
     geo.attributes.position.needsUpdate = true
+
+    // Sync color from shared colorRef
+    if (matRef.current && colorRef?.current) {
+      matRef.current.color.copy(colorRef.current)
+    }
   })
 
   return (
-    <lineLoop ref={loopRef} geometry={geo}>
+    <lineLoop geometry={geo}>
       <lineBasicMaterial
-        color={GREEN}
+        ref={matRef}
+        color="#00ff41"
         transparent
         opacity={opacity}
         blending={THREE.AdditiveBlending}
@@ -72,8 +67,8 @@ function WaveRing({ analyzer, zPos, radius, opacity, freqShift }) {
   )
 }
 
-/* ── Center core — icosahedron wireframe ───────────────────── */
-function CoreSphere({ analyzer }) {
+/* ── Core pulsing icosahedron ──────────────────────────────── */
+function CoreSphere({ analyzer, colorRef }) {
   const meshRef = useRef()
   const matRef  = useRef()
 
@@ -86,6 +81,8 @@ function CoreSphere({ analyzer }) {
     meshRef.current.rotation.y = t * 0.3
     meshRef.current.rotation.x = t * 0.18
     matRef.current.opacity = 0.08 + bass * 0.22
+
+    if (colorRef?.current) matRef.current.color.copy(colorRef.current)
   })
 
   return (
@@ -93,7 +90,7 @@ function CoreSphere({ analyzer }) {
       <icosahedronGeometry args={[3.5, 4]} />
       <meshBasicMaterial
         ref={matRef}
-        color={GREEN}
+        color="#00ff41"
         transparent
         opacity={0.1}
         wireframe
@@ -105,14 +102,13 @@ function CoreSphere({ analyzer }) {
 }
 
 /* ── Floating particles ────────────────────────────────────── */
-function AudioParticles({ analyzer }) {
+function AudioParticles({ analyzer, colorRef }) {
   const ptsRef = useRef()
   const matRef = useRef()
 
   const positions = useMemo(() => {
     const arr = new Float32Array(PARTICLE_COUNT * 3)
     for (let i = 0; i < PARTICLE_COUNT; i++) {
-      // Fibonacci sphere distribution
       const phi   = Math.acos(1 - 2 * (i + 0.5) / PARTICLE_COUNT)
       const theta = Math.PI * (1 + Math.sqrt(5)) * i
       const r     = 15 + Math.random() * 55
@@ -126,14 +122,15 @@ function AudioParticles({ analyzer }) {
   useFrame(({ clock }) => {
     if (!ptsRef.current || !matRef.current) return
     const highs = analyzer?.bands?.highs || 0
-    const amp   = analyzer?.amplitude || 0
+    const amp   = analyzer?.amplitude   || 0
     const t     = clock.getElapsedTime()
 
     ptsRef.current.rotation.y = t * 0.03
     ptsRef.current.rotation.x = Math.sin(t * 0.018) * 0.08
-
     matRef.current.opacity = 0.18 + highs * 0.65
     matRef.current.size    = 0.05 + highs * 0.22 + amp * 0.1
+
+    if (colorRef?.current) matRef.current.color.copy(colorRef.current)
   })
 
   return (
@@ -143,7 +140,7 @@ function AudioParticles({ analyzer }) {
       </bufferGeometry>
       <pointsMaterial
         ref={matRef}
-        color={GREEN}
+        color="#00ff41"
         size={0.07}
         transparent
         opacity={0.22}
@@ -156,8 +153,9 @@ function AudioParticles({ analyzer }) {
 }
 
 /* ── 3D Lissajous / XY figure ──────────────────────────────── */
-function Lissajous3D({ analyzer }) {
+function Lissajous3D({ analyzer, colorRef }) {
   const lineRef = useRef()
+  const matRef  = useRef()
   const TRAIL   = 512
 
   const geo = useMemo(() => {
@@ -172,36 +170,36 @@ function Lissajous3D({ analyzer }) {
   useFrame(({ clock }) => {
     if (!analyzer?.analyser) return
     analyzer.analyser.getByteTimeDomainData(timeDomain.current)
-
-    const td  = timeDomain.current
-    const len = td.length
-    const pos = geo.attributes.position.array
+    const td   = timeDomain.current
+    const len  = td.length
+    const pos  = geo.attributes.position.array
     const bass = analyzer.bands?.bass || 0
     const SCALE = 8 + bass * 4
-
-    // XY Lissajous: use channel-like offsets for X, Y, Z
     const o1 = Math.floor(len / 3)
     const o2 = Math.floor(2 * len / 3)
 
     for (let i = 0; i < TRAIL; i++) {
-      const t  = Math.floor((i / TRAIL) * len)
+      const t = Math.floor((i / TRAIL) * len)
       pos[i * 3]     = (td[t] / 128 - 1) * SCALE
       pos[i * 3 + 1] = (td[(t + o1) % len] / 128 - 1) * SCALE
       pos[i * 3 + 2] = (td[(t + o2) % len] / 128 - 1) * SCALE
     }
-
     geo.attributes.position.needsUpdate = true
 
     if (lineRef.current) {
       lineRef.current.rotation.y += 0.004
       lineRef.current.rotation.x += 0.0015
     }
+    if (matRef.current && colorRef?.current) {
+      matRef.current.color.copy(colorRef.current)
+    }
   })
 
   return (
     <line ref={lineRef} geometry={geo}>
       <lineBasicMaterial
-        color={GREEN}
+        ref={matRef}
+        color="#00ff41"
         transparent
         opacity={0.85}
         blending={THREE.AdditiveBlending}
@@ -211,16 +209,19 @@ function Lissajous3D({ analyzer }) {
   )
 }
 
-/* ── Outer ambient rings (static, decorative) ──────────────── */
-function AmbientRings({ analyzer }) {
+/* ── Ambient decorative rings ──────────────────────────────── */
+function AmbientRings({ analyzer, colorRef }) {
   const groupRef = useRef()
+  const matsRef  = useRef([])
 
   useFrame(({ clock }) => {
     if (!groupRef.current) return
-    const t    = clock.getElapsedTime()
-    const bass = analyzer?.bands?.bass || 0
+    const t = clock.getElapsedTime()
     groupRef.current.rotation.z = t * 0.04
     groupRef.current.rotation.x = t * 0.02
+    if (colorRef?.current) {
+      matsRef.current.forEach(m => m && m.color.copy(colorRef.current))
+    }
   })
 
   const rings = useMemo(() => {
@@ -230,8 +231,7 @@ function AmbientRings({ analyzer }) {
         const a = (j / 128) * Math.PI * 2
         pts.push(new THREE.Vector3(Math.cos(a) * r, Math.sin(a) * r, 0))
       }
-      const geo = new THREE.BufferGeometry().setFromPoints(pts)
-      return { geo, opacity: 0.04 - i * 0.01, radius: r }
+      return { geo: new THREE.BufferGeometry().setFromPoints(pts), opacity: 0.04 - i * 0.01 }
     })
   }, [])
 
@@ -240,7 +240,8 @@ function AmbientRings({ analyzer }) {
       {rings.map((ring, i) => (
         <lineLoop key={i} geometry={ring.geo}>
           <lineBasicMaterial
-            color={GREEN}
+            ref={el => (matsRef.current[i] = el)}
+            color="#00ff41"
             transparent
             opacity={ring.opacity}
             blending={THREE.AdditiveBlending}
@@ -252,13 +253,12 @@ function AmbientRings({ analyzer }) {
   )
 }
 
-/* ── Complete 3D scene ─────────────────────────────────────── */
-function Scene({ analyzer, subMode }) {
+/* ── Scene ─────────────────────────────────────────────────── */
+function Scene({ analyzer, subMode, colorRef }) {
   return (
     <>
       {subMode === 'wave' && (
         <>
-          {/* Tunnel of waveform rings */}
           {Array.from({ length: RING_COUNT }, (_, i) => {
             const t       = i / (RING_COUNT - 1)
             const z       = -TUNNEL_HALF + t * TUNNEL_HALF * 2
@@ -272,26 +272,26 @@ function Scene({ analyzer, subMode }) {
                 zPos={z}
                 radius={radius}
                 opacity={opacity}
-                freqShift={i * 18} // offset for variation between rings
+                freqShift={i * 18}
+                colorRef={colorRef}
               />
             )
           })}
-          <CoreSphere analyzer={analyzer} />
-          <AudioParticles analyzer={analyzer} />
-          <AmbientRings analyzer={analyzer} />
+          <CoreSphere   analyzer={analyzer} colorRef={colorRef} />
+          <AudioParticles analyzer={analyzer} colorRef={colorRef} />
+          <AmbientRings   analyzer={analyzer} colorRef={colorRef} />
         </>
       )}
 
       {subMode === 'lissajous' && (
         <>
-          <Lissajous3D analyzer={analyzer} />
-          <AudioParticles analyzer={analyzer} />
-          <AmbientRings analyzer={analyzer} />
-          <CoreSphere analyzer={analyzer} />
+          <Lissajous3D    analyzer={analyzer} colorRef={colorRef} />
+          <AudioParticles analyzer={analyzer} colorRef={colorRef} />
+          <AmbientRings   analyzer={analyzer} colorRef={colorRef} />
+          <CoreSphere     analyzer={analyzer} colorRef={colorRef} />
         </>
       )}
 
-      {/* Bloom — makes phosphor glow feel real */}
       <EffectComposer>
         <Bloom
           intensity={1.6}
@@ -315,8 +315,19 @@ function Scene({ analyzer, subMode }) {
   )
 }
 
-/* ── Root component ────────────────────────────────────────── */
-export default function Immersive3DScope({ analyzer, subMode }) {
+/* ── Root ──────────────────────────────────────────────────── */
+export default function Immersive3DScope({ analyzer, subMode, scopeColor }) {
+  // Stable color ref — updated in-place when scopeColor changes
+  const colorRef = useRef(new THREE.Color(scopeColor || '#00ff41'))
+
+  useEffect(() => {
+    try {
+      colorRef.current.set(scopeColor || '#00ff41')
+    } catch {
+      colorRef.current.set('#00ff41')
+    }
+  }, [scopeColor])
+
   return (
     <div style={{ position: 'fixed', inset: 0, background: '#000d00' }}>
       <Canvas
@@ -331,7 +342,7 @@ export default function Immersive3DScope({ analyzer, subMode }) {
         dpr={[1, 1.5]}
       >
         <color attach="background" args={['#000d00']} />
-        <Scene analyzer={analyzer} subMode={subMode} />
+        <Scene analyzer={analyzer} subMode={subMode} colorRef={colorRef} />
       </Canvas>
     </div>
   )

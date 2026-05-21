@@ -51,3 +51,8 @@ export function generateVisualConfig() {
     bloomStrength : rand(0.5, 1.0),
   }
 }
+
+/* Only pick a new palette — no geometry rebuild, no scene reset */
+export function generateNewPalette() {
+  return pick(PALETTES)
+}

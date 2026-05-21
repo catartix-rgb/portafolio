@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import UploadZone       from './ui/UploadZone'
 import SpaceScreen      from './screens/SpaceScreen'
 import { AudioAnalyzer } from './audio/AudioAnalyzer'
-import { generateVisualConfig } from './visual/visualConfig'
+import { generateVisualConfig, generateNewPalette } from './visual/visualConfig'
 import './App.css'
 
 export default function App() {
@@ -15,8 +15,9 @@ export default function App() {
     return () => analyzerRef.current?.destroy()
   }, [])
 
+  // Randomize: ONLY swap palette — no geometry rebuild, no scene reset
   const randomize = useCallback(() => {
-    setConfig(generateVisualConfig())
+    setConfig(prev => prev ? { ...prev, palette: generateNewPalette() } : generateVisualConfig())
   }, [])
 
   // Load audio file — used for both initial load AND song replacement

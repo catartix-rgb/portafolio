@@ -1,0 +1,94 @@
+/* Oscilloscope color picker — bottom-left, above WAVE/XY dock */
+.root {
+  position: fixed;
+  bottom: 94px;    /* above OscModeSelector (36px) + its height (~46px) + gap */
+  left: 28px;
+  z-index: 510;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  pointer-events: auto;
+}
+
+/* ── Expanded palette ──────────────────────── */
+.palette {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 8px;
+  background: rgba(0, 8, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55);
+  pointer-events: auto;
+}
+
+.swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  background: var(--c);
+  cursor: pointer;
+  transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+  pointer-events: auto;
+  padding: 0;
+}
+.swatch:hover {
+  transform: scale(1.25);
+  border-color: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 0 10px var(--g), 0 0 24px var(--g);
+}
+.swatchActive {
+  border-color: #fff;
+  box-shadow: 0 0 8px var(--g), 0 0 20px var(--g);
+  transform: scale(1.15);
+}
+
+/* ── Toggle button ─────────────────────────── */
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px 7px 9px;
+  background: rgba(0, 8, 0, 0.50);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.22s, border-color 0.22s, box-shadow 0.22s;
+  pointer-events: auto;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.toggle:hover {
+  background: rgba(0, 20, 0, 0.65);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 12px var(--g);
+}
+
+.dot {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: 0 0 6px var(--g);
+  flex-shrink: 0;
+}
+
+.label {
+  font-family: 'Courier New', monospace;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+}
+.toggle:hover .label { color: rgba(255, 255, 255, 0.8); }
+
+@media (max-width: 480px) {
+  .root { bottom: 140px; left: 14px; }
+}

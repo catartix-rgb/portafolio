@@ -507,8 +507,8 @@
       #drag-hint { right: 24px; bottom: 30px; }
       #detail-panel { padding: 80px 28px 40px; }
 
-      /* View toggle no se solape con la nav */
-      #view-toggle { top: 76px; }
+      /* View toggle bottom-left — no top override needed on mobile */
+      #view-toggle { bottom: 22px; left: 24px; font-size: 9px; padding: 9px 18px; }
 
       /* Filters bar abajo, scrollable */
       .gal-filters { bottom: 20px; justify-content: flex-start; }
@@ -524,7 +524,10 @@
        VIEW TOGGLE
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
     #view-toggle {
-      position: fixed; top: 22px; left: 50%; transform: translateX(-50%);
+      position: fixed;
+      bottom: 36px;
+      left: 52px;
+      transform: none;
       z-index: 700;
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.28);
@@ -568,7 +571,7 @@
         inset 0 -1px 0 rgba(0,0,0,0.15),
         0 14px 48px rgba(0,0,0,0.44),
         0 4px 12px rgba(0,0,0,0.28);
-      transform: translateX(-50%) translateY(-2px);
+      transform: translateY(-2px);
     }
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
