@@ -3,426 +3,1668 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Juan Pablo Castro Casillas — Diseñador. Lo imperfecto es lo más real, auténtico.">
+  <meta name="author" content="Juan Pablo Castro Casillas">
   <title>JPCC — Diseñador</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,700;0,14..32,900;1,14..32,300;1,14..32,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,700;0,14..32,900;1,14..32,300;1,14..32,400&family=Permanent+Marker&family=Rubik+Glitch&family=Sedgwick+Ave+Display&display=swap" rel="stylesheet">
+
   <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    :root {
-      --bg: #EDECEA; --bg-dark: #0A0A0A; --ink: #080808; --ink-muted: #6B6B6B;
-      --border: rgba(8, 8, 8, 0.10); --border-hard: rgba(8, 8, 8, 0.85);
-      --font: 'Inter', sans-serif; --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       LANG TOGGLE BUTTON
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .lang-toggle {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--ink);
+      padding: 8px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.25s var(--ease);
+      flex-shrink: 0;
+      position: relative;
+      z-index: 2;
     }
-    html { scroll-behavior: smooth; font-size: 16px; }
-    body { background: var(--bg); color: var(--ink); font-family: var(--font); overflow-x: hidden; cursor: none; }
-    body::after { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9998; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E"); }
-    
-    #scroll-bar { position: fixed; top: 0; left: 0; height: 2px; background: var(--ink); z-index: 9999; width: 0%; }
-    
-    .lang-toggle { font-size: 10px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; background: transparent; border: 1px solid var(--border); color: var(--ink); padding: 8px 14px; border-radius: 4px; cursor: pointer; transition: all 0.25s; flex-shrink: 0; position: relative; z-index: 2; }
-    .lang-toggle:hover { background: rgba(8, 8, 8, 0.04); border-color: var(--ink); }
-    
-    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 500; display: flex; align-items: center; justify-content: space-between; padding: 22px 52px; gap: 16px; }
-    nav.scrolled { padding: 14px 52px; background: rgba(237, 236, 234, 0.10); backdrop-filter: blur(36px); }
-    .nav-logo { font-size: 11px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; text-decoration: none; color: var(--ink); }
-    .nav-links { display: flex; gap: 6px; list-style: none; flex-shrink: 1; }
-    .nav-links a { font-size: 10.5px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none; color: var(--ink); padding: 7px 16px; border-radius: 100px; }
-    
-    .wrap { max-width: 1480px; margin: 0 auto; }
-    section { padding: 120px 52px; border-bottom: 1px solid var(--border-hard); }
-    .sec-label { display: flex; align-items: center; gap: 14px; font-size: 10px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 72px; }
-    .sec-label::before { content: ''; width: 28px; height: 1px; background: currentColor; }
-    
-    #hero { min-height: 100svh; display: flex; flex-direction: column; justify-content: flex-end; padding-top: 130px; padding-bottom: 64px; }
-    .hero-eyebrow { display: flex; justify-content: space-between; margin-bottom: 52px; }
-    .hero-tag { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-muted); }
-    .hero-tag--right { text-align: right; }
-    .hero-name { font-size: clamp(40px, 11.8vw, 186px); font-weight: 900; line-height: 0.87; letter-spacing: -0.045em; text-transform: uppercase; margin-bottom: 56px; }
-    .hero-specs { font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-muted); line-height: 2.6; }
-    
-    #trabajo { padding-bottom: 0; }
-    .work-header { display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-hard); padding-bottom: 20px; }
-    .work-cols { display: grid; grid-template-columns: 56px 1fr 100px 180px 160px; gap: 20px; padding: 14px 0; border-bottom: 1px solid var(--border); font-size: 9.5px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-muted); }
-    .proj-row { display: grid; grid-template-columns: 56px 1fr 100px 180px 160px; gap: 20px; padding: 26px 0; border-bottom: 1px solid var(--border); }
+
+    .lang-toggle:hover {
+      background: rgba(8, 8, 8, 0.04);
+      border-color: var(--ink);
+    }
+
+    .lang-toggle::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      border-bottom-color: rgba(0, 0, 0, 0.07);
+      box-shadow:
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.75),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.05),
+        0 4px 16px rgba(0, 0, 0, 0.06);
+      opacity: 0;
+      transition: opacity 0.3s var(--ease);
+      z-index: -1;
+    }
+
+    .lang-toggle:hover::before {
+      opacity: 1;
+    }
+
+    /* Indicador de idioma actual */
+    .lang-toggle.active-en {
+      font-weight: 700;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .lang-toggle {
+        font-size: 9px;
+        padding: 6px 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .lang-toggle {
+        font-size: 8px;
+        padding: 5px 8px;
+      }
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       RESET & BASE (ORIGINAL)
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg:           #EDECEA;
+      --bg-dark:      #0A0A0A;
+      --ink:          #080808;
+      --ink-muted:    #6B6B6B;
+      --ink-ghost:    #CACAC8;
+      --border:       rgba(8, 8, 8, 0.10);
+      --border-hard:  rgba(8, 8, 8, 0.85);
+      --font:         'Inter', 'Helvetica Neue', Arial, sans-serif;
+      --ease:         cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in:      cubic-bezier(0.7, 0, 1, 1);
+
+      /* ── Liquid Glass tokens ── */
+      --glass-bg:        rgba(237, 236, 234, 0.12);
+      --glass-blur:      blur(28px) saturate(200%) brightness(1.05);
+      --glass-border:    rgba(255, 255, 255, 0.55);
+      --glass-border-b:  rgba(0, 0, 0, 0.08);
+      --glass-shine:     rgba(255, 255, 255, 0.70);
+      --glass-shadow:    0 8px 40px rgba(0,0,0,0.10), 0 1.5px 0 rgba(255,255,255,0.55) inset, 0 -1px 0 rgba(0,0,0,0.06) inset;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font);
+      overflow-x: hidden;
+      cursor: none;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       GRAIN TEXTURE
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9998;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      opacity: 1;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       CUSTOM CURSOR
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #cur-dot {
+      position: fixed;
+      width: 7px;
+      height: 7px;
+      background: var(--ink);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 10000;
+      transform: translate(-50%, -50%);
+      transition: width 0.25s var(--ease), height 0.25s var(--ease), background 0.25s;
+      will-change: left, top;
+    }
+
+    #cur-ring {
+      position: fixed;
+      width: 38px;
+      height: 38px;
+      border: 1.5px solid rgba(8, 8, 8, 0.35);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 10000;
+      transform: translate(-50%, -50%);
+      transition: width 0.35s var(--ease), height 0.35s var(--ease), border-color 0.25s;
+      will-change: left, top;
+    }
+
+    body.cur-active #cur-dot {
+      width: 11px;
+      height: 11px;
+    }
+
+    body.cur-active #cur-ring {
+      width: 62px;
+      height: 62px;
+      border-color: rgba(8, 8, 8, 0.2);
+    }
+
+    body.cur-dark #cur-dot {
+      background: var(--bg);
+    }
+
+    body.cur-dark #cur-ring {
+      border-color: rgba(237, 236, 234, 0.4);
+    }
+
+    @media (hover: none) and (pointer: coarse) {
+      #cur-dot, #cur-ring { display: none !important; }
+      body { cursor: auto !important; }
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       SCROLL PROGRESS
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #scroll-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 2px;
+      background: var(--ink);
+      z-index: 9999;
+      width: 0%;
+      transition: width 0.08s linear;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       NAV
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       LIQUID GLASS SYSTEM
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .liquid-glass {
+      background: rgba(255, 255, 255, 0.10);
+      backdrop-filter: blur(32px) saturate(200%) brightness(1.08);
+      -webkit-backdrop-filter: blur(32px) saturate(200%) brightness(1.08);
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      border-bottom-color: rgba(0, 0, 0, 0.07);
+      box-shadow:
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.72),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.06),
+        inset 1px 0 0 rgba(255, 255, 255, 0.28),
+        inset -1px 0 0 rgba(255, 255, 255, 0.18),
+        0 12px 48px rgba(0, 0, 0, 0.10),
+        0 2px 8px rgba(0, 0, 0, 0.06);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .liquid-glass::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(255,255,255,0.38) 0%,
+        rgba(255,255,255,0.08) 35%,
+        rgba(255,255,255,0.00) 60%,
+        rgba(255,255,255,0.06) 100%
+      );
+      pointer-events: none;
+      z-index: 1;
+      border-radius: inherit;
+    }
+
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 52px;
+      gap: 16px;
+      transition: padding 0.4s var(--ease), background 0.4s var(--ease), backdrop-filter 0.4s var(--ease), box-shadow 0.4s var(--ease);
+    }
+
+    nav.scrolled {
+      padding: 14px 52px;
+      background: rgba(237, 236, 234, 0.10);
+      backdrop-filter: blur(36px) saturate(220%) brightness(1.08);
+      -webkit-backdrop-filter: blur(36px) saturate(220%) brightness(1.08);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.52);
+      box-shadow:
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.75),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.05),
+        0 12px 48px rgba(0, 0, 0, 0.08),
+        0 2px 6px rgba(0, 0, 0, 0.04);
+    }
+
+    nav.scrolled::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 100%;
+      background: linear-gradient(
+        135deg,
+        rgba(255,255,255,0.32) 0%,
+        rgba(255,255,255,0.05) 40%,
+        transparent 70%
+      );
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .nav-logo {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--ink);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 6px;
+      list-style: none;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      flex-shrink: 1;
+      min-width: 0;
+    }
+    .nav-links::-webkit-scrollbar { display: none; }
+
+    .nav-links li {
+      position: relative;
+    }
+
+    .nav-links a {
+      font-size: 10.5px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--ink);
+      position: relative;
+      z-index: 2;
+      display: inline-block;
+      padding: 7px 16px;
+      border-radius: 100px;
+      transition: color 0.25s var(--ease);
+    }
+
+    .nav-links a::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 100px;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      border-bottom-color: rgba(0, 0, 0, 0.07);
+      box-shadow:
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.75),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.05),
+        0 4px 16px rgba(0, 0, 0, 0.06);
+      opacity: 0;
+      transform: scale(0.92);
+      transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+      z-index: -1;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 100px;
+      background: linear-gradient(
+        135deg,
+        rgba(255,255,255,0.40) 0%,
+        rgba(255,255,255,0.05) 50%,
+        transparent 100%
+      );
+      opacity: 0;
+      transition: opacity 0.3s var(--ease);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .nav-links a:hover::before,
+    .nav-links a:focus::before {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .nav-links a:hover::after,
+    .nav-links a:focus::after {
+      opacity: 1;
+    }
+
+    .nav-audio {
+      background: linear-gradient(90deg, #ff2a2a, #ff7a2a, #e8ff2a, #2aff3b, #2a8cff, #a22aff, #ff2a8c);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      mix-blend-mode: normal !important;
+      animation: rainbow 4s linear infinite;
+      font-weight: 700 !important;
+    }
+
+    .nav-music {
+      background: linear-gradient(90deg, #00f2fe, #4facfe, #00f2fe);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      mix-blend-mode: normal !important;
+      animation: cyanGlow 3s ease infinite;
+      font-weight: 700 !important;
+    }
+
+    @keyframes cyanGlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes rainbow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       REVEAL SYSTEM
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .rev {
+      opacity: 0;
+      transform: translateY(36px);
+      transition: opacity 1s var(--ease), transform 1s var(--ease);
+    }
+
+    .rev.in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .rev-d1 { transition-delay: 0.1s; }
+    .rev-d2 { transition-delay: 0.22s; }
+    .rev-d3 { transition-delay: 0.36s; }
+    .rev-d4 { transition-delay: 0.52s; }
+    .rev-d5 { transition-delay: 0.68s; }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       LAYOUT BASE
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .wrap {
+      max-width: 1480px;
+      margin: 0 auto;
+    }
+
+    section {
+      padding: 120px 52px;
+      border-bottom: 1px solid var(--border-hard);
+    }
+
+    .sec-label {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 72px;
+    }
+
+    .sec-label::before {
+      content: '';
+      width: 28px;
+      height: 1px;
+      background: currentColor;
+      flex-shrink: 0;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       HERO
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #hero {
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding-top: 130px;
+      padding-bottom: 64px;
+      border-bottom: 1px solid var(--border-hard);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 52px;
+      width: 1px;
+      height: 100%;
+      background: var(--border);
+    }
+
+    .hero-eyebrow {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 52px;
+    }
+
+    .hero-tag {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      line-height: 2.4;
+    }
+
+    .hero-tag--right {
+      text-align: right;
+    }
+
+    .hero-name {
+      font-size: clamp(40px, 11.8vw, 186px);
+      font-weight: 900;
+      line-height: 0.87;
+      letter-spacing: -0.045em;
+      text-transform: uppercase;
+      margin-bottom: 56px;
+    }
+
+    .hero-name .word {
+      display: inline-block;
+      overflow: hidden;
+      vertical-align: top;
+      margin-right: 0.08em;
+    }
+
+    .hero-name .word-inner {
+      display: block;
+      transform: translateY(115%);
+      transition: transform 1.3s var(--ease);
+    }
+
+    .hero-name.revealed .word {
+      overflow: visible;
+    }
+
+    .castro-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    .castro-static {
+      opacity: 0;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .castro-flicker {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: inline-block;
+      white-space: nowrap;
+      transition: color 0.15s var(--ease), transform 0.15s var(--ease);
+      transform-origin: center center;
+    }
+
+    .castro-flicker.glitch-active {
+      animation: graffiti-flicker 1.4s steps(1) forwards;
+      font-size: 0.82em;
+    }
+
+    @keyframes graffiti-flicker {
+      0%, 100% {
+        font-family: var(--font);
+        transform: none;
+        opacity: 1;
+      }
+      8% {
+        font-family: 'Permanent Marker', cursive;
+        transform: skewX(-4deg) rotate(-1deg) scale(0.98);
+        opacity: 0.9;
+      }
+      15% {
+        font-family: var(--font);
+        transform: none;
+        opacity: 0.7;
+      }
+      22% {
+        font-family: 'Rubik Glitch', display;
+        transform: skewY(3deg) scale(1.02);
+        opacity: 0.85;
+      }
+      30% {
+        font-family: 'Permanent Marker', cursive;
+        transform: scale(0.97) rotate(0.5deg);
+        opacity: 0.9;
+      }
+      38% {
+        font-family: 'Sedgwick Ave Display', cursive;
+        transform: skewX(5deg) scale(1.04) rotate(-2deg);
+        opacity: 0.95;
+      }
+      46% {
+        font-family: var(--font);
+        transform: none;
+        opacity: 0.8;
+      }
+      54% {
+        font-family: 'Rubik Glitch', display;
+        transform: translateY(-2px) scale(0.99);
+        opacity: 0.75;
+      }
+      62% {
+        font-family: 'Sedgwick Ave Display', cursive;
+        transform: scale(1.02) rotate(1deg);
+        opacity: 0.9;
+      }
+      70% {
+        font-family: var(--font);
+        transform: none;
+        opacity: 1;
+      }
+    }
+
+    .hero-name .word-inner.up {
+      transform: translateY(0%);
+    }
+
+    .hero-name .word:nth-child(1) .word-inner { transition-delay: 0.00s; }
+    .hero-name .word:nth-child(2) .word-inner { transition-delay: 0.07s; }
+    .hero-name .word:nth-child(3) .word-inner { transition-delay: 0.14s; }
+    .hero-name .word:nth-child(4) .word-inner { transition-delay: 0.22s; }
+
+    .hero-footer {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 48px;
+      align-items: end;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+    }
+
+    .hero-manifesto {
+      font-size: clamp(15px, 1.9vw, 22px);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.5;
+      color: var(--ink);
+      max-width: 520px;
+    }
+
+    .hero-manifesto strong {
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    .hero-specs {
+      text-align: right;
+      font-size: 10.5px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      line-height: 2.6;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       SCOREBOARD / LED TICKER
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&display=swap');
+
+    .marquee-wrap {
+      position: relative;
+      background: #000;
+      overflow: hidden;
+      border-top: 1px solid #1a0000;
+      border-bottom: 1px solid #1a0000;
+      padding: 0;
+    }
+
+    .marquee-wrap::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.28) 2px,
+        rgba(0,0,0,0.28) 4px
+      );
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .marquee-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        90deg,
+        #000 0%,
+        transparent 4%,
+        transparent 96%,
+        #000 100%
+      );
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .marquee-track {
+      display: flex;
+      white-space: nowrap;
+      animation: scoreTick 28s linear infinite;
+      position: relative;
+      z-index: 1;
+    }
+
+    .m-item {
+      display: inline-flex;
+      align-items: center;
+      font-family: 'Orbitron', 'Courier New', monospace;
+      font-size: clamp(10px, 1.1vw, 13px);
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      padding: 18px 0;
+      flex-shrink: 0;
+      color: #ffffff;
+      text-shadow:
+        0 0 6px rgba(255, 255, 255, 0.75),
+        0 0 20px rgba(255, 255, 255, 0.25);
+      animation: ledFlicker 8s ease-in-out infinite;
+    }
+
+    .m-item.amber {
+      color: #ffffff;
+      font-weight: 900;
+      text-shadow:
+        0 0 8px rgba(255, 255, 255, 0.9),
+        0 0 24px rgba(255, 255, 255, 0.4),
+        0 0 48px rgba(255, 255, 255, 0.12);
+    }
+
+    .m-item.dim {
+      color: rgba(255, 255, 255, 0.32);
+      text-shadow: none;
+      animation: none;
+    }
+
+    .m-sep {
+      display: inline-flex;
+      align-items: center;
+      margin: 0 28px;
+      color: rgba(255, 255, 255, 0.18);
+      text-shadow: none;
+      font-size: 16px;
+      animation: none;
+    }
+
+    @keyframes ledFlicker {
+      0%, 94%, 100% { opacity: 1; }
+      95% { opacity: 0.88; }
+      96% { opacity: 1; }
+      97% { opacity: 0.92; }
+      98% { opacity: 1; }
+    }
+
+    @keyframes scoreTick {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       TRABAJO/WORK
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #trabajo {
+      padding-bottom: 0;
+    }
+
+    .work-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 1px solid var(--border-hard);
+      padding-bottom: 20px;
+      margin-bottom: 0;
+    }
+
+    .work-header .sec-label { margin-bottom: 0; }
+
+    .work-count {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+    }
+
+    .work-cols {
+      display: grid;
+      grid-template-columns: 56px 1fr 100px 180px 160px;
+      gap: 20px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 9.5px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+    }
+
+    .work-empty {
+      padding: 96px 0 108px;
+    }
+
+    .work-empty-headline {
+      font-size: clamp(64px, 12vw, 160px);
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      line-height: 0.85;
+      text-transform: uppercase;
+      color: rgba(8, 8, 8, 0.06);
+      user-select: none;
+      margin-bottom: 48px;
+    }
+
+    .work-empty-sub {
+      border-top: 1px solid var(--border);
+      padding-top: 24px;
+      max-width: 380px;
+    }
+
+    .work-empty-sub p {
+      font-size: 12.5px;
+      color: var(--ink-muted);
+      line-height: 1.85;
+      letter-spacing: 0.02em;
+    }
+
+    .proj-row {
+      display: grid;
+      grid-template-columns: 56px 1fr 100px 180px 160px;
+      gap: 20px;
+      padding: 26px 0;
+      border-bottom: 1px solid var(--border);
+      cursor: none;
+      transition: background 0.25s;
+      position: relative;
+    }
+
     .proj-row:hover { background: rgba(8,8,8,0.025); }
-    .proj-num { font-size: 11px; color: var(--ink-muted); }
-    .proj-name { font-size: clamp(20px, 2.4vw, 32px); font-weight: 700; letter-spacing: -0.03em; }
-    .proj-year, .proj-cat, .proj-stack { font-size: 11.5px; color: var(--ink-muted); }
-    
-    #statement { background: var(--bg-dark); color: var(--bg); padding: 100px 52px; }
+
+    .proj-num {
+      font-size: 11px;
+      color: var(--ink-muted);
+      padding-top: 4px;
+    }
+
+    .proj-body {}
+
+    .proj-name {
+      font-size: clamp(20px, 2.4vw, 32px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+    }
+
+    .proj-desc {
+      font-size: 12px;
+      color: var(--ink-muted);
+      line-height: 1.75;
+      font-style: italic;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.55s var(--ease), opacity 0.4s var(--ease), margin-top 0.4s;
+    }
+
+    .proj-row:hover .proj-desc {
+      max-height: 80px;
+      opacity: 1;
+      margin-top: 10px;
+    }
+
+    .proj-year, .proj-cat, .proj-stack {
+      font-size: 11.5px;
+      color: var(--ink-muted);
+      align-self: start;
+      padding-top: 6px;
+      letter-spacing: 0.03em;
+    }
+
+    .proj-img-float {
+      position: fixed;
+      width: 280px;
+      height: 340px;
+      object-fit: cover;
+      pointer-events: none;
+      z-index: 600;
+      opacity: 0;
+      transform: scale(0.85) rotate(-2deg);
+      transition: opacity 0.4s var(--ease), transform 0.5s var(--ease);
+      border: 1px solid var(--border);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.18);
+      will-change: left, top, opacity, transform;
+    }
+
+    .proj-img-float.visible {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+    }
+
+    .proj-thumb {
+      display: none;
+      width: 100%;
+      max-width: 320px;
+      height: auto;
+      margin-top: 14px;
+      border: 1px solid var(--border);
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       STATEMENT SECTION
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #statement {
+      background: var(--bg-dark);
+      color: var(--bg);
+      padding: 100px 52px;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
     #statement .sec-label { color: rgba(237,236,234,0.4); }
     #statement .sec-label::before { background: rgba(237,236,234,0.4); }
-    .statement-text { font-size: clamp(28px, 6vw, 80px); font-weight: 900; text-transform: uppercase; max-width: 1200px; }
-    .statement-text em { font-style: italic; font-weight: 300; }
-    .statement-quote { margin-top: 64px; max-width: 640px; border-left: 2px solid rgba(237, 236, 234, 0.25); padding-left: 28px; font-size: clamp(16px, 2.2vw, 24px); font-weight: 300; color: rgba(237, 236, 234, 0.7); font-style: italic; }
-    
-    #servicios { padding-bottom: 100px; }
-    .svc-layout { display: grid; grid-template-columns: 300px 1fr; gap: 96px; }
-    .svc-title { font-size: clamp(42px, 4.5vw, 68px); font-weight: 900; text-transform: uppercase; margin-bottom: 28px; }
-    .svc-blurb { font-size: 12.5px; color: var(--ink-muted); line-height: 1.9; max-width: 260px; }
-    .svc-table { width: 100%; border-collapse: collapse; }
-    .svc-table thead tr { border-bottom: 1px solid var(--border-hard); }
-    .svc-table thead th { font-size: 9.5px; font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-muted); padding-bottom: 14px; text-align: left; }
-    .svc-table tbody tr { border-bottom: 1px solid var(--border); }
-    .svc-table tbody tr:hover { background: rgba(8,8,8,0.028); }
-    .svc-table td { padding: 22px 0; }
-    .svc-table td.col-num { font-size: 10px; color: var(--ink-muted); width: 72px; }
-    .svc-table td.col-name { font-size: clamp(16px, 2vw, 22px); font-weight: 700; }
-    .svc-table td.col-tags { font-size: 11px; color: var(--ink-muted); padding-left: 32px; }
-    .svc-table td.col-note { font-size: 11px; color: var(--ink-muted); text-align: right; width: 180px; }
-    
-    #sobre { padding-bottom: 100px; }
-    .about-layout { display: grid; grid-template-columns: 1fr 400px; gap: 80px; }
-    .about-headline { font-size: clamp(42px, 6vw, 92px); font-weight: 900; text-transform: uppercase; margin-bottom: 52px; }
-    .about-headline em { font-style: italic; font-weight: 300; }
-    .about-body { font-size: 14px; color: var(--ink-muted); line-height: 1.9; max-width: 540px; border-top: 1px solid var(--border); padding-top: 28px; }
-    .about-meta { border-top: 1px solid var(--border-hard); }
-    .meta-row { display: flex; justify-content: space-between; padding: 18px 0; border-bottom: 1px solid var(--border); }
-    .meta-label { font-size: 10px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-muted); }
-    .meta-val { font-size: 12.5px; text-align: right; }
+
+    .statement-text {
+      font-size: clamp(28px, 6vw, 80px);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 0.9;
+      text-transform: uppercase;
+      max-width: 1200px;
+    }
+
+    .statement-text em {
+      font-style: italic;
+      font-weight: 300;
+    }
+
+    .statement-quote {
+      margin-top: 64px;
+      max-width: 640px;
+      border-left: 2px solid rgba(237, 236, 234, 0.25);
+      padding-left: 28px;
+      font-size: clamp(16px, 2.2vw, 24px);
+      font-weight: 300;
+      line-height: 1.6;
+      color: rgba(237, 236, 234, 0.7);
+      font-style: italic;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       SERVICIOS/SERVICES
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #servicios {
+      padding-bottom: 100px;
+    }
+
+    .svc-layout {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 96px;
+      align-items: start;
+    }
+
+    .svc-sidebar {
+      position: sticky;
+      top: 100px;
+    }
+
+    .svc-title {
+      font-size: clamp(42px, 4.5vw, 68px);
+      font-weight: 900;
+      letter-spacing: -0.045em;
+      line-height: 0.88;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+
+    .svc-blurb {
+      font-size: 12.5px;
+      color: var(--ink-muted);
+      line-height: 1.9;
+      max-width: 260px;
+    }
+
+    .svc-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .svc-table thead tr {
+      border-bottom: 1px solid var(--border-hard);
+    }
+
+    .svc-table thead th {
+      font-size: 9.5px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      padding-bottom: 14px;
+      text-align: left;
+      font-weight: 400;
+    }
+
+    .svc-table tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.22s;
+    }
+
+    .svc-table tbody tr:hover {
+      background: rgba(8,8,8,0.028);
+    }
+
+    .svc-table td {
+      padding: 22px 0;
+      vertical-align: middle;
+    }
+
+    .svc-table td.col-num {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      color: var(--ink-muted);
+      width: 72px;
+    }
+
+    .svc-table td.col-name {
+      font-size: clamp(16px, 2vw, 22px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .svc-table td.col-tags {
+      font-size: 11px;
+      color: var(--ink-muted);
+      padding-left: 32px;
+      line-height: 1.9;
+    }
+
+    .svc-table td.col-note {
+      font-size: 11px;
+      color: var(--ink-muted);
+      text-align: right;
+      padding-left: 16px;
+      width: 180px;
+      letter-spacing: 0.04em;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       SOBRE/ABOUT
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #sobre {
+      padding-bottom: 100px;
+    }
+
+    .about-layout {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .about-left {}
+
+    .about-headline {
+      font-size: clamp(42px, 6vw, 92px);
+      font-weight: 900;
+      letter-spacing: -0.045em;
+      line-height: 0.88;
+      text-transform: uppercase;
+      margin-bottom: 52px;
+    }
+
+    .about-headline em {
+      font-style: italic;
+      font-weight: 300;
+    }
+
+    .about-body {
+      font-size: 14px;
+      color: var(--ink-muted);
+      line-height: 1.9;
+      max-width: 540px;
+      border-top: 1px solid var(--border);
+      padding-top: 28px;
+    }
+
+    .about-meta {
+      border-top: 1px solid var(--border-hard);
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 18px 0;
+      border-bottom: 1px solid var(--border);
+      gap: 16px;
+    }
+
+    .meta-label {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      flex-shrink: 0;
+    }
+
+    .meta-val {
+      font-size: 12.5px;
+      font-weight: 400;
+      text-align: right;
+      line-height: 1.5;
+    }
+
     .meta-val.italic { font-style: italic; }
-    .meta-val a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--border); }
+
+    .meta-val a {
+      color: var(--ink);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border);
+      transition: border-color 0.25s;
+    }
+
     .meta-val a:hover { border-color: var(--ink); }
-    
-    footer { padding: 28px 52px; display: flex; justify-content: space-between; }
-    .foot-copy { font-size: 10.5px; letter-spacing: 0.1em; color: var(--ink-muted); text-transform: uppercase; }
-    .foot-up { font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; text-decoration: none; color: var(--ink); display: flex; align-items: center; gap: 10px; }
+
+    .status-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      background: #4caf50;
+      border-radius: 50%;
+      margin-right: 8px;
+      animation: pulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       FOOTER
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    footer {
+      padding: 28px 52px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: none;
+    }
+
+    .foot-copy {
+      font-size: 10.5px;
+      letter-spacing: 0.1em;
+      color: var(--ink-muted);
+      text-transform: uppercase;
+    }
+
+    .foot-up {
+      font-size: 10.5px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: gap 0.25s;
+    }
+
     .foot-up:hover { gap: 18px; }
-    
+
+    .foot-up::after {
+      content: '↑';
+      font-size: 14px;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       RESPONSIVE
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    @media (max-width: 1024px) {
+      .svc-layout    { grid-template-columns: 1fr; gap: 52px; }
+      .svc-sidebar   { position: static; }
+      .about-layout  { grid-template-columns: 1fr; gap: 52px; }
+      .svc-table td.col-note { display: none; }
+    }
+
     @media (max-width: 768px) {
-      section { padding: 80px 24px; }
-      nav { padding: 16px 20px; }
-      .about-layout { grid-template-columns: 1fr; gap: 52px; }
-      .svc-layout { grid-template-columns: 1fr; gap: 52px; }
-      .work-cols { display: none; }
-      .proj-row { grid-template-columns: 40px 1fr; gap: 8px 14px; }
-      .proj-year, .proj-cat, .proj-stack { grid-column: 2; }
+      section        { padding: 80px 24px; }
+      nav            { padding: 16px 20px; gap: 12px; }
+      nav.scrolled   { padding: 12px 20px; }
+      footer         { padding: 22px 24px; }
+
+      #hero          { padding: 110px 24px 52px; }
+      #hero::before  { left: 24px; }
+
+      .hero-eyebrow  { flex-direction: column; gap: 12px; }
+      .hero-tag--right { text-align: left; }
+      .hero-footer   { grid-template-columns: 1fr; gap: 24px; }
+      .hero-specs    { text-align: left; }
+
+      .work-cols     { display: none; }
+      .proj-row      {
+        grid-template-columns: 40px 1fr;
+        grid-template-rows: auto auto;
+        gap: 8px 14px;
+      }
+      .proj-year, .proj-cat, .proj-stack {
+        grid-column: 2;
+        font-size: 10.5px;
+      }
+
+      .proj-thumb { display: block; width: 100%; max-width: 100%; }
+      
+      .statement-text { max-width: 100%; }
+      #servicios { padding-bottom: 40px; }
+      .proj-img-float { display: none; }
+
+      .statement-text { font-size: clamp(28px, 9vw, 56px); }
+
+      .svc-table td.col-tags { display: none; }
+      .svc-table td.col-name { font-size: 16px; }
+
+      .nav-links { gap: 4px; flex-shrink: 1; }
+      .nav-links a { font-size: 10px; padding: 6px 12px; white-space: nowrap; }
+      .nav-logo { flex-shrink: 0; }
+    }
+
+    @media (max-width: 480px) {
+      .hero-name {
+        font-size: clamp(48px, 15vw, 90px);
+      }
+      nav { padding: 14px 16px; }
+      nav.scrolled { padding: 10px 16px; }
     }
   </style>
 </head>
 <body>
 
-<div id="scroll-bar"></div>
+  <!-- Custom Cursor -->
+  <div id="cur-dot"></div>
+  <div id="cur-ring"></div>
 
-<nav id="nav">
-  <a href="#hero" class="nav-logo">catartix</a>
-  <ul class="nav-links">
-    <li><a href="#trabajo" data-i18n="nav.work">Trabajo</a></li>
-    <li><a href="galeria.html" data-i18n="nav.gallery">Galería</a></li>
-    <li><a href="#servicios" data-i18n="nav.services">Servicios</a></li>
-    <li><a href="#sobre" data-i18n="nav.about">Sobre mí</a></li>
-  </ul>
-  <button id="lang-toggle" class="lang-toggle">ES/EN</button>
-</nav>
+  <!-- Scroll Progress Bar -->
+  <div id="scroll-bar"></div>
 
-<section id="hero">
-  <div class="wrap">
-    <div class="hero-eyebrow">
-      <div class="hero-tag">
-        <span data-i18n="hero.designer">Diseñador creativo</span><br>
-        <span data-i18n="hero.portfolio">Portafolio 2026</span>
-      </div>
-      <div class="hero-tag hero-tag--right">
-        <span data-i18n="hero.available">Disponible</span><br>
-        <span data-i18n="hero.location">Guadalajara, México</span>
-      </div>
-    </div>
-    <h1 class="hero-name">Juan Pablo Castro Casillas</h1>
-    <div class="hero-specs">
-      <div data-i18n="hero.specs.1">Diseño Visual</div>
-      <div data-i18n="hero.specs.2">Identidad de Marca</div>
-      <div data-i18n="hero.specs.3">Experiencia Digital</div>
-      <div data-i18n="hero.specs.4">Arte & Dirección</div>
-    </div>
-  </div>
-</section>
+  <!-- ━━━━━━━━━━━━━━ NAV ━━━━━━━━━━━━━━ -->
+  <nav id="nav">
+    <a href="#hero" class="nav-logo">catartix</a>
+    <ul class="nav-links">
+      <li><a href="#trabajo" data-i18n="nav.work">Trabajo</a></li>
+      <li><a href="galeria.html" data-i18n="nav.gallery">Galería</a></li>
+      <li><a href="audiovisual.html" class="nav-audio" data-i18n="nav.audiovisual">Sala Audiovisual</a></li>
+      <li><a href="musical-space/dist/index.html" class="nav-music" data-i18n="nav.music">Música 3D</a></li>
+      <li><a href="#servicios" data-i18n="nav.services">Servicios</a></li>
+      <li><a href="#sobre" data-i18n="nav.about">Sobre mí</a></li>
+    </ul>
+    <button id="lang-toggle" class="lang-toggle" aria-label="Toggle language">ES/EN</button>
+  </nav>
 
-<section id="trabajo">
-  <div class="wrap">
-    <div class="work-header">
-      <div class="sec-label" data-i18n="work.title">01 — Trabajo</div>
-      <span class="work-count" id="proj-count" data-i18n="work.count">— casos de estudio</span>
-    </div>
+  <!-- ━━━━━━━━━━━━━━ HERO ━━━━━━━━━━━━━━ -->
+  <section id="hero">
+    <div class="wrap">
 
-    <div class="work-cols">
-      <span data-i18n="work.cols.num">N°</span>
-      <span data-i18n="work.cols.project">Proyecto</span>
-      <span data-i18n="work.cols.year">Año</span>
-      <span data-i18n="work.cols.category">Categoría</span>
-      <span data-i18n="work.cols.stack">Stack</span>
-    </div>
-
-    <div class="proj-row">
-      <span class="proj-num">01</span>
-      <div><div class="proj-name" data-i18n="proj.01.name">Alta Tensión</div></div>
-      <span class="proj-year">2025</span>
-      <span class="proj-cat" data-i18n="proj.01.cat">Identidad / Indumentaria</span>
-      <span class="proj-stack" data-i18n="proj.01.stack">Diseño Gráfico · Textil</span>
-    </div>
-
-    <div class="proj-row">
-      <span class="proj-num">02</span>
-      <div><div class="proj-name" data-i18n="proj.02.name">Not Different</div></div>
-      <span class="proj-year">2025</span>
-      <span class="proj-cat" data-i18n="proj.02.cat">Branding / Identidad</span>
-      <span class="proj-stack" data-i18n="proj.02.stack">Diseño Gráfico</span>
-    </div>
-
-    <div class="proj-row">
-      <span class="proj-num">03</span>
-      <div><div class="proj-name" data-i18n="proj.03.name">Catartix Pop Up</div></div>
-      <span class="proj-year">2025</span>
-      <span class="proj-cat" data-i18n="proj.03.cat">Cartelismo / Evento</span>
-      <span class="proj-stack" data-i18n="proj.03.stack">Diseño Gráfico</span>
-    </div>
-
-    <div class="proj-row">
-      <span class="proj-num">04</span>
-      <div><div class="proj-name" data-i18n="proj.04.name">Producción Editorial I</div></div>
-      <span class="proj-year">2025</span>
-      <span class="proj-cat" data-i18n="proj.04.cat">Fotografía / Editorial</span>
-      <span class="proj-stack" data-i18n="proj.04.stack">Dirección de Arte</span>
-    </div>
-
-    <div class="proj-row">
-      <span class="proj-num">05</span>
-      <div><div class="proj-name" data-i18n="proj.05.name">Producción Editorial II</div></div>
-      <span class="proj-year">2025</span>
-      <span class="proj-cat" data-i18n="proj.05.cat">Fotografía / Editorial</span>
-      <span class="proj-stack" data-i18n="proj.05.stack">Dirección de Arte</span>
-    </div>
-
-    <div class="proj-row">
-      <span class="proj-num">06</span>
-      <div><div class="proj-name" data-i18n="proj.06.name">Editorial Libro</div></div>
-      <span class="proj-year">2025</span>
-      <span class="proj-cat" data-i18n="proj.06.cat">Diseño Editorial / Libro</span>
-      <span class="proj-stack" data-i18n="proj.06.stack">Photoshop · Illustrator · InDesign</span>
-    </div>
-
-    <div class="proj-row">
-      <span class="proj-num">07</span>
-      <div><div class="proj-name" data-i18n="proj.07.name">Editorial Libro 2</div></div>
-      <span class="proj-year">2025</span>
-      <span class="proj-cat" data-i18n="proj.07.cat">Diseño Editorial</span>
-      <span class="proj-stack" data-i18n="proj.07.stack">Adobe Illustrator</span>
-    </div>
-
-    <div class="proj-row">
-      <span class="proj-num">08</span>
-      <div><div class="proj-name" data-i18n="proj.08.name">Editorial Libro 3</div></div>
-      <span class="proj-year">2025</span>
-      <span class="proj-cat" data-i18n="proj.08.cat">Diseño Editorial</span>
-      <span class="proj-stack" data-i18n="proj.08.stack">Adobe Illustrator</span>
-    </div>
-
-    <div class="proj-row">
-      <span class="proj-num">09</span>
-      <div><div class="proj-name" data-i18n="proj.09.name">Fika</div></div>
-      <span class="proj-year">2024</span>
-      <span class="proj-cat" data-i18n="proj.09.cat">Identidad & UX/UI</span>
-      <span class="proj-stack" data-i18n="proj.09.stack">Figma</span>
-    </div>
-
-    <div class="proj-row">
-      <span class="proj-num">10</span>
-      <div><div class="proj-name" data-i18n="proj.10.name">Logo Fika</div></div>
-      <span class="proj-year">2024</span>
-      <span class="proj-cat" data-i18n="proj.10.cat">Identidad / Logo</span>
-      <span class="proj-stack" data-i18n="proj.10.stack">Figma / Illustrator</span>
-    </div>
-  </div>
-</section>
-
-<section id="statement">
-  <div class="wrap">
-    <div class="sec-label" data-i18n="statement.label">— Filosofía</div>
-    <p class="statement-text">Diseño que<br>no pide<br><em>permiso.</em></p>
-    <blockquote class="statement-quote" data-i18n="statement.quote">Todos diseñamos, ya que hasta tomar una decisión es diseño.</blockquote>
-  </div>
-</section>
-
-<section id="servicios">
-  <div class="wrap">
-    <div class="svc-layout">
-      <div>
-        <div class="sec-label" data-i18n="services.title">02 — Servicios</div>
-        <h2 class="svc-title" data-i18n="services.heading">Capaci-<br>dades</h2>
-        <p class="svc-blurb" data-i18n="services.blurb">Trabajo en la intersección del pensamiento crítico y la ejecución visual. Cada proyecto es un sistema, no una decoración.</p>
-      </div>
-      <table class="svc-table">
-        <thead>
-          <tr>
-            <th class="col-num">Área</th>
-            <th class="col-name">Disciplina</th>
-            <th class="col-tags">Alcance</th>
-            <th class="col-note">Modalidad</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="col-num">01</td>
-            <td class="col-name" data-i18n="svc.1.name">Identidad Visual</td>
-            <td class="col-tags" data-i18n="svc.1.tags">Marcas, logotipos, sistemas gráficos</td>
-            <td class="col-note" data-i18n="svc.1.mode">Proyecto / Retención</td>
-          </tr>
-          <tr>
-            <td class="col-num">02</td>
-            <td class="col-name" data-i18n="svc.2.name">Diseño Editorial</td>
-            <td class="col-tags" data-i18n="svc.2.tags">Publicaciones, catálogos, libros</td>
-            <td class="col-note" data-i18n="svc.2.mode">Proyecto</td>
-          </tr>
-          <tr>
-            <td class="col-num">03</td>
-            <td class="col-name" data-i18n="svc.3.name">Interfaz Digital</td>
-            <td class="col-tags" data-i18n="svc.3.tags">UI/UX, sistemas de diseño</td>
-            <td class="col-note" data-i18n="svc.3.mode">Proyecto / Retención</td>
-          </tr>
-          <tr>
-            <td class="col-num">04</td>
-            <td class="col-name" data-i18n="svc.4.name">Dirección de Arte</td>
-            <td class="col-tags" data-i18n="svc.4.tags">Concepto visual, fotografía</td>
-            <td class="col-note" data-i18n="svc.4.mode">Proyecto</td>
-          </tr>
-          <tr>
-            <td class="col-num">05</td>
-            <td class="col-name" data-i18n="svc.5.name">Diseño de Experiencia</td>
-            <td class="col-tags" data-i18n="svc.5.tags">Espacios, instalaciones</td>
-            <td class="col-note" data-i18n="svc.5.mode">Consultoría</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
-
-<section id="sobre">
-  <div class="wrap">
-    <div class="sec-label" data-i18n="about.title">03 — Sobre mí</div>
-    <div class="about-layout">
-      <div>
-        <h2 class="about-headline">Soy alguien<br><em>que cree</em><br>en lo<br>imperfecto.</h2>
-        <p class="about-body" data-i18n="about.bio">Soy Juan Pablo Castro Casillas. Creo que el diseño más honesto nace de aceptar lo imperfecto como parte del proceso, no como un error a corregir. Mi trabajo busca traducir ideas complejas en sistemas visuales claros, directos y memorables.</p>
-      </div>
-      <div class="about-meta">
-        <div class="meta-row">
-          <span class="meta-label">Nombre</span>
-          <span class="meta-val">Juan Pablo Castro Casillas</span>
+      <div class="hero-eyebrow">
+        <div class="hero-tag rev">
+          <span data-i18n="hero.designer">Diseñador creativo</span><br>
+          <span data-i18n="hero.portfolio">Portafolio 2026</span>
         </div>
-        <div class="meta-row">
-          <span class="meta-label">Rol</span>
-          <span class="meta-val" data-i18n="about.role">Diseñador</span>
-        </div>
-        <div class="meta-row">
-          <span class="meta-label">Ubicación</span>
-          <span class="meta-val" data-i18n="about.location">Guadalajara, Jalisco, México</span>
-        </div>
-        <div class="meta-row">
-          <span class="meta-label">Disponibilidad</span>
-          <span class="meta-val"><span data-i18n="about.availability">Disponible para proyectos</span></span>
+        <div class="hero-tag hero-tag--right rev">
+          <span data-i18n="hero.available">Disponible</span><br>
+          <span data-i18n="hero.location">Guadalajara, México</span>
         </div>
       </div>
+
+      <h1 class="hero-name" id="hero-name" aria-label="Juan Pablo Castro Casillas">
+        <span class="word"><span class="word-inner">Juan</span></span>
+        <span class="word"><span class="word-inner">Pablo</span></span>
+        <span class="word"><span class="word-inner"><span class="castro-wrapper"><span class="castro-static">Castro</span><span class="castro-flicker">Castro</span></span></span></span>
+        <span class="word"><span class="word-inner">Casillas</span></span>
+      </h1>
+
+      <div class="hero-footer">
+        <blockquote class="hero-manifesto rev rev-d3" data-i18n="hero.manifesto">
+          &ldquo;Lo imperfecto<br>es lo más <strong>real, auténtico.</strong>&rdquo;
+        </blockquote>
+        <div class="hero-specs rev rev-d4">
+          <div data-i18n="hero.specs.1">Diseño Visual</div>
+          <div data-i18n="hero.specs.2">Identidad de Marca</div>
+          <div data-i18n="hero.specs.3">Experiencia Digital</div>
+          <div data-i18n="hero.specs.4">Arte & Dirección</div>
+        </div>
+      </div>
+
     </div>
-  </div>
-</section>
+  </section>
 
-<footer>
-  <span class="foot-copy" data-i18n="footer.copy">© 2025 Juan Pablo Castro Casillas</span>
-  <a href="#hero" class="foot-up" data-i18n="footer.up">Volver arriba</a>
-</footer>
+  <!-- ━━━━━━━━━━━━━━ TRABAJO ━━━━━━━━━━━━━━ -->
+  <section id="trabajo">
+    <div class="wrap">
 
-<script>
-const i18n = {
-  es: {
-    "nav.work": "Trabajo", "nav.gallery": "Galería", "nav.services": "Servicios", "nav.about": "Sobre mí",
-    "hero.designer": "Diseñador creativo", "hero.portfolio": "Portafolio 2026", "hero.available": "Disponible", "hero.location": "Guadalajara, México",
-    "hero.specs.1": "Diseño Visual", "hero.specs.2": "Identidad de Marca", "hero.specs.3": "Experiencia Digital", "hero.specs.4": "Arte & Dirección",
-    "work.title": "01 — Trabajo", "work.count": "— casos de estudio", "work.cols.num": "N°", "work.cols.project": "Proyecto", "work.cols.year": "Año", "work.cols.category": "Categoría", "work.cols.stack": "Stack",
-    "proj.01.name": "Alta Tensión", "proj.01.cat": "Identidad / Indumentaria", "proj.01.stack": "Diseño Gráfico · Textil",
-    "proj.02.name": "Not Different", "proj.02.cat": "Branding / Identidad", "proj.02.stack": "Diseño Gráfico",
-    "proj.03.name": "Catartix Pop Up", "proj.03.cat": "Cartelismo / Evento", "proj.03.stack": "Diseño Gráfico",
-    "proj.04.name": "Producción Editorial I", "proj.04.cat": "Fotografía / Editorial", "proj.04.stack": "Dirección de Arte",
-    "proj.05.name": "Producción Editorial II", "proj.05.cat": "Fotografía / Editorial", "proj.05.stack": "Dirección de Arte",
-    "proj.06.name": "Editorial Libro", "proj.06.cat": "Diseño Editorial / Libro", "proj.06.stack": "Photoshop · Illustrator · InDesign",
-    "proj.07.name": "Editorial Libro 2", "proj.07.cat": "Diseño Editorial", "proj.07.stack": "Adobe Illustrator",
-    "proj.08.name": "Editorial Libro 3", "proj.08.cat": "Diseño Editorial", "proj.08.stack": "Adobe Illustrator",
-    "proj.09.name": "Fika", "proj.09.cat": "Identidad & UX/UI", "proj.09.stack": "Figma",
-    "proj.10.name": "Logo Fika", "proj.10.cat": "Identidad / Logo", "proj.10.stack": "Figma / Illustrator",
-    "statement.label": "— Filosofía", "statement.quote": "Todos diseñamos, ya que hasta tomar una decisión es diseño.",
-    "services.title": "02 — Servicios", "services.heading": "Capaci-<br>dades", "services.blurb": "Trabajo en la intersección del pensamiento crítico y la ejecución visual. Cada proyecto es un sistema, no una decoración.",
-    "svc.1.name": "Identidad Visual", "svc.1.tags": "Marcas, logotipos, sistemas gráficos", "svc.1.mode": "Proyecto / Retención",
-    "svc.2.name": "Diseño Editorial", "svc.2.tags": "Publicaciones, catálogos, libros", "svc.2.mode": "Proyecto",
-    "svc.3.name": "Interfaz Digital", "svc.3.tags": "UI/UX, sistemas de diseño", "svc.3.mode": "Proyecto / Retención",
-    "svc.4.name": "Dirección de Arte", "svc.4.tags": "Concepto visual, fotografía", "svc.4.mode": "Proyecto",
-    "svc.5.name": "Diseño de Experiencia", "svc.5.tags": "Espacios, instalaciones", "svc.5.mode": "Consultoría",
-    "about.title": "03 — Sobre mí", "about.bio": "Soy Juan Pablo Castro Casillas. Creo que el diseño más honesto nace de aceptar lo imperfecto como parte del proceso, no como un error a corregir. Mi trabajo busca traducir ideas complejas en sistemas visuales claros, directos y memorables.",
-    "about.location": "Guadalajara, Jalisco, México", "about.availability": "Disponible para proyectos", "about.role": "Diseñador",
-    "footer.copy": "© 2025 Juan Pablo Castro Casillas", "footer.up": "Volver arriba",
-  },
-  en: {
-    "nav.work": "Work", "nav.gallery": "Gallery", "nav.services": "Services", "nav.about": "About",
-    "hero.designer": "Creative Designer", "hero.portfolio": "Portfolio 2026", "hero.available": "Available", "hero.location": "Guadalajara, Mexico",
-    "hero.specs.1": "Visual Design", "hero.specs.2": "Brand Identity", "hero.specs.3": "Digital Experience", "hero.specs.4": "Art & Direction",
-    "work.title": "01 — Work", "work.count": "— case studies", "work.cols.num": "N°", "work.cols.project": "Project", "work.cols.year": "Year", "work.cols.category": "Category", "work.cols.stack": "Stack",
-    "proj.01.name": "High Tension", "proj.01.cat": "Identity / Apparel", "proj.01.stack": "Graphic Design · Textile",
-    "proj.02.name": "Not Different", "proj.02.cat": "Branding / Identity", "proj.02.stack": "Graphic Design",
-    "proj.03.name": "Catartix Pop Up", "proj.03.cat": "Posters / Events", "proj.03.stack": "Graphic Design",
-    "proj.04.name": "Editorial Production I", "proj.04.cat": "Photography / Editorial", "proj.04.stack": "Art Direction",
-    "proj.05.name": "Editorial Production II", "proj.05.cat": "Photography / Editorial", "proj.05.stack": "Art Direction",
-    "proj.06.name": "Editorial Book", "proj.06.cat": "Editorial Design / Book", "proj.06.stack": "Photoshop · Illustrator · InDesign",
-    "proj.07.name": "Editorial Book 2", "proj.07.cat": "Editorial Design", "proj.07.stack": "Adobe Illustrator",
-    "proj.08.name": "Editorial Book 3", "proj.08.cat": "Editorial Design", "proj.08.stack": "Adobe Illustrator",
-    "proj.09.name": "Fika", "proj.09.cat": "Identity & UX/UI", "proj.09.stack": "Figma",
-    "proj.10.name": "Fika Logo", "proj.10.cat": "Identity / Logo", "proj.10.stack": "Figma / Illustrator",
-    "statement.label": "— Philosophy", "statement.quote": "We all design, because even making a decision is design.",
-    "services.title": "02 — Services", "services.heading": "Capabi-<br>lities", "services.blurb": "I work at the intersection of critical thinking and visual execution. Every project is a system, not decoration.",
-    "svc.1.name": "Visual Identity", "svc.1.tags": "Brands, logos, graphic systems", "svc.1.mode": "Project / Retainer",
-    "svc.2.name": "Editorial Design", "svc.2.tags": "Publications, catalogs, books", "svc.2.mode": "Project",
-    "svc.3.name": "Digital Interface", "svc.3.tags": "UI/UX, design systems", "svc.3.mode": "Project / Retainer",
-    "svc.4.name": "Art Direction", "svc.4.tags": "Visual concept, photography", "svc.4.mode": "Project",
-    "svc.5.name": "Experience Design", "svc.5.tags": "Spaces, installations", "svc.5.mode": "Consulting",
-    "about.title": "03 — About", "about.bio": "I'm Juan Pablo Castro Casillas. I believe the most honest design comes from accepting the imperfect as part of the process, not as an error to correct. My work seeks to translate complex ideas into clear, direct, and memorable visual systems.",
-    "about.location": "Guadalajara, Jalisco, Mexico", "about.availability": "Available for projects", "about.role": "Designer",
-    "footer.copy": "© 2025 Juan Pablo Castro Casillas", "footer.up": "Back to top",
-  }
-};
+      <div class="work-header rev">
+        <div class="sec-label" style="margin-bottom:0;" data-i18n="work.title">01 — Trabajo</div>
+        <span class="work-count" id="proj-count" data-i18n="work.count">— casos de estudio</span>
+      </div>
 
-let currentLang = localStorage.getItem('lang') || 'es';
-const btn = document.getElementById('lang-toggle');
-const nav = document.getElementById('nav');
-const scrollBar = document.getElementById('scroll-bar');
+      <div class="work-cols rev rev-d1">
+        <span data-i18n="work.cols.num">N°</span>
+        <span data-i18n="work.cols.project">Proyecto</span>
+        <span data-i18n="work.cols.year">Año</span>
+        <span data-i18n="work.cols.category">Categoría</span>
+        <span data-i18n="work.cols.stack">Stack</span>
+      </div>
 
-function updateText() {
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    el.innerHTML = i18n[currentLang][key] || key;
-  });
-  btn.textContent = currentLang === 'en' ? 'EN/ES' : 'ES/EN';
-  document.documentElement.lang = currentLang;
-}
+      <!-- Projects will be populated by JavaScript -->
+      <div id="projects-container"></div>
 
-btn.addEventListener('click', () => {
-  currentLang = currentLang === 'es' ? 'en' : 'es';
-  localStorage.setItem('lang', currentLang);
-  updateText();
-});
+      <img id="proj-float-img" class="proj-img-float" src="" alt="" aria-hidden="true">
 
-window.addEventListener('scroll', () => {
-  nav.classList.toggle('scrolled', scrollY > 50);
-  const max = document.body.scrollHeight - innerHeight;
-  scrollBar.style.width = (scrollY / max * 100) + '%';
-}, { passive: true });
+    </div>
+  </section>
 
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-  a.addEventListener('click', e => {
-    const target = document.querySelector(a.getAttribute('href'));
-    if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
-  });
-});
+  <!-- ━━━━━━━━━━━━━━ STATEMENT ━━━━━━━━━━━━━━ -->
+  <section id="statement">
+    <div class="wrap">
+      <div class="sec-label rev" data-i18n="statement.label">— Filosofía</div>
+      <p class="statement-text rev rev-d1" data-i18n="statement.text">
+        Diseño que<br>
+        no pide<br>
+        <em>permiso.</em>
+      </p>
+      <blockquote class="statement-quote rev rev-d2" data-i18n="statement.quote">
+        &ldquo;Todos diseñamos, ya que hasta tomar una decisión es diseño.&rdquo;
+      </blockquote>
+    </div>
+  </section>
 
-updateText();
-</script>
+  <!-- ━━━━━━━━━━━━━━ SERVICIOS ━━━━━━━━━━━━━━ -->
+  <section id="servicios">
+    <div class="wrap">
+      <div class="svc-layout">
+
+        <div class="svc-sidebar">
+          <div class="sec-label rev" data-i18n="services.title">02 — Servicios</div>
+          <h2 class="svc-title rev rev-d1" data-i18n="services.heading">Capaci-<br>dades</h2>
+          <p class="svc-blurb rev rev-d2" data-i18n="services.blurb">
+            Trabajo en la intersección del pensamiento crítico y la ejecución visual. Cada proyecto es un sistema, no una decoración.
+          </p>
+        </div>
+
+        <div>
+          <table class="svc-table" role="table" aria-label="Servicios">
+            <thead>
+              <tr>
+                <th class="col-num" data-i18n="work.cols.num">Área</th>
+                <th class="col-name">Disciplina</th>
+                <th class="col-tags">Alcance</th>
+                <th class="col-note" style="text-align:right;">Modalidad</th>
+              </tr>
+            </thead>
+            <tbody id="services-container">
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ━━━━━━━━━━━━━━ SOBRE MÍ ━━━━━━━━━━━━━━ -->
+  <section id="sobre">
+    <div class="wrap">
+      <div class="sec-label rev" data-i18n="about.title">03 — Sobre mí</div>
+
+      <div class="about-layout">
+        <div class="about-left">
+          <h2 class="about-headline rev" data-i18n="about.heading">
+            Soy alguien<br>
+            <em>que cree</em><br>
+            en lo<br>
+            imperfecto.
+          </h2>
+          <p class="about-body rev rev-d2" data-i18n="about.bio">
+            Soy Juan Pablo Castro Casillas. Creo que el diseño más honesto nace de aceptar lo imperfecto como parte del proceso, no como un error a corregir. Mi trabajo busca traducir ideas complejas en sistemas visuales claros, directos y memorables.
+          </p>
+        </div>
+
+        <div class="about-meta rev rev-d2">
+          <div class="meta-row">
+            <span class="meta-label" data-i18n-attr="about.name">Nombre</span>
+            <span class="meta-val" data-i18n="about.name">Juan Pablo Castro Casillas</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Rol</span>
+            <span class="meta-val" data-i18n="about.role">Diseñador</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Ubicación</span>
+            <span class="meta-val" data-i18n="about.location">Guadalajara, Jalisco, México</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Disponibilidad</span>
+            <span class="meta-val">
+              <span class="status-dot"></span><span data-i18n="about.availability">Disponible para proyectos</span>
+            </span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Filosofía</span>
+            <span class="meta-val italic" data-i18n="about.philosophy">El diseño trasciende de lo visual hacia lo funcional.</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Instagram</span>
+            <span class="meta-val">
+              <a href="https://instagram.com/user_cascas" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                @user_cascas
+              </a>
+            </span>
+          </div>
+          <div class="meta-row" style="border-bottom: none;">
+            <span class="meta-label">Correo</span>
+            <span class="meta-val">
+              <a href="mailto:catartix@gmail.com" style="display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                catartix@gmail.com
+              </a>
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ━━━━━━━━━━━━━━ FOOTER ━━━━━━━━━━━━━━ -->
+  <footer>
+    <span class="foot-copy" data-i18n="footer.copy">© 2025 Juan Pablo Castro Casillas</span>
+    <a href="#hero" class="foot-up" data-i18n="footer.up">Volver arriba</a>
+  </footer>
+
+  <!-- ━━━━━━━━━━━━━━ JAVASCRIPT ━━━━━━━━━━━━━━ -->
+  <script>
+    'use strict';
+
+    /* ── I18N SYSTEM ─────────────────────────────────── */
+    const translations = {
+      "es": {
+        "nav.work": "Trabajo",
+        "nav.gallery": "Galería",
+        "nav.audiovisual": "Sala Audiovisual",
+        "nav.music": "Música 3D",
+        "nav.services": "Servicios",
+        "nav.about": "Sobre mí",
+        "hero.designer": "Diseñador creativo",
+        "hero.portfolio": "Portafolio 2026",
+        "hero.available": "Disponible",
+        "hero.location": "Guadalajara, México",
+        "hero.manifesto": "Lo imperfecto<br>es lo más <strong>real, auténtico.</strong>",
+        "hero.specs.1": "Diseño Visual",
+        "hero.specs.2": "Identidad de Marca",
+        "hero.specs.3": "Experiencia Digital",
+        "hero.specs.4": "Arte & Dirección",
+        "work.title": "01 — Trabajo",
+        "work.count": "— casos de estudio",
+        "work.cols.num": "N°",
+        "work.cols.project": "Proyecto",
+        "work.cols.year": "Año",
+        "work.cols.category": "Categoría",
+        "work.cols.stack": "Stack",
+        "statement.label": "— Filosofía",
+        "statement.text": "Diseño que<br>no pide<br><em>permiso.</em>",
+        "statement.quote": "Todos diseñamos, ya que hasta tomar una decisión es diseño.",
+        "services.title": "02 — Servicios",
+        "services.heading": "Capaci-<br>dades",
+        "services.blurb": "Trabajo en la intersección del pensamiento crítico y la ejecución visual. Cada proyecto es un sistema, no una decoración.",
+        "about.title": "03 — Sobre mí",
+        "about.heading": "Soy alguien<br><em>que cree</em><br>en lo<br>imperfecto.",
+        "about.bio": "Soy Juan Pablo Castro Casillas. Creo que el diseño más honesto nace de aceptar lo imperfecto como parte del proceso, no como un error a corregir. Mi trabajo busca traducir ideas complejas en sistemas visuales claros, directos y memorables.",
+        "about.name": "Nombre",
+        "about.role": "Diseñador",
+        "about.location": "Guadalajara, Jalisco, México",
+        "about.availability": "Disponible para proyectos",
+        "about.philosophy": "El diseño trasciende de lo visual hacia lo funcional.",
+        "footer.copy": "© 2025 Juan Pablo Castro Casillas",
+        "footer.up": "Volver arriba",
+      },
+      "en": {
+        "nav.work": "Work",
+        "nav.gallery": "Gallery",
+        "nav.audiovisual": "Audiovisual Room",
+        "nav.music": "3D Music",
+        "nav.services": "Services",
+        "nav.about": "About",
+        "hero.designer": "Creative Designer",
+        "hero.portfolio": "Portfolio 2026",
+        "hero.available": "Available",
+        "hero.location": "Guadalajara, Mexico",
+        "hero.manifesto": "The imperfect<br>is what's most <strong>real, authentic.</strong>",
+        "hero.specs.1": "Visual Design",
+        "hero.specs.2": "Brand Identity",
+        "hero.specs.3": "Digital Experience",
+        "hero.specs.4": "Art & Direction",
+        "work.title": "01 — Work",
+        "work.count": "— case studies",
+        "work.cols.num": "N°",
+        "work.cols.project": "Project",
+        "work.cols.year": "Year",
+        "work.cols.category": "Category",
+        "work.cols.stack": "Stack",
+        "statement.label": "— Philosophy",
+        "statement.text": "Design that<br>doesn't ask for<br><em>permission.</em>",
+        "statement.quote": "We all design, because even making a decision is design.",
+        "services.title": "02 — Services",
+        "services.heading": "Capabi-<br>lities",
+        "services.blurb": "I work at the intersection of critical thinking and visual execution. Every project is a system, not decoration.",
+        "about.title": "03 — About",
+        "about.heading": "I'm someone<br><em>who believes</em><br>in the<br>imperfect.",
+        "about.bio": "I'm Juan Pablo Castro Casillas. I believe the most honest design comes from accepting the imperfect as part of the process, not as an error to correct. My work seeks to translate complex ideas into clear, direct, and memorable visual systems.",
+        "about.name": "Name",
+        "about.role": "Designer",
+        "about.location": "Guadalajara, Jalisco, Mexico",
+        "about.availability": "Available for projects",
+        "about.philosophy": "Design transcends the visual into the functional.",
+        "footer.copy": "© 2025 Juan Pablo Castro Casillas",
+        "footer.up": "Back to top",
+      }
+    };
+
+    let currentLang = localStorage.getItem('lang') || 'es';
+    const langToggle = document.getElementById('lang-toggle');
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem('lang', lang);
+      
+      // Update HTML lang attribute
+      document.documentElement.lang = lang;
+      document.documentElement.setAttribute('lang', lang);
+      
+      // Update all elements with data-i18n
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[lang] && translations[lang][key]) {
+          el.innerHTML = translations[lang][key];
+        }
+      });
+
+      // Update button state
+      langToggle.classList.toggle('active-en', lang === 'en');
+    }
+
+    langToggle.addEventListener('click', () => {
+      setLanguage(currentLang === 'es' ? 'en' : 'es');
+    });
+
+    // Initialize language on page load
+    window.addEventListener('load', () => {
+      setLanguage(currentLang);
+    });
+
+    /* ── Custom Cursor ─────────────────────────── */
+    const dot  = document.getElementById('cur-dot');
+    const ring = document.getElementById('cur-ring');
+    let mx = -100, my = -100;
+    let rx = -100, ry = -100;
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX;
+      my = e.clientY;
+      dot.style.left = mx + 'px';
+      dot.style.top  = my + 'px';
+    });
+
+    (function loop() {
+      rx += (mx - rx) * 0.11;
+      ry += (my - ry) * 0.11;
+      ring.style.left = rx + 'px';
+      ring.style.top  = ry + 'px';
+      requestAnimationFrame(loop);
+    })();
+
+    const hoverEls = document.querySelectorAll(
+      'a, button, .proj-row, .svc-table tbody tr, .foot-up, .castro-flicker'
+    );
+    hoverEls.forEach(el => {
+      el.addEventListener('mouseenter', () => document.body.classList.add('cur-active'));
+      el.addEventListener('mouseleave', () => document.body.classList.remove('cur-active'));
+    });
+
+    const darkSections = document.querySelectorAll('#statement, .marquee-wrap');
+    darkSections.forEach(sec => {
+      sec.addEventListener('mouseenter', () => document.body.classList.add('cur-dark'));
+      sec.addEventListener('mouseleave', () => document.body.classList.remove('cur-dark'));
+    });
+
+    /* ── Scroll: Nav + Progress ─────────────────── */
+    const nav      = document.getElementById('nav');
+    const scrollBar = document.getElementById('scroll-bar');
+
+    window.addEventListener('scroll', () => {
+      const sy  = window.scrollY;
+      const max = document.body.scrollHeight - window.innerHeight;
+      nav.classList.toggle('scrolled', sy > 50);
+      scrollBar.style.width = (sy / max * 100) + '%';
+    }, { passive: true });
+
+    /* ── Hero Name Reveal ──────────────────────── */
+    window.addEventListener('load', () => {
+      document.querySelectorAll('.word-inner').forEach(el => {
+        el.classList.add('up');
+      });
+      setTimeout(() => {
+        const heroName = document.getElementById('hero-name');
+        if (heroName) heroName.classList.add('revealed');
+      }, 1400);
+    });
+
+    /* ── Castro Glitch ───────────────────────── */
+    const castroEl = document.querySelector('.castro-flicker');
+    if (castroEl) {
+      const triggerGlitch = () => {
+        if (castroEl.classList.contains('glitch-active')) return;
+        castroEl.classList.add('glitch-active');
+        
+        const onAnimEnd = () => {
+          castroEl.classList.remove('glitch-active');
+          castroEl.removeEventListener('animationend', onAnimEnd);
+          scheduleGlitch();
+        };
+        castroEl.addEventListener('animationend', onAnimEnd);
+      };
+
+      const scheduleGlitch = () => {
+        const nextDelay = 4000 + Math.random() * 6000;
+        setTimeout(triggerGlitch, nextDelay);
+      };
+
+      window.addEventListener('load', () => {
+        setTimeout(scheduleGlitch, 3000);
+      });
+
+      castroEl.addEventListener('mouseenter', triggerGlitch);
+    }
+
+    /* ── Intersection Observer ─────────────────── */
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+
+    document.querySelectorAll('.rev').forEach(el => io.observe(el));
+
+    /* ── Smooth scroll ────────────────────────── */
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
 
 </body>
 </html>
