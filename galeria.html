@@ -789,101 +789,8 @@
     }
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-       LIGHT MODE TOGGLE
+       COLLAGE VIEW
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-    #light-mode-toggle {
-      position: fixed;
-      bottom: 36px;
-      right: 52px;
-      transform: none;
-      z-index: 700;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.28);
-      border-bottom-color: rgba(0,0,0,0.28);
-      color: rgba(237,236,234,0.88);
-      font-family: var(--font);
-      font-size: 9.5px;
-      font-weight: 500;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      padding: 10px 24px;
-      border-radius: 40px;
-      cursor: none;
-      backdrop-filter: blur(36px) saturate(220%) brightness(1.08);
-      -webkit-backdrop-filter: blur(36px) saturate(220%) brightness(1.08);
-      box-shadow:
-        inset 0 1.5px 0 rgba(255,255,255,0.42),
-        inset 0 -1px 0 rgba(0,0,0,0.28),
-        0 8px 36px rgba(0,0,0,0.36),
-        0 2px 6px rgba(0,0,0,0.20);
-      transition: all 0.35s cubic-bezier(0.16,1,0.3,1);
-      white-space: nowrap;
-      overflow: hidden;
-    }
-    #light-mode-toggle::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        135deg,
-        rgba(255,255,255,0.28) 0%,
-        rgba(255,255,255,0.04) 45%,
-        transparent 70%
-      );
-      border-radius: 40px;
-      pointer-events: none;
-    }
-    #light-mode-toggle:hover {
-      background: rgba(255,255,255,0.12);
-      border-color: rgba(255,255,255,0.50);
-      color: rgba(237,236,234,0.98);
-      box-shadow:
-        inset 0 1.5px 0 rgba(255,255,255,0.60),
-        inset 0 -1px 0 rgba(0,0,0,0.15),
-        0 14px 48px rgba(0,0,0,0.44),
-        0 4px 12px rgba(0,0,0,0.28);
-      transform: translateY(-2px);
-    }
-
-    /* TABLET (768px) */
-    @media (max-width: 768px) {
-      #light-mode-toggle {
-        bottom: 72px;
-        right: 24px;
-        font-size: 9px;
-        padding: 8px 16px;
-      }
-    }
-
-    /* MÓVIL (480px) */
-    @media (max-width: 480px) {
-      #light-mode-toggle {
-        bottom: auto;
-        top: 76px;
-        left: 16px;
-        right: auto;
-        font-size: 8.5px;
-        padding: 7px 14px;
-      }
-    }
-
-    /* MÓVIL MUY PEQUEÑO (< 380px) */
-    @media (max-width: 380px) {
-      #light-mode-toggle {
-        top: 72px;
-        left: 12px;
-        padding: 6px 12px;
-        font-size: 8px;
-      }
-    }
-
-    /* Light Mode Styles */
-    body.light-mode {
-      background: #f5f5f5;
-    }
-    body.light-mode #three-canvas {
-      background: #f5f5f5;
-    }
     #collage-view {
       position: fixed; inset: 0;
       z-index: 10;
@@ -1074,9 +981,6 @@
 
   <!-- View Toggle -->
   <button id="view-toggle" aria-label="Cambiar vista">Collage ↗</button>
-
-  <!-- Light Mode Toggle -->
-  <button id="light-mode-toggle" aria-label="Modo luz 3D">Luz 3D ✨</button>
 
   <!-- Side dots -->
   <div id="gal-index"></div>
@@ -1940,28 +1844,13 @@
 
     /* — Smooth gallery rotation — */
     currentRot += (targetRot - currentRot) * .065;
-    
-    if (lightMode) {
-      // Light mode: floating animation
-      floatingOffset += 0.008;
-      gallery.rotation.y = floatingOffset * 0.2;
-      
-      // Movimiento vertical suave para todos los frames
-      allFrames.forEach((f, idx) => {
-        f.position.y = Math.sin(floatingOffset + idx * 0.4) * 0.6;
-      });
-    } else {
-      // Normal mode: gallery rotation
-      gallery.rotation.y = currentRot;
-    }
+    gallery.rotation.y = currentRot;
 
     /* — Active piece tracking — */
-    if (!lightMode) {
-      const newIdx = getIdxFromRot(currentRot);
-      if (newIdx !== prevActive) {
-        prevActive = newIdx;
-        updateActive(newIdx);
-      }
+    const newIdx = getIdxFromRot(currentRot);
+    if (newIdx !== prevActive) {
+      prevActive = newIdx;
+      updateActive(newIdx);
     }
 
     /* — Billboard: every frame faces the camera — */
@@ -2037,8 +1926,6 @@
      COLLAGE MODE
   ════════════════════════════════════════════════ */
   let viewMode = '3d';
-  let lightMode = false;
-  let floatingOffset = 0;
 
   // Which cards get special sizing (index → class)
   const SPAN_CONFIG = { 0: 'span-tall', 2: 'span-wide', 5: 'span-tall', 7: 'span-wide' };
@@ -2121,52 +2008,6 @@
   document.querySelectorAll('.filter-pill').forEach(btn => {
     btn.addEventListener('click', e => updateCollageFilter(e.target.dataset.filter));
   });
-
-  /* ════════════════════════════════════════════════
-     LIGHT MODE TOGGLE
-  ════════════════════════════════════════════════ */
-  const lightModeBtn = document.getElementById('light-mode-toggle');
-
-  function toggleLightMode() {
-    lightMode = !lightMode;
-    document.body.classList.toggle('light-mode');
-
-    if (lightMode) {
-      // Enter light mode
-      scene.background = new THREE.Color(0xf5f5f5);
-      scene.fog = new THREE.FogExp2(0xf5f5f5, 0.04);
-      
-      // Cambiar luces para modo claro
-      topLight.intensity = 0.5;
-      warmLight.intensity = 0.3;
-      coolLight.intensity = 0.2;
-      flashLight.intensity = 0;
-      
-      // Esconder algunos elementos
-      document.getElementById('drag-hint').style.opacity = '0';
-      document.getElementById('drag-hint').style.pointerEvents = 'none';
-      
-      lightModeBtn.textContent = 'Oscuro ◐';
-    } else {
-      // Exit light mode
-      scene.background = new THREE.Color(0x080808);
-      scene.fog = new THREE.FogExp2(0x080808, 0.058);
-      
-      // Restaurar luces
-      topLight.intensity = 1.1;
-      warmLight.intensity = 0.55;
-      coolLight.intensity = 0.35;
-      
-      document.getElementById('drag-hint').style.opacity = '';
-      document.getElementById('drag-hint').style.pointerEvents = '';
-      
-      lightModeBtn.textContent = 'Luz 3D ✨';
-    }
-  }
-
-  lightModeBtn.addEventListener('click', toggleLightMode);
-  lightModeBtn.addEventListener('mouseenter', () => document.body.classList.add('cur-active'));
-  lightModeBtn.addEventListener('mouseleave', () => document.body.classList.remove('cur-active'));
   </script>
 </body>
 </html>
