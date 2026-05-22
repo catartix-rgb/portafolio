@@ -1645,10 +1645,16 @@
   // Click en botón cerrar
   zoomClose.addEventListener('click', closeZoom);
 
-  // Click fuera de la imagen
+  // Click fuera de la imagen (en cualquier parte del modal)
   zoomModal.addEventListener('click', (e) => {
-    if (e.target === zoomModal) closeZoom();
+    // Cierra si hace click en el modal mismo o en el contenedor (fuera de la imagen)
+    if (e.target === zoomModal || e.target === zoomContainer) {
+      closeZoom();
+    }
   });
+
+  // También cerrar si hace click en la hint de instrucciones
+  document.querySelector('.zoom-hint')?.addEventListener('click', closeZoom);
 
   // Botones de zoom
   zoomIn.addEventListener('click', () => {
