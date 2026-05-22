@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Galería 3D — Juan Pablo Castro Casillas. Explora los trabajos en un espacio tridimensional.">
-  <title>Galería 3D- catartix</title>
+  <title>Galería 3D — JPCC</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -403,8 +403,8 @@
       #key-hint { display: none; }
       
       #detail-panel { 
-        width: 100%; top: auto; bottom: 0; height: 75vh; 
-        padding: 32px 20px 24px; 
+        width: 100%; top: auto; bottom: 0; height: 48vh; 
+        padding: 24px 20px 20px; 
         transform: translateY(105%) translateX(0);
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
@@ -413,8 +413,8 @@
       
       #large-view { 
         right: 0; 
-        bottom: 75vh; 
-        padding: 12px;
+        bottom: 48vh; 
+        padding: 8px;
         z-index: 650;
       }
     }
@@ -485,9 +485,9 @@
 
     @media (max-width: 768px) {
       .dp-label {
-        margin-bottom: 16px;
-        font-size: 9px;
-        gap: 10px;
+        margin-bottom: 12px;
+        font-size: 8px;
+        gap: 8px;
       }
     }
     .dp-label::before {
@@ -504,8 +504,8 @@
 
     @media (max-width: 768px) {
       .dp-name {
-        font-size: clamp(22px, 5vw, 36px);
-        margin-bottom: 16px;
+        font-size: clamp(18px, 4vw, 28px);
+        margin-bottom: 12px;
       }
     }
 
@@ -517,9 +517,9 @@
 
     @media (max-width: 768px) {
       .dp-desc {
-        font-size: 12px;
-        line-height: 1.6;
-        margin-bottom: 24px;
+        font-size: 11px;
+        line-height: 1.5;
+        margin-bottom: 16px;
       }
     }
 
@@ -534,6 +534,18 @@
       color: rgba(237,236,234,.28);
     }
     .dp-val { font-size: 12.5px; color: rgba(237,236,234,.6); }
+
+    @media (max-width: 768px) {
+      .dp-meta-row {
+        padding: 10px 0;
+      }
+      .dp-key {
+        font-size: 8px;
+      }
+      .dp-val {
+        font-size: 11px;
+      }
+    }
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
        ZOOM MODAL
