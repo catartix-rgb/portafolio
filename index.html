@@ -13,75 +13,7 @@
 
   <style>
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-       LANG TOGGLE BUTTON
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-    .lang-toggle {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--ink);
-      padding: 8px 14px;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.25s var(--ease);
-      flex-shrink: 0;
-      position: relative;
-      z-index: 2;
-    }
-
-    .lang-toggle:hover {
-      background: rgba(8, 8, 8, 0.04);
-      border-color: var(--ink);
-    }
-
-    .lang-toggle::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
-      border: 1px solid rgba(255, 255, 255, 0.55);
-      border-bottom-color: rgba(0, 0, 0, 0.07);
-      box-shadow:
-        inset 0 1.5px 0 rgba(255, 255, 255, 0.75),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.05),
-        0 4px 16px rgba(0, 0, 0, 0.06);
-      opacity: 0;
-      transition: opacity 0.3s var(--ease);
-      z-index: -1;
-    }
-
-    .lang-toggle:hover::before {
-      opacity: 1;
-    }
-
-    /* Indicador de idioma actual */
-    .lang-toggle.active-en {
-      font-weight: 700;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .lang-toggle {
-        font-size: 9px;
-        padding: 6px 10px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .lang-toggle {
-        font-size: 8px;
-        padding: 5px 8px;
-      }
-    }
-
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-       RESET & BASE (ORIGINAL)
+       RESET & BASE
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
     *, *::before, *::after {
       margin: 0;
@@ -212,6 +144,7 @@
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
        LIQUID GLASS SYSTEM
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    /* Reusable liquid-glass surface */
     .liquid-glass {
       background: rgba(255, 255, 255, 0.10);
       backdrop-filter: blur(32px) saturate(200%) brightness(1.08);
@@ -229,6 +162,7 @@
       overflow: hidden;
     }
 
+    /* Specular shine sweep on liquid-glass */
     .liquid-glass::before {
       content: '';
       position: absolute;
@@ -272,6 +206,7 @@
         0 2px 6px rgba(0, 0, 0, 0.04);
     }
 
+    /* Specular sweep on scrolled nav */
     nav.scrolled::after {
       content: '';
       position: absolute;
@@ -329,6 +264,7 @@
       transition: color 0.25s var(--ease);
     }
 
+    /* Liquid glass pill behind each nav link */
     .nav-links a::before {
       content: '';
       position: absolute;
@@ -349,6 +285,7 @@
       z-index: -1;
     }
 
+    /* Specular shine on pill */
     .nav-links a::after {
       content: '';
       position: absolute;
@@ -477,6 +414,7 @@
       overflow: hidden;
     }
 
+    /* Vertical index line */
     #hero::before {
       content: '';
       position: absolute;
@@ -506,6 +444,7 @@
       text-align: right;
     }
 
+    /* Massive name */
     .hero-name {
       font-size: clamp(40px, 11.8vw, 186px);
       font-weight: 900;
@@ -664,8 +603,10 @@
       border-top: 1px solid #1a0000;
       border-bottom: 1px solid #1a0000;
       padding: 0;
+      /* CRT scanlines overlay */
     }
 
+    /* Scanline effect */
     .marquee-wrap::before {
       content: '';
       position: absolute;
@@ -681,6 +622,7 @@
       z-index: 2;
     }
 
+    /* Side fade masks */
     .marquee-wrap::after {
       content: '';
       position: absolute;
@@ -699,6 +641,7 @@
     .marquee-track {
       display: flex;
       white-space: nowrap;
+      /* Slightly faster, more mechanical feel */
       animation: scoreTick 28s linear infinite;
       position: relative;
       z-index: 1;
@@ -721,6 +664,7 @@
       animation: ledFlicker 8s ease-in-out infinite;
     }
 
+    /* Amber accent — now bright white, slightly larger glow */
     .m-item.amber {
       color: #ffffff;
       font-weight: 900;
@@ -730,12 +674,14 @@
         0 0 48px rgba(255, 255, 255, 0.12);
     }
 
+    /* Dim items — muted white */
     .m-item.dim {
       color: rgba(255, 255, 255, 0.32);
       text-shadow: none;
       animation: none;
     }
 
+    /* Separator */
     .m-sep {
       display: inline-flex;
       align-items: center;
@@ -746,6 +692,7 @@
       animation: none;
     }
 
+    /* LED digit flicker — subtle, not distracting */
     @keyframes ledFlicker {
       0%, 94%, 100% { opacity: 1; }
       95% { opacity: 0.88; }
@@ -754,13 +701,14 @@
       98% { opacity: 1; }
     }
 
+    /* Mechanical step-scroll feel via steps */
     @keyframes scoreTick {
       0%   { transform: translateX(0); }
       100% { transform: translateX(-50%); }
     }
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-       TRABAJO/WORK
+       WORK / PROYECTOS
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
     #trabajo {
       padding-bottom: 0;
@@ -784,6 +732,7 @@
       color: var(--ink-muted);
     }
 
+    /* Column header */
     .work-cols {
       display: grid;
       grid-template-columns: 56px 1fr 100px 180px 160px;
@@ -797,6 +746,7 @@
       color: var(--ink-muted);
     }
 
+    /* Empty state */
     .work-empty {
       padding: 96px 0 108px;
     }
@@ -825,6 +775,7 @@
       letter-spacing: 0.02em;
     }
 
+    /* Project row (for future use) */
     .proj-row {
       display: grid;
       grid-template-columns: 56px 1fr 100px 180px 160px;
@@ -878,6 +829,7 @@
       letter-spacing: 0.03em;
     }
 
+    /* Project image preview (hover float) */
     .proj-img-float {
       position: fixed;
       width: 280px;
@@ -898,6 +850,7 @@
       transform: scale(1) rotate(0deg);
     }
 
+    /* Inline project image (mobile) */
     .proj-thumb {
       display: none;
       width: 100%;
@@ -947,7 +900,7 @@
     }
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-       SERVICIOS/SERVICES
+       SERVICIOS
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
     #servicios {
       padding-bottom: 100px;
@@ -981,6 +934,7 @@
       max-width: 260px;
     }
 
+    /* Services table */
     .svc-table {
       width: 100%;
       border-collapse: collapse;
@@ -1045,7 +999,7 @@
     }
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-       SOBRE/ABOUT
+       SOBRE MÍ
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
     #sobre {
       padding-bottom: 100px;
@@ -1083,6 +1037,7 @@
       padding-top: 28px;
     }
 
+    /* Meta table */
     .about-meta {
       border-top: 1px solid var(--border-hard);
     }
@@ -1123,6 +1078,7 @@
 
     .meta-val a:hover { border-color: var(--ink); }
 
+    /* Status dot */
     .status-dot {
       display: inline-block;
       width: 7px;
@@ -1221,6 +1177,7 @@
       .svc-table td.col-tags { display: none; }
       .svc-table td.col-name { font-size: 16px; }
 
+      /* Nav links: scroll horizontal sin corte */
       .nav-links { gap: 4px; flex-shrink: 1; }
       .nav-links a { font-size: 10px; padding: 6px 12px; white-space: nowrap; }
       .nav-logo { flex-shrink: 0; }
@@ -1248,14 +1205,13 @@
   <nav id="nav">
     <a href="#hero" class="nav-logo">catartix</a>
     <ul class="nav-links">
-      <li><a href="#trabajo" data-i18n="nav.work">Trabajo</a></li>
-      <li><a href="galeria.html" data-i18n="nav.gallery">Galería</a></li>
-      <li><a href="audiovisual.html" class="nav-audio" data-i18n="nav.audiovisual">Sala Audiovisual</a></li>
-      <li><a href="musical-space/dist/index.html" class="nav-music" data-i18n="nav.music">Música 3D</a></li>
-      <li><a href="#servicios" data-i18n="nav.services">Servicios</a></li>
-      <li><a href="#sobre" data-i18n="nav.about">Sobre mí</a></li>
+      <li><a href="#trabajo">Trabajo</a></li>
+      <li><a href="galeria.html">Galería</a></li>
+      <li><a href="audiovisual.html" class="nav-audio">Sala Audiovisual</a></li>
+      <li><a href="musical-space/dist/index.html" class="nav-music">Música 3D</a></li>
+      <li><a href="#servicios">Servicios</a></li>
+      <li><a href="#sobre">Sobre mí</a></li>
     </ul>
-    <button id="lang-toggle" class="lang-toggle" aria-label="Toggle language">ES/EN</button>
   </nav>
 
   <!-- ━━━━━━━━━━━━━━ HERO ━━━━━━━━━━━━━━ -->
@@ -1264,12 +1220,12 @@
 
       <div class="hero-eyebrow">
         <div class="hero-tag rev">
-          <span data-i18n="hero.designer">Diseñador creativo</span><br>
-          <span data-i18n="hero.portfolio">Portafolio 2026</span>
+          <span>Diseñador creativo</span><br>
+          <span>Portafolio 2026</span>
         </div>
         <div class="hero-tag hero-tag--right rev">
-          <span data-i18n="hero.available">Disponible</span><br>
-          <span data-i18n="hero.location">Guadalajara, México</span>
+          <span>Disponible</span><br>
+          <span>Guadalajara, México</span>
         </div>
       </div>
 
@@ -1281,40 +1237,212 @@
       </h1>
 
       <div class="hero-footer">
-        <blockquote class="hero-manifesto rev rev-d3" data-i18n="hero.manifesto">
+        <blockquote class="hero-manifesto rev rev-d3">
           &ldquo;Lo imperfecto<br>es lo más <strong>real, auténtico.</strong>&rdquo;
         </blockquote>
         <div class="hero-specs rev rev-d4">
-          <div data-i18n="hero.specs.1">Diseño Visual</div>
-          <div data-i18n="hero.specs.2">Identidad de Marca</div>
-          <div data-i18n="hero.specs.3">Experiencia Digital</div>
-          <div data-i18n="hero.specs.4">Arte & Dirección</div>
+          <div>Diseño Visual</div>
+          <div>Identidad de Marca</div>
+          <div>Experiencia Digital</div>
+          <div>Arte &amp; Dirección</div>
         </div>
       </div>
 
     </div>
   </section>
 
+  <!-- ━━━━━━━━━━━━━━ SCOREBOARD TICKER ━━━━━━━━━━━━━━ -->
+  <div class="marquee-wrap" role="marquee" aria-label="Live feed">
+    <div class="marquee-track" aria-hidden="true">
+      <!-- Set 1 -->
+      <span class="m-item amber">LIVE<span class="m-sep">◈</span></span>
+      <span class="m-item">SIGNAL DETECTED<span class="m-sep">◈</span></span>
+      <span class="m-item dim">19.4319° N  99.1331° W<span class="m-sep">◈</span></span>
+      <span class="m-item amber">JPCC — DISEÑADOR VISUAL<span class="m-sep">◈</span></span>
+      <span class="m-item">AUDIO INPUT ACTIVE<span class="m-sep">◈</span></span>
+      <span class="m-item dim">BPM 128 ▸ FREQ 440 Hz<span class="m-sep">◈</span></span>
+      <span class="m-item">IDENTIDAD VISUAL &amp; EXPERIENCIA DIGITAL<span class="m-sep">◈</span></span>
+      <span class="m-item amber">360° INMERSIVE MODE<span class="m-sep">◈</span></span>
+      <span class="m-item dim">MXC-26 / REF:2025-JPX<span class="m-sep">◈</span></span>
+      <span class="m-item">ARTE &amp; DIRECCIÓN CREATIVA<span class="m-sep">◈</span></span>
+      <span class="m-item amber">PORTAFOLIO — EDICIÓN 2025<span class="m-sep">◈</span></span>
+      <span class="m-item dim">SYS:OK ▸ NET:ON ▸ DSP:READY<span class="m-sep">◈</span></span>
+      <!-- Set 2 (duplicate for seamless loop) -->
+      <span class="m-item amber">LIVE<span class="m-sep">◈</span></span>
+      <span class="m-item">SIGNAL DETECTED<span class="m-sep">◈</span></span>
+      <span class="m-item dim">19.4319° N  99.1331° W<span class="m-sep">◈</span></span>
+      <span class="m-item amber">JPCC — DISEÑADOR VISUAL<span class="m-sep">◈</span></span>
+      <span class="m-item">AUDIO INPUT ACTIVE<span class="m-sep">◈</span></span>
+      <span class="m-item dim">BPM 128 ▸ FREQ 440 Hz<span class="m-sep">◈</span></span>
+      <span class="m-item">IDENTIDAD VISUAL &amp; EXPERIENCIA DIGITAL<span class="m-sep">◈</span></span>
+      <span class="m-item amber">360° INMERSIVE MODE<span class="m-sep">◈</span></span>
+      <span class="m-item dim">MXC-26 / REF:2025-JPX<span class="m-sep">◈</span></span>
+      <span class="m-item">ARTE &amp; DIRECCIÓN CREATIVA<span class="m-sep">◈</span></span>
+      <span class="m-item amber">PORTAFOLIO — EDICIÓN 2025<span class="m-sep">◈</span></span>
+      <span class="m-item dim">SYS:OK ▸ NET:ON ▸ DSP:READY<span class="m-sep">◈</span></span>
+    </div>
+  </div>
+
   <!-- ━━━━━━━━━━━━━━ TRABAJO ━━━━━━━━━━━━━━ -->
   <section id="trabajo">
     <div class="wrap">
 
       <div class="work-header rev">
-        <div class="sec-label" style="margin-bottom:0;" data-i18n="work.title">01 — Trabajo</div>
-        <span class="work-count" id="proj-count" data-i18n="work.count">— casos de estudio</span>
+        <div class="sec-label" style="margin-bottom:0;">01 — Trabajo</div>
+        <span class="work-count" id="proj-count">— casos de estudio</span>
       </div>
 
+      <!-- Column labels (shown when projects exist) -->
       <div class="work-cols rev rev-d1">
-        <span data-i18n="work.cols.num">N°</span>
-        <span data-i18n="work.cols.project">Proyecto</span>
-        <span data-i18n="work.cols.year">Año</span>
-        <span data-i18n="work.cols.category">Categoría</span>
-        <span data-i18n="work.cols.stack">Stack</span>
+        <span>N°</span>
+        <span>Proyecto</span>
+        <span>Año</span>
+        <span>Categoría</span>
+        <span>Stack</span>
       </div>
 
-      <!-- Projects will be populated by JavaScript -->
-      <div id="projects-container"></div>
+      <!-- PROJECT ROWS -->
+      <div class="proj-row rev" data-img="img/alta-tension.jpg">
+        <span class="proj-num">01</span>
+        <div class="proj-body">
+          <div class="proj-name">Alta Tensión</div>
+          <div class="proj-desc">
+            Exploración de identidad gráfica aplicada a indumentaria. Lenguaje visual crudo inspirado en señalización industrial y simbología de peligro como vehículo estético.
+          </div>
+          <img class="proj-thumb" src="img/alta-tension.jpg" alt="Alta Tensión — Playera" loading="lazy">
+        </div>
+        <span class="proj-year">2025</span>
+        <span class="proj-cat">Identidad / Indumentaria</span>
+        <span class="proj-stack">Diseño Gráfico · Textil</span>
+      </div>
 
+      <div class="proj-row rev" data-img="img/not-different.jpg">
+        <span class="proj-num">02</span>
+        <div class="proj-body">
+          <div class="proj-name">Not Different</div>
+          <div class="proj-desc">
+            Una exploración de branding e identidad para marca.
+          </div>
+          <img class="proj-thumb" src="img/not-different.jpg" alt="Not Different — Branding" loading="lazy">
+        </div>
+        <span class="proj-year">2025</span>
+        <span class="proj-cat">Branding / Identidad</span>
+        <span class="proj-stack">Diseño Gráfico</span>
+      </div>
+
+      <div class="proj-row rev" data-img="img/catartix-popup.jpg">
+        <span class="proj-num">03</span>
+        <div class="proj-body">
+          <div class="proj-name">Catartix Pop Up</div>
+          <div class="proj-desc">
+            Póster para evento musical. Exploración gráfica experimentando con alto contraste de colores y texturas de semitono.
+          </div>
+          <img class="proj-thumb" src="img/catartix-popup.jpg" alt="Catartix Pop Up — Póster" loading="lazy">
+        </div>
+        <span class="proj-year">2025</span>
+        <span class="proj-cat">Cartelismo / Evento</span>
+        <span class="proj-stack">Diseño Gráfico</span>
+      </div>
+
+      <div class="proj-row rev" data-img="img/editorial-1.jpg">
+        <span class="proj-num">04</span>
+        <div class="proj-body">
+          <div class="proj-name">Producción Editorial I</div>
+          <div class="proj-desc">
+            Dirección de arte y fotografía para producción editorial. Exploración visual de estética de moda y lifestyle.
+          </div>
+          <img class="proj-thumb" src="img/editorial-1.jpg" alt="Fotografía Editorial I" loading="lazy">
+        </div>
+        <span class="proj-year">2025</span>
+        <span class="proj-cat">Fotografía / Editorial</span>
+        <span class="proj-stack">Dirección de Arte</span>
+      </div>
+
+      <div class="proj-row rev" data-img="img/editorial-2.jpg">
+        <span class="proj-num">05</span>
+        <div class="proj-body">
+          <div class="proj-name">Producción Editorial II</div>
+          <div class="proj-desc">
+            Segunda parte de la serie fotográfica, centrada en composición visual, indumentaria y detalles en los accesorios.
+          </div>
+          <img class="proj-thumb" src="img/editorial-2.jpg" alt="Fotografía Editorial II" loading="lazy">
+        </div>
+        <span class="proj-year">2025</span>
+        <span class="proj-cat">Fotografía / Editorial</span>
+        <span class="proj-stack">Dirección de Arte</span>
+      </div>
+
+      <div class="proj-row rev" data-img="img/editorial-libro.jpg">
+        <span class="proj-num">06</span>
+        <div class="proj-body">
+          <div class="proj-name">Editorial Libro</div>
+          <div class="proj-desc">
+            Diseño editorial y maquetación conceptual de un libro. Proyecto experimental enfocado en la estructura de retículas, jerarquía tipográfica y composición espacial del contenido.
+          </div>
+          <img class="proj-thumb" src="img/editorial-libro.jpg" alt="Exploración Editorial — Libro" loading="lazy">
+        </div>
+        <span class="proj-year">2025</span>
+        <span class="proj-cat">Diseño Editorial / Libro</span>
+        <span class="proj-stack">Photoshop · Illustrator · InDesign</span>
+      </div>
+
+      <div class="proj-row rev" data-img="img/editorial-libro-2.jpg">
+        <span class="proj-num">07</span>
+        <div class="proj-body">
+          <div class="proj-name">Editorial Libro 2</div>
+          <div class="proj-desc">
+            Exploración de técnicas avanzadas en Illustrator aplicadas al diseño editorial. Retículas, semitono, paleta cromática restringida y tratamiento de imagen como sistema visual coherente.
+          </div>
+          <img class="proj-thumb" src="img/editorial-libro-2.jpg" alt="Diseño Editorial I" loading="lazy">
+        </div>
+        <span class="proj-year">2025</span>
+        <span class="proj-cat">Diseño Editorial</span>
+        <span class="proj-stack">Adobe Illustrator</span>
+      </div>
+
+      <div class="proj-row rev" data-img="img/editorial-libro-3.jpg">
+        <span class="proj-num">08</span>
+        <div class="proj-body">
+          <div class="proj-name">Editorial Libro 3</div>
+          <div class="proj-desc">
+            Segunda exploración del proyecto editorial. Paleta cromática restringida — naranja quemado y negro — sobre imágenes de semitono. Textura, contraste y ritmo visual como lenguaje propio.
+          </div>
+          <img class="proj-thumb" src="img/editorial-libro-3.jpg" alt="Diseño Editorial II" loading="lazy">
+        </div>
+        <span class="proj-year">2025</span>
+        <span class="proj-cat">Diseño Editorial</span>
+        <span class="proj-stack">Adobe Illustrator</span>
+      </div>
+
+      <div class="proj-row rev" data-img="img/fika-1.jpg">
+        <span class="proj-num">09</span>
+        <div class="proj-body">
+          <div class="proj-name">Fika</div>
+          <div class="proj-desc">
+            Desarrollo de identidad y de onboarding de UX/UI para una aplicación.
+          </div>
+          <img class="proj-thumb" src="img/fika-1.jpg" alt="Fika — Identidad y UX/UI" loading="lazy">
+        </div>
+        <span class="proj-year">2024</span>
+        <span class="proj-cat">Identidad & UX/UI</span>
+        <span class="proj-stack">Figma</span>
+      </div>
+
+      <div class="proj-row rev" data-img="img/fika-logo.jpg">
+        <span class="proj-num">10</span>
+        <div class="proj-body">
+          <div class="proj-name">Logo Fika</div>
+          <div class="proj-desc">
+            Desarrollo del logotipo e identidad visual base para la aplicación de Fika.
+          </div>
+          <img class="proj-thumb" src="img/fika-logo.jpg" alt="Logo Fika" loading="lazy">
+        </div>
+        <span class="proj-year">2024</span>
+        <span class="proj-cat">Identidad / Logo</span>
+        <span class="proj-stack">Figma / Illustrator</span>
+      </div>
+
+      <!-- Floating image for hover -->
       <img id="proj-float-img" class="proj-img-float" src="" alt="" aria-hidden="true">
 
     </div>
@@ -1323,13 +1451,13 @@
   <!-- ━━━━━━━━━━━━━━ STATEMENT ━━━━━━━━━━━━━━ -->
   <section id="statement">
     <div class="wrap">
-      <div class="sec-label rev" data-i18n="statement.label">— Filosofía</div>
-      <p class="statement-text rev rev-d1" data-i18n="statement.text">
+      <div class="sec-label rev">— Filosofía</div>
+      <p class="statement-text rev rev-d1">
         Diseño que<br>
         no pide<br>
         <em>permiso.</em>
       </p>
-      <blockquote class="statement-quote rev rev-d2" data-i18n="statement.quote">
+      <blockquote class="statement-quote rev rev-d2">
         &ldquo;Todos diseñamos, ya que hasta tomar una decisión es diseño.&rdquo;
       </blockquote>
     </div>
@@ -1341,24 +1469,54 @@
       <div class="svc-layout">
 
         <div class="svc-sidebar">
-          <div class="sec-label rev" data-i18n="services.title">02 — Servicios</div>
-          <h2 class="svc-title rev rev-d1" data-i18n="services.heading">Capaci-<br>dades</h2>
-          <p class="svc-blurb rev rev-d2" data-i18n="services.blurb">
+          <div class="sec-label rev">02 — Servicios</div>
+          <h2 class="svc-title rev rev-d1">Capaci-<br>dades</h2>
+          <p class="svc-blurb rev rev-d2">
             Trabajo en la intersección del pensamiento crítico y la ejecución visual. Cada proyecto es un sistema, no una decoración.
           </p>
         </div>
 
         <div>
-          <table class="svc-table" role="table" aria-label="Servicios">
+          <table class="svc-table" role="table" aria-label="Capacidades y servicios">
             <thead>
               <tr>
-                <th class="col-num" data-i18n="work.cols.num">Área</th>
+                <th class="col-num">Área</th>
                 <th class="col-name">Disciplina</th>
                 <th class="col-tags">Alcance</th>
                 <th class="col-note" style="text-align:right;">Modalidad</th>
               </tr>
             </thead>
-            <tbody id="services-container">
+            <tbody>
+              <tr class="rev">
+                <td class="col-num">01</td>
+                <td class="col-name">Identidad Visual</td>
+                <td class="col-tags">Marcas, logotipos, sistemas gráficos,<br>manuales de identidad corporativa.</td>
+                <td class="col-note">Proyecto / Retención</td>
+              </tr>
+              <tr class="rev rev-d1">
+                <td class="col-num">02</td>
+                <td class="col-name">Diseño Editorial</td>
+                <td class="col-tags">Publicaciones, catálogos, libros de marca,<br>layouts de alta densidad informacional.</td>
+                <td class="col-note">Proyecto</td>
+              </tr>
+              <tr class="rev rev-d2">
+                <td class="col-num">03</td>
+                <td class="col-name">Interfaz Digital</td>
+                <td class="col-tags">UI/UX, sistemas de diseño, prototipado,<br>design tokens y handoff.</td>
+                <td class="col-note">Proyecto / Retención</td>
+              </tr>
+              <tr class="rev rev-d3">
+                <td class="col-num">04</td>
+                <td class="col-name">Dirección de Arte</td>
+                <td class="col-tags">Concepto visual, fotografía, campaña,<br>narrativa de marca y storytelling.</td>
+                <td class="col-note">Proyecto</td>
+              </tr>
+              <tr class="rev rev-d4">
+                <td class="col-num">05</td>
+                <td class="col-name">Diseño de Experiencia</td>
+                <td class="col-tags">Espacios, instalaciones, señalética<br>y exhibiciones.</td>
+                <td class="col-note">Consultoría</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -1370,43 +1528,43 @@
   <!-- ━━━━━━━━━━━━━━ SOBRE MÍ ━━━━━━━━━━━━━━ -->
   <section id="sobre">
     <div class="wrap">
-      <div class="sec-label rev" data-i18n="about.title">03 — Sobre mí</div>
+      <div class="sec-label rev">03 — Sobre mí</div>
 
       <div class="about-layout">
         <div class="about-left">
-          <h2 class="about-headline rev" data-i18n="about.heading">
+          <h2 class="about-headline rev">
             Soy alguien<br>
             <em>que cree</em><br>
             en lo<br>
             imperfecto.
           </h2>
-          <p class="about-body rev rev-d2" data-i18n="about.bio">
+          <p class="about-body rev rev-d2">
             Soy Juan Pablo Castro Casillas. Creo que el diseño más honesto nace de aceptar lo imperfecto como parte del proceso, no como un error a corregir. Mi trabajo busca traducir ideas complejas en sistemas visuales claros, directos y memorables.
           </p>
         </div>
 
         <div class="about-meta rev rev-d2">
           <div class="meta-row">
-            <span class="meta-label" data-i18n-attr="about.name">Nombre</span>
-            <span class="meta-val" data-i18n="about.name">Juan Pablo Castro Casillas</span>
+            <span class="meta-label">Nombre</span>
+            <span class="meta-val">Juan Pablo Castro Casillas</span>
           </div>
           <div class="meta-row">
             <span class="meta-label">Rol</span>
-            <span class="meta-val" data-i18n="about.role">Diseñador</span>
+            <span class="meta-val">Diseñador</span>
           </div>
           <div class="meta-row">
             <span class="meta-label">Ubicación</span>
-            <span class="meta-val" data-i18n="about.location">Guadalajara, Jalisco, México</span>
+            <span class="meta-val">Guadalajara, Jalisco, México</span>
           </div>
           <div class="meta-row">
             <span class="meta-label">Disponibilidad</span>
             <span class="meta-val">
-              <span class="status-dot"></span><span data-i18n="about.availability">Disponible para proyectos</span>
+              <span class="status-dot"></span>Disponible para proyectos
             </span>
           </div>
           <div class="meta-row">
             <span class="meta-label">Filosofía</span>
-            <span class="meta-val italic" data-i18n="about.philosophy">El diseño trasciende de lo visual hacia lo funcional.</span>
+            <span class="meta-val italic">El diseño trasciende de lo visual hacia lo funcional.</span>
           </div>
           <div class="meta-row">
             <span class="meta-label">Instagram</span>
@@ -1434,129 +1592,13 @@
 
   <!-- ━━━━━━━━━━━━━━ FOOTER ━━━━━━━━━━━━━━ -->
   <footer>
-    <span class="foot-copy" data-i18n="footer.copy">© 2025 Juan Pablo Castro Casillas</span>
-    <a href="#hero" class="foot-up" data-i18n="footer.up">Volver arriba</a>
+    <span class="foot-copy">© 2025 Juan Pablo Castro Casillas</span>
+    <a href="#hero" class="foot-up">Volver arriba</a>
   </footer>
 
   <!-- ━━━━━━━━━━━━━━ JAVASCRIPT ━━━━━━━━━━━━━━ -->
   <script>
     'use strict';
-
-    /* ── I18N SYSTEM ─────────────────────────────────── */
-    const translations = {
-      "es": {
-        "nav.work": "Trabajo",
-        "nav.gallery": "Galería",
-        "nav.audiovisual": "Sala Audiovisual",
-        "nav.music": "Música 3D",
-        "nav.services": "Servicios",
-        "nav.about": "Sobre mí",
-        "hero.designer": "Diseñador creativo",
-        "hero.portfolio": "Portafolio 2026",
-        "hero.available": "Disponible",
-        "hero.location": "Guadalajara, México",
-        "hero.manifesto": "Lo imperfecto<br>es lo más <strong>real, auténtico.</strong>",
-        "hero.specs.1": "Diseño Visual",
-        "hero.specs.2": "Identidad de Marca",
-        "hero.specs.3": "Experiencia Digital",
-        "hero.specs.4": "Arte & Dirección",
-        "work.title": "01 — Trabajo",
-        "work.count": "— casos de estudio",
-        "work.cols.num": "N°",
-        "work.cols.project": "Proyecto",
-        "work.cols.year": "Año",
-        "work.cols.category": "Categoría",
-        "work.cols.stack": "Stack",
-        "statement.label": "— Filosofía",
-        "statement.text": "Diseño que<br>no pide<br><em>permiso.</em>",
-        "statement.quote": "Todos diseñamos, ya que hasta tomar una decisión es diseño.",
-        "services.title": "02 — Servicios",
-        "services.heading": "Capaci-<br>dades",
-        "services.blurb": "Trabajo en la intersección del pensamiento crítico y la ejecución visual. Cada proyecto es un sistema, no una decoración.",
-        "about.title": "03 — Sobre mí",
-        "about.heading": "Soy alguien<br><em>que cree</em><br>en lo<br>imperfecto.",
-        "about.bio": "Soy Juan Pablo Castro Casillas. Creo que el diseño más honesto nace de aceptar lo imperfecto como parte del proceso, no como un error a corregir. Mi trabajo busca traducir ideas complejas en sistemas visuales claros, directos y memorables.",
-        "about.name": "Nombre",
-        "about.role": "Diseñador",
-        "about.location": "Guadalajara, Jalisco, México",
-        "about.availability": "Disponible para proyectos",
-        "about.philosophy": "El diseño trasciende de lo visual hacia lo funcional.",
-        "footer.copy": "© 2025 Juan Pablo Castro Casillas",
-        "footer.up": "Volver arriba",
-      },
-      "en": {
-        "nav.work": "Work",
-        "nav.gallery": "Gallery",
-        "nav.audiovisual": "Audiovisual Room",
-        "nav.music": "3D Music",
-        "nav.services": "Services",
-        "nav.about": "About",
-        "hero.designer": "Creative Designer",
-        "hero.portfolio": "Portfolio 2026",
-        "hero.available": "Available",
-        "hero.location": "Guadalajara, Mexico",
-        "hero.manifesto": "The imperfect<br>is what's most <strong>real, authentic.</strong>",
-        "hero.specs.1": "Visual Design",
-        "hero.specs.2": "Brand Identity",
-        "hero.specs.3": "Digital Experience",
-        "hero.specs.4": "Art & Direction",
-        "work.title": "01 — Work",
-        "work.count": "— case studies",
-        "work.cols.num": "N°",
-        "work.cols.project": "Project",
-        "work.cols.year": "Year",
-        "work.cols.category": "Category",
-        "work.cols.stack": "Stack",
-        "statement.label": "— Philosophy",
-        "statement.text": "Design that<br>doesn't ask for<br><em>permission.</em>",
-        "statement.quote": "We all design, because even making a decision is design.",
-        "services.title": "02 — Services",
-        "services.heading": "Capabi-<br>lities",
-        "services.blurb": "I work at the intersection of critical thinking and visual execution. Every project is a system, not decoration.",
-        "about.title": "03 — About",
-        "about.heading": "I'm someone<br><em>who believes</em><br>in the<br>imperfect.",
-        "about.bio": "I'm Juan Pablo Castro Casillas. I believe the most honest design comes from accepting the imperfect as part of the process, not as an error to correct. My work seeks to translate complex ideas into clear, direct, and memorable visual systems.",
-        "about.name": "Name",
-        "about.role": "Designer",
-        "about.location": "Guadalajara, Jalisco, Mexico",
-        "about.availability": "Available for projects",
-        "about.philosophy": "Design transcends the visual into the functional.",
-        "footer.copy": "© 2025 Juan Pablo Castro Casillas",
-        "footer.up": "Back to top",
-      }
-    };
-
-    let currentLang = localStorage.getItem('lang') || 'es';
-    const langToggle = document.getElementById('lang-toggle');
-
-    function setLanguage(lang) {
-      currentLang = lang;
-      localStorage.setItem('lang', lang);
-      
-      // Update HTML lang attribute
-      document.documentElement.lang = lang;
-      document.documentElement.setAttribute('lang', lang);
-      
-      // Update all elements with data-i18n
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (translations[lang] && translations[lang][key]) {
-          el.innerHTML = translations[lang][key];
-        }
-      });
-
-      // Update button state
-      langToggle.classList.toggle('active-en', lang === 'en');
-    }
-
-    langToggle.addEventListener('click', () => {
-      setLanguage(currentLang === 'es' ? 'en' : 'es');
-    });
-
-    // Initialize language on page load
-    window.addEventListener('load', () => {
-      setLanguage(currentLang);
-    });
 
     /* ── Custom Cursor ─────────────────────────── */
     const dot  = document.getElementById('cur-dot');
@@ -1579,6 +1621,7 @@
       requestAnimationFrame(loop);
     })();
 
+    // Cursor states
     const hoverEls = document.querySelectorAll(
       'a, button, .proj-row, .svc-table tbody tr, .foot-up, .castro-flicker'
     );
@@ -1604,7 +1647,7 @@
       scrollBar.style.width = (sy / max * 100) + '%';
     }, { passive: true });
 
-    /* ── Hero Name Reveal ──────────────────────── */
+    /* ── Hero Name Reveal (after load) ──────────── */
     window.addEventListener('load', () => {
       document.querySelectorAll('.word-inner').forEach(el => {
         el.classList.add('up');
@@ -1615,34 +1658,37 @@
       }, 1400);
     });
 
-    /* ── Castro Glitch ───────────────────────── */
+    /* ── Castro Glitch/Flicker Effect ───────────── */
     const castroEl = document.querySelector('.castro-flicker');
     if (castroEl) {
       const triggerGlitch = () => {
         if (castroEl.classList.contains('glitch-active')) return;
         castroEl.classList.add('glitch-active');
         
+        // Remove class when animation finishes
         const onAnimEnd = () => {
           castroEl.classList.remove('glitch-active');
           castroEl.removeEventListener('animationend', onAnimEnd);
-          scheduleGlitch();
+          scheduleGlitch(); // Schedule next random glitch
         };
         castroEl.addEventListener('animationend', onAnimEnd);
       };
 
       const scheduleGlitch = () => {
-        const nextDelay = 4000 + Math.random() * 6000;
+        const nextDelay = 4000 + Math.random() * 6000; // 4 to 10 seconds
         setTimeout(triggerGlitch, nextDelay);
       };
 
+      // Start the cycle after page load
       window.addEventListener('load', () => {
         setTimeout(scheduleGlitch, 3000);
       });
 
+      // Hover trigger
       castroEl.addEventListener('mouseenter', triggerGlitch);
     }
 
-    /* ── Intersection Observer ─────────────────── */
+    /* ── Intersection Observer (section reveals) ─── */
     const io = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -1654,7 +1700,16 @@
 
     document.querySelectorAll('.rev').forEach(el => io.observe(el));
 
-    /* ── Smooth scroll ────────────────────────── */
+    /* ── Project Count ───────────────────────────── */
+    const rows    = document.querySelectorAll('.proj-row');
+    const counter = document.getElementById('proj-count');
+    if (rows.length === 0) {
+      counter.textContent = '— casos de estudio';
+    } else {
+      counter.textContent = rows.length + (rows.length === 1 ? ' caso de estudio' : ' casos de estudio');
+    }
+
+    /* ── Smooth scroll for anchor links ─────────── */
     document.querySelectorAll('a[href^="#"]').forEach(a => {
       a.addEventListener('click', e => {
         const target = document.querySelector(a.getAttribute('href'));
@@ -1664,6 +1719,34 @@
         }
       });
     });
+
+    /* ── Project Image Float (desktop hover) ─────── */
+    const floatImg = document.getElementById('proj-float-img');
+    let fix = -200, fiy = -200;
+
+    document.querySelectorAll('.proj-row[data-img]').forEach(row => {
+      row.addEventListener('mouseenter', () => {
+        floatImg.src = row.dataset.img;
+        floatImg.classList.add('visible');
+      });
+      row.addEventListener('mouseleave', () => {
+        floatImg.classList.remove('visible');
+      });
+      row.addEventListener('mousemove', e => {
+        fix = e.clientX + 28;
+        fiy = e.clientY - 80;
+      });
+    });
+
+    (function floatLoop() {
+      if (floatImg) {
+        const cfx = parseFloat(floatImg.style.left) || fix;
+        const cfy = parseFloat(floatImg.style.top)  || fiy;
+        floatImg.style.left = (cfx + (fix - cfx) * 0.09) + 'px';
+        floatImg.style.top  = (cfy + (fiy - cfy) * 0.09) + 'px';
+      }
+      requestAnimationFrame(floatLoop);
+    })();
   </script>
 
 </body>
